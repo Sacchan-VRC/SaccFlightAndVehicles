@@ -91,10 +91,6 @@ namespace SaccFlightAndVehicles
             else if (!CanopyOpen)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyClosing)); }
         }
-        public void SFEXT_O_RespawnButton()
-        {
-            CanopyOpening();
-        }
         public void SFEXT_G_RespawnButton()
         {
             CanopyBroken = false;
@@ -217,7 +213,7 @@ namespace SaccFlightAndVehicles
         public void CanopyBreakOff()
         {
             if (CanopyBroken) { return; }
-            Dial_Funcon.SetActive(true);
+            if (Dial_Funcon) Dial_Funcon.SetActive(true);
             CanopyOpen = true;
             CanopyBroken = true;
             CanopyAnimator.SetBool(AnimCanopyBroken, true);

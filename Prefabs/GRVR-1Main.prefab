@@ -32279,12 +32279,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1564986659178906793}
-  EntityControl: {fileID: 8496099365134152853}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 8496099365134152853}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &1564986659178906793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42359,6 +42365,7 @@ MonoBehaviour:
   AllowFiringGrounded: 1
   DisallowFireIfWind: 0
   EnableOnSelected: []
+  DT_UseToFire: 0
   HUDControl: {fileID: 8920779757100026574}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 1564986658540807043}
@@ -42795,6 +42802,8 @@ MonoBehaviour:
   - {fileID: 6866471498013573617}
   - {fileID: 6866471498141761955}
   LaunchSound: {fileID: 0}
+  ReloadSound: {fileID: 0}
+  ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
   LaunchParticle_num: 15
   AllowFiringWhenGrounded: 0
@@ -42808,8 +42817,8 @@ MonoBehaviour:
   AnimFiredTriggerName: bomblaunched
   AnimBoolStayTrueOnExit: 0
   KeyboardInput_InstantFire: 0
-  HandHeld_MachineGun: 0
   HandHeld_UseEventToFire: 0
+  DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
@@ -54561,6 +54570,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -90627,7 +90637,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &3209257280250722067
 MonoBehaviour:
   m_ObjectHideFlags: 0

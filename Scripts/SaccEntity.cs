@@ -1134,6 +1134,9 @@ namespace SaccFlightAndVehicles
         public void EntityRespawn()//can be used by simple items to respawn
         {
             if (Time.time - lastRespawnTime < 3) { return; }
+            VRCPlayerApi currentOwner = Networking.GetOwner(gameObject);
+            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero);
+            if (Occupied || _dead || BlockedCheck) { return; }
             if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld) && !CustomPickup_Synced_isHeld)
             {
                 lastRespawnTime = Time.time;
@@ -1156,7 +1159,6 @@ namespace SaccFlightAndVehicles
                     rb.position = transform.position;
                     rb.rotation = transform.rotation;
                 }
-                SendEventToExtensions("SFEXT_O_RespawnButton");
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendRespawn));
             }
         }
@@ -1445,6 +1447,26 @@ namespace SaccFlightAndVehicles
         public void SetWreckedFalse()
         {
             wrecked = false;
+        }
+        public void ReSupply()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply_Event));
+        }
+        [System.NonSerialized] public uint ReSupplied;
+        private float LastResupplyTime = 0;
+        public void ReSupply_Event()
+        {
+            ReSupplied = 0;//used to know if other scripts resupplied
+            SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
+            LastResupplyTime = Time.time;
+        }
+        public void ReFuel()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReFuel_Event));
+        }
+        public void ReFuel_Event()
+        {
+            SendEventToExtensions("SFEXT_G_ReFuel");//extensions increase the ReSupplied value too
         }
     }
 }

@@ -229,7 +229,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_ReSupply()
         {
             if (NumAAM != FullAAMs)
-            { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+            { EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1); }
             NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
             UpdateAmmoVisuals();
         }

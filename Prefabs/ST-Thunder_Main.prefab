@@ -28764,6 +28764,8 @@ MonoBehaviour:
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 100
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 10
@@ -28801,7 +28803,6 @@ MonoBehaviour:
   CurrentDistance: 0
   CurrentlyDistant: 0
   ACCELTEST: 0
-  DBGLR: {fileID: 0}
 --- !u!114 &2935594653847325616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29374,7 +29375,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  MinDamageLevel: -10
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 627101967383212201}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -29387,6 +29388,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -29704,12 +29706,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2935594654760479891}
-  EntityControl: {fileID: 2935594654239514266}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 2935594654239514266}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &2935594654760479891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35050,10 +35058,19 @@ MonoBehaviour:
   GearDown: {fileID: 0}
   Wings: []
   DoCaterpillarTracks: 0
-  TrackEmptys: []
+  TrackSourceWheels: []
+  TrackRotations: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: 1
+  TrackSpeedMulti: []
   TrackMaterialSlots: 
+  CogWheelsTrack0: []
+  CogWheelsTrack0_rotSpeeds: []
+  CogWheelsTrack1: []
+  CogWheelsTrack1_rotSpeeds: []
+  CogWheelsTrack2: []
+  CogWheelsTrack2_rotSpeeds: []
+  CogWheelsTrack3: []
+  CogWheelsTrack3_rotSpeeds: []
 --- !u!114 &2271131324685053666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46520,6 +46537,7 @@ MonoBehaviour:
   AllowFiringGrounded: 1
   DisallowFireIfWind: 0
   EnableOnSelected: []
+  DT_UseToFire: 0
   HUDControl: {fileID: 0}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 0}
@@ -73480,7 +73498,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &8171699581786078010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100313,6 +100330,7 @@ MonoBehaviour:
   WheelPoint: {fileID: 4245581326357367353}
   WheelVisual: {fileID: 8526519379945658905}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
@@ -100675,6 +100693,7 @@ MonoBehaviour:
   WheelPoint: {fileID: 6742347727811927341}
   WheelVisual: {fileID: 8925908164272044935}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
@@ -100910,6 +100929,7 @@ MonoBehaviour:
   WheelPoint: {fileID: 6244952549718896985}
   WheelVisual: {fileID: 1360454494236487788}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
@@ -101215,6 +101235,7 @@ MonoBehaviour:
   WheelPoint: {fileID: 6804424785436110686}
   WheelVisual: {fileID: 8077420114681668614}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5

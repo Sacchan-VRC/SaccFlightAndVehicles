@@ -21209,7 +21209,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &928038714535486169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57739,10 +57738,19 @@ MonoBehaviour:
   Wings:
   - {fileID: 1150038748548334083}
   DoCaterpillarTracks: 0
-  TrackEmptys: []
+  TrackSourceWheels: []
+  TrackRotations: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: 1
+  TrackSpeedMulti: []
   TrackMaterialSlots: 
+  CogWheelsTrack0: []
+  CogWheelsTrack0_rotSpeeds: []
+  CogWheelsTrack1: []
+  CogWheelsTrack1_rotSpeeds: []
+  CogWheelsTrack2: []
+  CogWheelsTrack2_rotSpeeds: []
+  CogWheelsTrack3: []
+  CogWheelsTrack3_rotSpeeds: []
 --- !u!114 &7062232292374017793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57898,12 +57906,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6141758679900960112}
-  EntityControl: {fileID: 6141758680382097273}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 6141758680382097273}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &6141758679900960112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58124,6 +58138,8 @@ MonoBehaviour:
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 100
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 0
@@ -58161,7 +58177,6 @@ MonoBehaviour:
   CurrentDistance: 0
   CurrentlyDistant: 0
   ACCELTEST: 0
-  DBGLR: {fileID: 0}
 --- !u!114 &6141758679994110547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58299,6 +58314,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &6141758680061051261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58468,6 +58485,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &6141758680273700199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58727,6 +58746,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 9052383265541724133}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -58739,6 +58759,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -59069,6 +59090,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &6141758680559467796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59239,6 +59262,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &6141758681580453100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77648,22 +77673,22 @@ PrefabInstance:
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.84152657
+      value: 0.84152585
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000049002856
+      value: 0.0000001011575
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000079800975
+      value: 0.00000015757867
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.54021573
+      value: 0.54021686
       objectReference: {fileID: 0}
     - target: {fileID: -5491882240545318371, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77743,22 +77768,22 @@ PrefabInstance:
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8415254
+      value: 0.84152585
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000052096184
+      value: -0.00000015173626
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000008115297
+      value: 0.00000023636801
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5402176
+      value: -0.54021686
       objectReference: {fileID: 0}
     - target: {fileID: -1551168584785544901, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77963,22 +77988,22 @@ PrefabInstance:
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.84152627
+      value: 0.8415258
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000015173608
+      value: 0.0000015961524
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000023636812
+      value: -0.000002313101
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5402162
+      value: -0.54021704
       objectReference: {fileID: 0}
     - target: {fileID: 3783353238668546013, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77988,22 +78013,22 @@ PrefabInstance:
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.84152645
+      value: 0.84152585
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000015173604
+      value: 0.0000016467305
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000023636817
+      value: 0.0000023918906
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.540216
+      value: 0.54021686
       objectReference: {fileID: 0}
     - target: {fileID: 5419709599708206005, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78287,11 +78312,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 5235027013741521781}
   WheelVisual: {fileID: 5910489168914116605}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.25
   WheelRadius: 0.385672
   SpringForceMulti: 7
   DampingForceMulti: 0.5
-  MaxSuspensionForce: 50
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.23
   Grip: 3
   GripCurve:
@@ -78636,11 +78662,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 2652361264034778016}
   WheelVisual: {fileID: 4575407254928553814}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.25
   WheelRadius: 0.385672
   SpringForceMulti: 7
   DampingForceMulti: 0.5
-  MaxSuspensionForce: 50
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.23
   Grip: 3
   GripCurve:
@@ -78897,11 +78924,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 1964122673162561279}
   WheelVisual: {fileID: 6005323304930896397}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.35
   WheelRadius: 0.48209
   SpringForceMulti: 9
   DampingForceMulti: 0.75
-  MaxSuspensionForce: 50
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.23
   Grip: 3.5
   GripCurve:
@@ -79176,11 +79204,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 2155946338269525905}
   WheelVisual: {fileID: 1953323024443111551}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.35
   WheelRadius: 0.48209
   SpringForceMulti: 9
   DampingForceMulti: 0.75
-  MaxSuspensionForce: 50
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.23
   Grip: 3.5
   GripCurve:

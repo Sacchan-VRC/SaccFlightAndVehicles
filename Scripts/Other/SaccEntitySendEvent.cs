@@ -11,11 +11,11 @@ namespace SaccFlightAndVehicles
     {
         public SaccEntity EntityControl;
         [Tooltip("Name of entity event to send to the SaccEntity (send to all extensions)")]
-        public string EntityEvent_Name = "SFEXT_O_RespawnButton";
+        public string EntityEventName = string.Empty;
         [Tooltip("Name of event to send to the SaccEntity (just sent to entity)")]
         public bool EntityEventGlobal = false;
         public UdonSharpBehaviour[] OtherScripts;
-        public string OtherScripts_Event_Name;
+        public string OtherScripts_Event_Name = string.Empty;
         public bool OtherScript_EventGlobal = false;
         [Tooltip("(Optional) Animator to send Trigger to")]
         [SerializeField] Animator AnimTriggerAnimator;
@@ -30,7 +30,7 @@ namespace SaccFlightAndVehicles
         {
             if (initialized) return;
             initialized = true;
-            if (EntityEvent_Name == string.Empty) { EntityEventGlobal = false; }
+            if (EntityEventName == string.Empty) { EntityEventGlobal = false; }
             if (OtherScripts_Event_Name == string.Empty) { OtherScript_EventGlobal = false; }
             if (EntityEventGlobal && OtherScript_EventGlobal) { BothGlobal = true; }
         }
@@ -73,9 +73,9 @@ namespace SaccFlightAndVehicles
         }
         public void Event_both()
         {
-            if (EntityEvent_Name != string.Empty)
+            if (EntityEventName != string.Empty)
             {
-                EntityControl.SendEventToExtensions(EntityEvent_Name);
+                EntityControl.SendEventToExtensions(EntityEventName);
             }
             if (OtherScripts_Event_Name != string.Empty)
             {
@@ -87,9 +87,9 @@ namespace SaccFlightAndVehicles
         }
         public void EntityEvent()
         {
-            if (EntityEvent_Name != string.Empty)
+            if (EntityEventName != string.Empty)
             {
-                EntityControl.SendEventToExtensions(EntityEvent_Name);
+                EntityControl.SendEventToExtensions(EntityEventName);
             }
         }
         public void NormalEvent()

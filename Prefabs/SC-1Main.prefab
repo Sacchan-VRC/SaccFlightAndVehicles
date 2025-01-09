@@ -6121,7 +6121,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &914079681194553607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26574,6 +26573,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &914079681445392395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32021,6 +32022,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 914079681947988394}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -32033,6 +32035,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -43338,12 +43341,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 914079681930388931}
-  EntityControl: {fileID: 8560298986138584170}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 8560298986138584170}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &914079681930388931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59214,6 +59223,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &914079682345404375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59379,6 +59390,7 @@ MonoBehaviour:
   SAVControl: {fileID: -1791885612027421787}
   GunAnimator: {fileID: 914079681580794731}
   GunFiringBoolName: gunfiring
+  FireKey: 32
   FireNowKey: 0
   AmmoBars:
   - {fileID: 5465751469412826418}
@@ -59388,13 +59400,14 @@ MonoBehaviour:
   HudCrosshair: {fileID: 5465751470364059121}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 12
-  GunRecoil: 150
+  RecoilForce: 1
   DoAnimBool: 1
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 1
   AllowFiringGrounded: 1
   DisallowFireIfWind: 0
   EnableOnSelected: []
+  DT_UseToFire: 0
   HUDControl: {fileID: 6993950238987410200}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 5465751470212229616}
@@ -80245,6 +80258,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &914079682730908513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85503,6 +85518,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &914079682918043358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85642,6 +85659,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &914079682919084881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96837,6 +96856,8 @@ MonoBehaviour:
   VelLiftMax: 10
   MaxGs: 25
   GDamage: 110
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 100
   GroundEffectMaxDistance: 9
   GroundEffectStrength: 6
   GroundEffectLiftMax: 12
@@ -96874,10 +96895,6 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  CrashDoesDamage: 0
-  SmallCrashDmg: 0.1
-  MediumCrashDmg: 0.25
-  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 0.45
   MissilePushForce: 1
   SeaLevel: -1080

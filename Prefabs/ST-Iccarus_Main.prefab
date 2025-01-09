@@ -1054,7 +1054,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &8371397292631183520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22796,6 +22795,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1803049917701134627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63594,10 +63595,19 @@ MonoBehaviour:
   Wings:
   - {fileID: 5390485614586610051}
   DoCaterpillarTracks: 0
-  TrackEmptys: []
+  TrackSourceWheels: []
+  TrackRotations: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: 1
+  TrackSpeedMulti: []
   TrackMaterialSlots: 
+  CogWheelsTrack0: []
+  CogWheelsTrack0_rotSpeeds: []
+  CogWheelsTrack1: []
+  CogWheelsTrack1_rotSpeeds: []
+  CogWheelsTrack2: []
+  CogWheelsTrack2_rotSpeeds: []
+  CogWheelsTrack3: []
+  CogWheelsTrack3_rotSpeeds: []
 --- !u!114 &1890296060720629965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63848,12 +63858,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056451226300}
-  EntityControl: {fileID: 3243243057054021813}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 3243243057054021813}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &3243243056451226300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64022,6 +64038,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &3243243056561536689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64180,6 +64198,8 @@ MonoBehaviour:
   RevLimiter: 8000
   MaxGs: 20
   GDamage: 12
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 100
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 0
@@ -64217,7 +64237,6 @@ MonoBehaviour:
   CurrentDistance: 0
   CurrentlyDistant: 0
   ACCELTEST: 0
-  DBGLR: {fileID: 0}
 --- !u!114 &3243243056628280735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64457,6 +64476,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &3243243056892148395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64754,6 +64775,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 6741418170646384416}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -64766,6 +64788,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -89213,11 +89236,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 6802782697197838462}
   WheelVisual: {fileID: 2861363327480148299}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.60272
   SpringForceMulti: 6
   DampingForceMulti: 0.8
-  MaxSuspensionForce: 20
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 3.2
   GripCurve:
@@ -89506,11 +89530,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 3614565497722149662}
   WheelVisual: {fileID: 1600372230470421315}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.491575
   SpringForceMulti: 8
   DampingForceMulti: 0.78
-  MaxSuspensionForce: 20
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 2.6
   GripCurve:
@@ -89837,11 +89862,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 4112528509146167146}
   WheelVisual: {fileID: 888232133081724446}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.491575
   SpringForceMulti: 8
   DampingForceMulti: 0.78
-  MaxSuspensionForce: 20
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 2.6
   GripCurve:
@@ -90098,11 +90124,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 4246101840799647001}
   WheelVisual: {fileID: 7900695418297590805}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.60272
   SpringForceMulti: 6
   DampingForceMulti: 0.8
-  MaxSuspensionForce: 20
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 3.2
   GripCurve:

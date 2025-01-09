@@ -203,7 +203,7 @@ namespace SaccFlightAndVehicles
             if (UseMainFuel || BoostOverheatMode) { return; }
             if (_BoostRemaining != BoostInSeconds)
             {
-                SGVControl.SetProgramVariable("ReSupplied", (int)SGVControl.GetProgramVariable("ReSupplied") + 1);
+                EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1);
                 if ((bool)SGVControl.GetProgramVariable("IsOwner"))
                 {
                     BoostRemaining = Mathf.Min(_BoostRemaining + (BoostInSeconds / ResupplyTime), BoostInSeconds);

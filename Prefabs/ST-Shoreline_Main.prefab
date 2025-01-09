@@ -1539,12 +1539,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1217889975052110448}
-  EntityControl: {fileID: 1217889975573313657}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: 1217889975573313657}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &1217889975052110448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2022,6 +2028,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -2381,7 +2388,6 @@ MonoBehaviour:
   CurrentDistance: 0
   CurrentlyDistant: 0
   ACCELTEST: 0
-  DBGLR: {fileID: 0}
 --- !u!114 &1217889975697026387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7734,8 +7740,11 @@ MonoBehaviour:
   - {fileID: 264292837108118855}
   DoCaterpillarTracks: 0
   TrackSourceWheels: []
+  TrackRotations: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: {x: 0, y: 0.01}
+  TrackSpeedMulti:
+  - {x: 4.82321e-40, y: 0}
+  - {x: 0, y: 0}
   TrackMaterialSlots: 
   CogWheelsTrack0: []
   CogWheelsTrack0_rotSpeeds: []
@@ -14343,7 +14352,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &5316971469266767980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68133,6 +68141,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8645561969618739443}
   SGVControl: {fileID: 1217889975697026386}
   Dial_Funcon: {fileID: 6294896692845356055}
+  Funcon_Invert: 0
   ToggledCoMPos: {fileID: 0}
   floatSGVNames: []
   floatSGVToggledValues: []

@@ -200,7 +200,7 @@ namespace SaccFlightAndVehicles
             if (NumAGM != FullAGMs)
             {
                 if (SAVControl)
-                { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+                { EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1); }
             }
             NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
             UpdateAmmoVisuals();

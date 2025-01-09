@@ -425,7 +425,6 @@ namespace SaccFlightAndVehicles
         private float SoundBarrier;
         [System.NonSerializedAttribute] public float FullFuel;
         private float LowFuelDivider;
-        private float LastResupplyTime = 0;
         [System.NonSerializedAttribute] public bool Asleep;
         private bool Initialized;
         [System.NonSerializedAttribute] public bool IsAirVehicle = true;//could be checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
@@ -643,7 +642,6 @@ namespace SaccFlightAndVehicles
             }
             get => DisablePhysicsApplication;
         }
-        [System.NonSerializedAttribute] public int ReSupplied = 0;
 #if UNITY_EDITOR
         [Header("Debug:")]
         public bool SetVel;
@@ -1925,20 +1923,12 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
             }
         }
-        public void SFEXT_O_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply));
-        }
-        public void ReSupply()
-        {
-            ReSupplied = 0;//used to know if other scripts resupplied
             if ((Fuel < FullFuel - 10 || Health != FullHealth))
             {
-                ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
+                EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
-            EntityControl.SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
-
-            LastResupplyTime = Time.time;
 
             if (IsOwner)
             {
@@ -1954,25 +1944,21 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SFEXT_O_RespawnButton()//called when using respawn button
+        public void SFEXT_G_RespawnButton()//called globally when using respawn button
         {
-            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
-            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
-            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
-            Networking.SetOwner(localPlayer, EntityControl.gameObject);
-            Atmosphere = 1;//vehiclemoving optimization requires this to be here
-                           //synced variables
-            Health = FullHealth;
-            Fuel = FullFuel;
-            EngineOutput = 0;
-            VTOLAngle = VTOLDefaultValue;
-            VTOLAngleInput = VTOLDefaultValue;
-            VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
-            SetRespawnPos();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-        }
-        public void ResetStatus()//called globally when using respawn button
-        {
+            if (IsOwner)
+            {
+                Atmosphere = 1;//vehiclemoving optimization requires this to be here
+                               //synced variables
+                Health = FullHealth;
+                Fuel = FullFuel;
+                EngineOutput = 0;
+                VTOLAngle = VTOLDefaultValue;
+                VTOLAngleInput = VTOLDefaultValue;
+                VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
+                SetRespawnPos();
+            }
+
             if (_EngineOn)
             {
                 SetEngineOff();
@@ -1989,7 +1975,6 @@ namespace SaccFlightAndVehicles
             VehicleForce = Vector3.zero;
             VehicleTorque = Vector3.zero;
             EntityControl.SetWreckedFalse();
-            EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
         }
         public void SFEXT_L_BulletHit()
         {

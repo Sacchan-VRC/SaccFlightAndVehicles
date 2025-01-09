@@ -1125,7 +1125,7 @@ namespace SaccFlightAndVehicles
         }
         public void ResupplySound()
         {
-            if ((int)SAVControl.GetProgramVariable("ReSupplied") > 0)
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
             {
                 if (ReSupply)
                 {

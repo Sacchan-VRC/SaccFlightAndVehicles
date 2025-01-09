@@ -232,7 +232,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_ReSupply()
         {
             if (SAVControl && NumBomb != FullBombs)
-            { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+            { EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1); }
             NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
             BombPoint = 0;
             UpdateAmmoVisuals();

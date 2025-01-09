@@ -92,8 +92,9 @@ namespace SaccFlightAndVehicles
             else
             { SetFlapsOn(); }
         }
-        public void SFEXT_O_RespawnButton()
+        public void SFEXT_G_RespawnButton()
         {
+            if (!EntityControl.IsOwner) return;
             if (DefaultFlapsOff)
             { SetFlapsOff(); }
             else

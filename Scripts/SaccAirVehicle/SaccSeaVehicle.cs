@@ -233,7 +233,6 @@ namespace SaccFlightAndVehicles
         private float SoundBarrier;
         [System.NonSerializedAttribute] public float FullFuel;
         private float LowFuelDivider;
-        private float LastResupplyTime = 0;
         [System.NonSerializedAttribute] public float FullGunAmmo;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
@@ -413,7 +412,6 @@ namespace SaccFlightAndVehicles
         private float JoystickValueLastFrame;
         private float JoyStickValue;
         Vector3 CompareAngleLastFrame;
-        [System.NonSerializedAttribute] public int ReSupplied = 0;
         public void SFEXT_L_EntityStart()
         {
             VehicleGameObj = EntityControl.gameObject;
@@ -1369,20 +1367,13 @@ namespace SaccFlightAndVehicles
             if (EngineOnOnEnter && Occupied)
             { SetEngineOn(); }
         }
-        public void SFEXT_O_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply));
-        }
-        public void ReSupply()
-        {
-            ReSupplied = 0;//used to know if other scripts resupplied
             if ((Fuel < FullFuel - 10 || Health != FullHealth))
             {
-                ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
+                EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
             EntityControl.SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
-
-            LastResupplyTime = Time.time;
 
             if (IsOwner)
             {
@@ -1398,21 +1389,16 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SFEXT_O_RespawnButton()//called when using respawn button
+
+        public void SFEXT_G_RespawnButton()//called globally when using respawn button
         {
-            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
-            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
-            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
-            Networking.SetOwner(localPlayer, EntityControl.gameObject);
-            IsOwner = true;
-            //synced variables
-            Health = FullHealth;
-            Fuel = FullFuel;
-            SetRespawnPos();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-        }
-        public void ResetStatus()//called globally when using respawn button
-        {
+            if (IsOwner)
+            {
+                //synced variables
+                Health = FullHealth;
+                Fuel = FullFuel;
+                SetRespawnPos();
+            }
             if (_EngineOn)
             {
                 SetEngineOff();
@@ -1422,7 +1408,7 @@ namespace SaccFlightAndVehicles
             //these two make it invincible and unable to be respawned again for 5s
             EntityControl.dead = true;
             SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
-            EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
+            EntityControl.SendEventToExtensions("");
             if (LowFuelLastFrame)
             { SendNotLowFuel(); }
             if (NoFuelLastFrame)

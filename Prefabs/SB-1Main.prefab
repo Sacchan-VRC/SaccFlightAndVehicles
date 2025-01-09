@@ -31592,6 +31592,7 @@ MonoBehaviour:
   SAVControl: {fileID: 2926696625540112212}
   GunAnimator: {fileID: 2934804655656756586}
   GunFiringBoolName: gunfiring
+  FireKey: 32
   FireNowKey: 0
   AmmoBars:
   - {fileID: 8101121279732142817}
@@ -31601,13 +31602,14 @@ MonoBehaviour:
   HudCrosshair: {fileID: 8101121278964104237}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 12
-  GunRecoil: 150
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
   AllowFiringGrounded: 1
   DisallowFireIfWind: 0
   EnableOnSelected: []
+  DT_UseToFire: 0
   HUDControl: {fileID: -1311050107183977077}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 8101121279009016025}
@@ -53332,6 +53334,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &2934804654584033638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98944,12 +98948,18 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2934804655299911390}
-  EntityControl: {fileID: -5424269735798070188}
-  EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityControl: {fileID: 0}
+  EntityEventName: 
   EntityEventGlobal: 0
-  OtherScripts: []
-  OtherScripts_Event_Name: 
+  OtherScripts:
+  - {fileID: -5424269735798070188}
+  OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  AnimTriggerAnimator: {fileID: 0}
+  AnimTriggerName: 
+  AnimTrigger_Global: 0
+  Sound: {fileID: 0}
+  Sound_Global: 0
 --- !u!114 &2934804655299911390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99479,7 +99489,6 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
-  EventName: SFEXT_O_ReSupply
 --- !u!114 &2934804655443657180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100477,6 +100486,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &2934804655606403472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100795,6 +100806,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 2934804655618455735}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -100807,6 +100819,7 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
   PassengerFunctionControllers: []
   AAMTargets: []
   DialFuncPos: 0
@@ -106728,6 +106741,8 @@ MonoBehaviour:
   VelLiftMax: 0
   MaxGs: 20
   GDamage: 20
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 100
   GroundEffectMaxDistance: 0
   GroundEffectStrength: 0
   GroundEffectLiftMax: 0
@@ -106765,10 +106780,6 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  CrashDoesDamage: 0
-  SmallCrashDmg: 0.1
-  MediumCrashDmg: 0.25
-  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080

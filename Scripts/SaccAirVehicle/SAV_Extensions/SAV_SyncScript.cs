@@ -269,13 +269,13 @@ namespace SaccFlightAndVehicles
         { Occupied = false; }
         public void SFEXT_O_PilotExit()
         { Piloting = false; }
-        public void SFEXT_O_RespawnButton()
-        {
-            ResetSyncTimes();
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
-        }
         public void SFEXT_G_RespawnButton()
         {
+            if (IsOwner)
+            {
+                ResetSyncTimes();
+                nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
+            }
             ExitIdleMode();
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;

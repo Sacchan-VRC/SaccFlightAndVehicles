@@ -10,7 +10,7 @@ namespace SaccFlightAndVehicles
     public class SaccResupplyTrigger : UdonSharpBehaviour
     {
         [Tooltip("Object to send event to")]
-        public SaccEntity SendEventTo;
+        public UdonSharpBehaviour SendEventTo;
         [Tooltip("Delay after entering a respply zone before the event is first sent")]
         public float ResupplyInitialDelay = 1;
         [Tooltip("Delay between resupplies")]
@@ -18,7 +18,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Layer to check for resupply triggers on")]
         public int ResupplyLayer = 27;
         [Tooltip("Name of event sent by this trigger")]
-        public string EventName = "SFEXT_O_ReSupply";
         private float LastResupplyTime = 0;
         private int NumTriggers = 0;
         private bool InResupplyZone;
@@ -35,7 +34,7 @@ namespace SaccFlightAndVehicles
                 if (Time.time - LastResupplyTime > ResupplyDelay)
                 {
                     LastResupplyTime = Time.time;
-                    SendEventTo.SendEventToExtensions(EventName);
+                    SendEventTo.SendCustomEvent("ReSupply");
                 }
             }
         }

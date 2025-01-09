@@ -758,17 +758,18 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_RespawnButton()
         {
+            if (IsOwner)
+            {
+                PlayReelIn = false;
+                HookLaunched = false;
+                PlayReelIn = true;
+                HookAttachPoint = -Vector3.zero;
+                RequestSerialization();
+            }
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
         }
-        public void SFEXT_O_RespawnButton()
-        {
-            PlayReelIn = false;
-            HookLaunched = false;
-            PlayReelIn = true;
-            HookAttachPoint = -Vector3.zero;
-            RequestSerialization();
-        }
+
         public void SFEXT_G_PilotExit()
         {
             TriggerDesktop = false;

@@ -139,6 +139,7 @@ namespace SaccFlightAndVehicles
             if (_firing) { Firing = false; }
             gameObject.SetActive(true);
             RequestSerialization();
+            OnDeserialization();
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -158,19 +159,21 @@ namespace SaccFlightAndVehicles
             Selected = false;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(false); }
         }
-        public void SFEXT_O_ReSupply()
-        {
-            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-            RequestSerialization();
-            UpdateAmmoVisuals();
-        }
         public void SFEXT_G_ReSupply()
         {
+            if (IsOwner)
+            {
+                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+                RequestSerialization();
+                OnDeserialization();
+            }
             if (SAVControl && GunAmmoInSeconds != FullGunAmmoInSeconds)
-            { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+            { EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1); }
+        }
+        public override void OnDeserialization()
+        {
             UpdateAmmoVisuals();
         }
-
         public void UpdateAmmoVisuals()
         {
             for (int i = 0; i < AmmoBars.Length; i++)
@@ -178,16 +181,14 @@ namespace SaccFlightAndVehicles
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
             }
         }
-        public void SFEXT_O_RespawnButton()
-        {
-            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-            RequestSerialization();
-            UpdateAmmoVisuals();
-        }
         public void SFEXT_G_RespawnButton()
         {
-            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-            UpdateAmmoVisuals();
+            if (IsOwner)
+            {
+                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+                RequestSerialization();
+                UpdateAmmoVisuals();
+            }
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
         }
@@ -283,6 +284,7 @@ namespace SaccFlightAndVehicles
                 {
                     Firing = false;
                     RequestSerialization();
+                    OnDeserialization();
                     // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                 }
             }

@@ -185,11 +185,9 @@ namespace SaccFlightAndVehicles
         private bool Passenger;
         private float LastHitTime;
         private float PredictedHealth;
-        private int ReSupplied;
         [System.NonSerializedAttribute] public float PlayerThrottle;
         [System.NonSerializedAttribute] public float VehicleSpeed;//set by syncscript if not owner
         [System.NonSerializedAttribute] public bool MovingForward;
-        [System.NonSerialized] public float LastResupplyTime;
         //Quaternion VehicleRotLastFrameThrottle;
         Quaternion VehicleRotLastFrameR;
         [System.NonSerializedAttribute] public bool WheelGripLastFrameR = false;
@@ -1148,25 +1146,19 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public int NumPassengers;
         [System.NonSerializedAttribute] public bool IsOwner;
         [System.NonSerializedAttribute] public bool UsingManualSync;
-        public void SFEXT_O_RespawnButton()//called when using respawn button
+        public void SFEXT_G_RespawnButton()//called globally when using respawn button
         {
-            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
-            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && VehicleSpeed > .2f;
-            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
-            Networking.SetOwner(localPlayer, EntityControl.gameObject);
-            IsOwner = true;
-            Fuel = FullFuel;
-            Health = FullHealth;
-            YawInput = 0;
-            AutoSteerLerper = 0;
-            SetRespawnPos();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-        }
-        public void ResetStatus()//called globally when using respawn button
-        {
+            if (IsOwner)
+            {
+                IsOwner = true;
+                Fuel = FullFuel;
+                Health = FullHealth;
+                YawInput = 0;
+                AutoSteerLerper = 0;
+                SetRespawnPos();
+            }
             EntityControl.dead = true;
             SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
-            EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -1410,20 +1402,12 @@ namespace SaccFlightAndVehicles
         {
             EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
         }
-        public void SFEXT_O_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply));
-        }
-        public void ReSupply()
-        {
-            ReSupplied = 0;//used to know if other scripts resupplied
             if ((Fuel < FullFuel - 10 || Health != FullHealth))
             {
-                ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
+                EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
-            EntityControl.SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
-
-            LastResupplyTime = Time.time;
 
             if (IsOwner)
             {
