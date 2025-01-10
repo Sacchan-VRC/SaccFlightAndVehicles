@@ -186,6 +186,11 @@ namespace SaccFlightAndVehicles
         {
             RotExtrapolation_Raw = Extrapolation_Smooth = L_LastGunRotation = L_GunRotation = TurretRotatorVert.localRotation = TurretRotatorHor.localRotation = Quaternion.identity;
         }
+        public void SFEXT_G_ReAppear()
+        {
+            HORSYNC.localRotation = Quaternion.identity;
+            VERTSYNC.localRotation = Quaternion.identity;
+        }
         private void Update()
         {
             if (Manning)
