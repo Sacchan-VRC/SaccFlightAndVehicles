@@ -35,6 +35,9 @@ namespace SaccFlightAndVehicles
         public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
         [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
         public bool ThrowSpaceVehicle = false;
+        [Tooltip("For colliders using the armor system (Tanks), final damage = base damage * 2^(ArmorPenetrationLevel - ColliderArmorLevel)")]
+        [Range(0, 14)]
+        public int ArmorPenetrationLevel = 5;
         private Animator MissileAnimator;
         [System.NonSerialized] public SaccEntity EntityControl;
         private bool StartTrack = false;
@@ -140,7 +143,51 @@ namespace SaccFlightAndVehicles
             Exploding = false;
         }
         private void OnCollisionEnter(Collision other)
-        { if (!Exploding) { hitwater = false; Explode(); } }
+        {
+            // Ricochets could be added here
+            if (IsOwner && other.gameObject)
+            {
+                SaccEntity HitVehicle = other.gameObject.GetComponent<SaccEntity>();
+                if (HitVehicle)
+                {
+                    int dmgLvl = ArmorPenetrationLevel;
+
+                    int Armor = 0;
+                    if (other.collider.transform.childCount > 0)
+                    {
+                        string pname = other.collider.transform.GetChild(0).name;
+                        getArmorValue(pname, ref Armor);
+                    }
+                    bool DoDamage = true;
+                    dmgLvl = dmgLvl - Armor;
+                    if (dmgLvl > 0) DoDamage = true;
+                    if (DoDamage) HitVehicle.WeaponDamageVehicle(dmgLvl, gameObject);
+                }
+            }
+            if (!Exploding)
+            {
+                hitwater = false; Explode();
+            }
+        }
+        void getArmorValue(string name, ref int armor)
+        {
+            int index = name.LastIndexOf(':');
+            if (index > -1)
+            {
+                name = name.Substring(index);
+                if (name.Length == 3)
+                {
+                    if (name[1] >= '0' && name[1] <= '9')
+                    {
+                        if (name[2] >= '0' && name[2] <= '9')
+                        {
+                            armor = 10 * (name[1] - 48);
+                            armor += name[2] - 48;
+                        }
+                    }
+                }
+            }
+        }
         private void OnTriggerEnter(Collider other)
         {
             if (other && other.gameObject.layer == 4 /* water */)
