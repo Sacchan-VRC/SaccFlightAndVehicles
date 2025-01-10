@@ -72,8 +72,24 @@ namespace SaccFlightAndVehicles
         [SerializeField] Transform[] CogWheelsTrack3;
         [SerializeField] float[] CogWheelsTrack3_rotSpeeds;
         private Material[] Tracks = new Material[0];
+        [Tooltip("Object that shows the driver where the turret is pointing")]
+        [SerializeField] Transform DriverTurretAngleIndicator;
+        [Tooltip("Object that shows the driver where the commander is pointing")]
+        [SerializeField] Transform DriverCommanderAngleIndicator;
+        [Tooltip("Object that shows the gunner where the tank is pointing")]
+        [SerializeField] Transform GunnerTankAngleIndicator;
+        [Tooltip("Object that shows the gunner where the commander is pointing")]
+        [SerializeField] Transform GunnerCommanderAngleIndicator;
+        [Tooltip("Object that shows the commander where the tank is pointing")]
+        [SerializeField] Transform CommanderTankAngleIndicator;
+        [Tooltip("Object that shows the commander where the gunner is pointing")]
+        [SerializeField] Transform CommanderTurretAngleIndicator;
+        [Tooltip("For checking angle for angle indicator")]
+        [SerializeField] Transform Turret;
+        [SerializeField] Transform Commander;
         private SaccEntity EntityControl;
         private Animator VehicleAnimator;
+        private Transform VehicleTransform;
         private bool InWater;
         private bool Occupied;
         private bool Sleeping = true;
@@ -119,8 +135,9 @@ namespace SaccFlightAndVehicles
         VRCPlayerApi localPlayer;
         public void SFEXT_L_EntityStart()
         {
-            VehicleAnimator = ((SaccEntity)SGVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
-            CenterOfMass = ((SaccEntity)SGVControl.GetProgramVariable("EntityControl")).CenterOfMass;
+            VehicleAnimator = EntityControl.GetComponent<Animator>();
+            CenterOfMass = EntityControl.CenterOfMass;
+            VehicleTransform = EntityControl.transform;
             DriveWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("DriveWheels");
             SteerWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("SteerWheels");
             OtherWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("OtherWheels");
@@ -290,7 +307,30 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            if (!Occupied)
+            if (InVehicle)
+            {
+                if (Turret)
+                {
+                    float angleTurret = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(Turret.forward, VehicleTransform.up), VehicleTransform.up);
+                    if (DriverTurretAngleIndicator)
+                        DriverTurretAngleIndicator.localRotation = Quaternion.Euler(0, 0, angleTurret);
+                    if (GunnerTankAngleIndicator)
+                        GunnerTankAngleIndicator.localRotation = Quaternion.Euler(0, 0, -angleTurret);
+                    if (Commander)
+                    {
+                        float angleCommander = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(Commander.forward, VehicleTransform.up), VehicleTransform.up);
+                        if (DriverCommanderAngleIndicator)
+                            DriverCommanderAngleIndicator.localRotation = Quaternion.Euler(0, 0, angleCommander);
+                        if (GunnerCommanderAngleIndicator)
+                            GunnerCommanderAngleIndicator.localRotation = Quaternion.Euler(0, 0, angleTurret - angleCommander);
+                        if (CommanderTankAngleIndicator)
+                            CommanderTankAngleIndicator.localRotation = Quaternion.Euler(0, 0, -angleCommander);
+                        if (CommanderTurretAngleIndicator)
+                            CommanderTurretAngleIndicator.localRotation = Quaternion.Euler(0, 0, -angleCommander + angleTurret);
+                    }
+                }
+            }
+            else if (!Occupied)
             {
                 if (DoEffects > 10)
                 {
