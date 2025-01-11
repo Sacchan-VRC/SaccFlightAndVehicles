@@ -422,7 +422,7 @@ namespace SaccFlightAndVehicles
 
 
             localPlayer = Networking.LocalPlayer;
-            if (localPlayer == null)
+            if (!Utilities.IsValid(localPlayer))
             {
                 InEditor = true;
                 Piloting = true;
@@ -1297,22 +1297,26 @@ namespace SaccFlightAndVehicles
         {
             //Debug.Log("TouchDown");
             if (GroundedLastFrame) { return; }
-            GroundedLastFrame = true;
             Taxiing = true;
+            Grounded = false;
+            GroundedLastFrame = true;
             EntityControl.SendEventToExtensions("SFEXT_G_TouchDown");
         }
         public void TouchDownWater()
         {
             //Debug.Log("TouchDownWater");
             if (FloatingLastFrame) { return; }
-            FloatingLastFrame = true;
             Taxiing = true;
+            Floating = true;
+            FloatingLastFrame = true;
             EntityControl.SendEventToExtensions("SFEXT_G_TouchDownWater");
         }
         public void TakeOff()
         {
             //Debug.Log("TakeOff");
             Taxiing = false;
+            Floating = false;
+            Grounded = false;
             FloatingLastFrame = false;
             GroundedLastFrame = false;
             EntityControl.SendEventToExtensions("SFEXT_G_TakeOff");

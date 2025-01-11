@@ -792,6 +792,7 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)
             {
+                if (player == localPlayer) { return; }
                 SendEventToExtensions("SFEXT_O_OnPlayerJoined");
                 if (Holding)
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup)); }

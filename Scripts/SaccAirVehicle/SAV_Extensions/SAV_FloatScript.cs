@@ -87,7 +87,7 @@ namespace SaccFlightAndVehicles
             _floatForce = FloatForce;
 
             localPlayer = Networking.LocalPlayer;
-            if (localPlayer == null)
+            if (!Utilities.IsValid(localPlayer))
             { InEditor = true; }
 
             VehicleTransform = VehicleRigidbody.transform;
@@ -164,6 +164,31 @@ namespace SaccFlightAndVehicles
             {
                 FindDepth(i);
             }
+        }
+        float SimpleSurfaceHeight;
+        public float FindDepthSimple()
+        {
+            float result;
+            RaycastHit checkhit;
+            if (Physics.Raycast(EntityControl.CenterOfMass.position, Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                if (Physics.Raycast(checkhit.point, -Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+                {
+                    result = checkhit.point.y;
+                }
+                else
+                { result = float.MinValue; }
+            }
+            else
+            {
+                if (Physics.Raycast(EntityControl.CenterOfMass.position + (Vector3.up * 100f), -Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+                {
+                    result = checkhit.point.y;
+                }
+                else
+                { result = float.MinValue; }
+            }
+            return result;
         }
         public void FindDepth(int i)
         {

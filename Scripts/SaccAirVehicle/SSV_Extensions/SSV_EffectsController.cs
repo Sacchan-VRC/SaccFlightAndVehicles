@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using TMPro;
 
 namespace SaccFlightAndVehicles
 {
@@ -15,7 +16,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
         public float PlaySplashSpeed = 7;
         public Transform[] FlatWaterEffects;
-        public UdonSharpBehaviour FloatScript;
+        public SAV_FloatScript FloatScript;
         [System.NonSerialized] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
         [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
@@ -54,6 +55,7 @@ namespace SaccFlightAndVehicles
             else { InEditor = false; }
             IsOwner = EntityControl.IsOwner;
             VehicleAnimator.SetBool("owner", IsOwner);
+            VehicleAnimator.SetBool("onwater", true);
 
             if (PrintAnimHashNamesOnStart)
             { PrintStringHashes(); }
@@ -103,7 +105,13 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(HEALTH_STRING, (float)SSVControl.GetProgramVariable("Health") * FullHealthDivider);
             VehicleAnimator.SetFloat(MACH10_STRING, spd * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
 
-            float watersurface = (float)FloatScript.GetProgramVariable("SurfaceHeight") + .02f;
+            if (IsOwner)
+                watersurface = FloatScript.SurfaceHeight + .02f;
+            else if (Time.time - lastSurfaceCheck > 1)
+            {
+                lastSurfaceCheck = Time.time;
+                watersurface = FloatScript.FindDepthSimple() + .02f;
+            }
 
             for (int x = 0; x < FlatWaterEffectsLength; x++)
             {
@@ -117,6 +125,8 @@ namespace SaccFlightAndVehicles
                 FlatWaterEffects[x].rotation = newrot;
             }
         }
+        float watersurface;
+        float lastSurfaceCheck;
         public void SFEXT_G_PilotEnter()
         {
             DoEffects = 0f;
