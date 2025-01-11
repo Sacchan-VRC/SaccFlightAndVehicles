@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
+using TMPro;
 
 namespace SaccFlightAndVehicles
 {
@@ -19,6 +20,8 @@ namespace SaccFlightAndVehicles
         public GameObject AGM;
         public int NumAGM = 4;
         public Text HUDText_AGM_ammo;
+        public TextMeshPro HUDText_AGM_ammo_TMP;
+        public TextMeshProUGUI HUDText_AGM_ammo_TMPUGUI;
         [Tooltip("Camera that renders onto the AtGScreen")]
         public Camera AtGCam;
         [Tooltip("Screen that displays target, that is enabled when selected")]
@@ -145,6 +148,8 @@ namespace SaccFlightAndVehicles
             reloadspeed = FullAGMs / FullReloadTimeSec;
             FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
             if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+            if (HUDText_AGM_ammo_TMP) { HUDText_AGM_ammo_TMP.text = NumAGM.ToString("F0"); }
+            if (HUDText_AGM_ammo_TMPUGUI) { HUDText_AGM_ammo_TMPUGUI.text = NumAGM.ToString("F0"); }
         }
         private GameObject InstantiateWeapon()
         {

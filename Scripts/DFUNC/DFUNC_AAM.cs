@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
+using TMPro;
 
 namespace SaccFlightAndVehicles
 {
@@ -144,6 +145,8 @@ namespace SaccFlightAndVehicles
             { distance_from_head = 1.333f; }
 
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+            if (HUDText_AAM_ammo_TMP) { HUDText_AAM_ammo_TMP.text = NumAAM.ToString("F0"); }
+            if (HUDText_AAM_ammo_TMPUGUI) { HUDText_AAM_ammo_TMPUGUI.text = NumAAM.ToString("F0"); }
 
             NumChildrenStart = transform.childCount;
             if (AAM)
@@ -549,6 +552,8 @@ namespace SaccFlightAndVehicles
 
         //hud stuff
         public Text HUDText_AAM_ammo;
+        public TextMeshPro HUDText_AAM_ammo_TMP;
+        public TextMeshProUGUI HUDText_AAM_ammo_TMPUGUI;
         [Tooltip("Hud element to highlight current target")]
         public Transform AAMTargetIndicator;
         private float distance_from_head;
