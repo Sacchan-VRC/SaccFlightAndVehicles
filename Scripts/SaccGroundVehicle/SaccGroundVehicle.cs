@@ -159,6 +159,8 @@ namespace SaccFlightAndVehicles
         public bool TankMode;
         [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
+        [Tooltip("Make tank slower by this ratio when reversing")]
+        public float TANK_ReverseSpeed = 0.75f;
         [Tooltip("Multiply how much the VR throttle moves from hand movement, for DFUNCS and TankMode")]
         [System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
         [Header("Debug")]
@@ -628,8 +630,10 @@ namespace SaccFlightAndVehicles
                         // bool RightNeg = RightThrottle < 0;
                         // float RGearRatio = RightNeg ? -GearRatio : GearRatio;
                         // float LGearRatio = LeftNeg ? -GearRatio : GearRatio;
-                        float LGearRatio = Mathf.LerpUnclamped(0, GearRatio, LeftThrottle);
-                        float RGearRatio = Mathf.LerpUnclamped(0, GearRatio, RightThrottle);
+                        float reverseSpeedL = LeftThrottle < 0 ? TANK_ReverseSpeed : 1;
+                        float reverseSpeedR = LeftThrottle < 0 ? TANK_ReverseSpeed : 1;
+                        float LGearRatio = Mathf.LerpUnclamped(0, GearRatio, LeftThrottle * reverseSpeedL);
+                        float RGearRatio = Mathf.LerpUnclamped(0, GearRatio, RightThrottle * reverseSpeedR);
 
                         // float LClutch = Clutch;
                         // float RClutch = Clutch;
