@@ -87,7 +87,12 @@ namespace SaccFlightAndVehicles
                     {
                         if (hit.collider)
                         {
-                            float tempdist = Vector3.Distance(hit.collider.ClosestPoint(value), value);
+                            MeshCollider mc = hit.collider.GetComponent<MeshCollider>();
+                            float tempdist;
+                            if (mc && !mc.convex)
+                                tempdist = Vector3.Distance(hit.collider.transform.position, value);
+                            else
+                                tempdist = Vector3.Distance(hit.collider.ClosestPoint(value), value);
                             if (tempdist < NearestDist)
                             {
                                 NearestDist = tempdist;
