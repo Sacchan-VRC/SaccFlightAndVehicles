@@ -21,6 +21,8 @@ namespace SaccFlightAndVehicles
         public int DefaultPage = 0;
         [Tooltip("Overrides Default Page")]
         public bool StartOnRandomPage = false;
+        [Tooltip("Enable if you just want to click on the object (as opposed to menu buttons) to change race")]
+        public bool EnableInteract = false;
         [Tooltip("CB_PageChange")]
         public UdonSharpBehaviour[] PageChangeCallbacks;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(current))] public int _current = -1;
@@ -79,6 +81,7 @@ namespace SaccFlightAndVehicles
             { current = Random.Range(0, ToggleObjs.Length); }
             else
             { current = DefaultPage; }
+            DisableInteractive = !EnableInteract;
         }
         public override void Interact()
         {
