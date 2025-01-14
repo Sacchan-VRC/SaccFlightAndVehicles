@@ -32,6 +32,7 @@ namespace SaccFlightAndVehicles
         public Transform ElevationIndicator;
         [Tooltip("Hud element that shows yaw angle")]
         public Transform HeadingIndicator;
+        [Range(-180, 180), SerializeField] float HeadingOffset = 0;
         [Tooltip("Hud element that shows vehicle's direction of movement")]
         public Transform VelocityIndicator;
         private SaccEntity EntityControl;
@@ -104,7 +105,12 @@ namespace SaccFlightAndVehicles
 
                 //Heading indicator
                 Vector3 VehicleEuler = EntityControl.transform.rotation.eulerAngles;
-                if (HeadingIndicator) { HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -VehicleEuler.y, 0)); }
+
+                float angleCompass = VehicleEuler.y + HeadingOffset;
+                if (angleCompass > 360) angleCompass -= 360;
+                if (angleCompass < 0) angleCompass += 360;
+                angleCompass -= 180;
+                if (HeadingIndicator) { HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -angleCompass, 0)); }
                 /////////////////
 
                 //Elevation indicator
