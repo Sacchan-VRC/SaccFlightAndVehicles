@@ -150,6 +150,7 @@ namespace SaccFlightAndVehicles
         }
         private void OnCollisionEnter(Collision other)
         {
+            if (Exploding) return;
             // Ricochets could be added here
             if (IsOwner && other.gameObject)
             {
@@ -171,10 +172,8 @@ namespace SaccFlightAndVehicles
                     if (DoDamage) HitVehicle.WeaponDamageVehicle(dmgLvl, gameObject);
                 }
             }
-            if (!Exploding)
-            {
-                hitwater = false; Explode();
-            }
+            hitwater = false;
+            Explode();
         }
         void getArmorValue(string name, ref int armor)
         {
