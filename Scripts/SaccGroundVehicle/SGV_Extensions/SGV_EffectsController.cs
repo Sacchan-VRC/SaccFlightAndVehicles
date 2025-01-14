@@ -300,6 +300,16 @@ namespace SaccFlightAndVehicles
             }
             if (InVehicle)
             {
+                if (DriverHeading)
+                {
+                    float heading = Commander.eulerAngles.y + HeadingOffset;
+                    if (heading > 360) heading -= 360;
+                    if (heading < 0) heading += 360;
+                    heading -= 180;
+                    Vector3 pos = DriverHeading.localPosition;
+                    pos.x = heading / 10;
+                    DriverHeading.localPosition = pos;
+                }
                 if (Turret)
                 {
                     float angleTurret = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(Turret.forward, VehicleTransform.up), VehicleTransform.up);
@@ -307,12 +317,32 @@ namespace SaccFlightAndVehicles
                     {
                         TurretAngleIndicator[i].localRotation = Quaternion.Euler(0, 0, angleTurret);
                     }
+                    if (GunnerHeading)
+                    {
+                        float heading = Commander.eulerAngles.y + HeadingOffset;
+                        if (heading > 360) heading -= 360;
+                        if (heading < 0) heading += 360;
+                        heading -= 180;
+                        Vector3 pos = GunnerHeading.localPosition;
+                        pos.x = heading / 10;
+                        GunnerHeading.localPosition = pos;
+                    }
                     if (Commander)
                     {
                         float angleCommander = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(Commander.forward, VehicleTransform.up), VehicleTransform.up);
                         for (int i = 0; i < CommanderAngleIndicator.Length; i++)
                         {
                             CommanderAngleIndicator[i].localRotation = Quaternion.Euler(0, 0, angleCommander);
+                        }
+                        if (CommanderHeading)
+                        {
+                            float heading = Commander.eulerAngles.y + HeadingOffset;
+                            if (heading > 360) heading -= 360;
+                            if (heading < 0) heading += 360;
+                            heading -= 180;
+                            Vector3 pos = CommanderHeading.localPosition;
+                            pos.x = heading / 10;
+                            CommanderHeading.localPosition = pos;
                         }
                     }
                 }
@@ -329,6 +359,10 @@ namespace SaccFlightAndVehicles
                 DoEffects += Time.deltaTime;
             }
         }
+        [Range(-180, 180)][SerializeField] float HeadingOffset = 0;
+        public Transform DriverHeading;
+        public Transform GunnerHeading;
+        public Transform CommanderHeading;
         public void FallAsleep()
         {
             if (DespawnIfUnused)
