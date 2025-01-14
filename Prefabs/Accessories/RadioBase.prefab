@@ -427,12 +427,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2764286107858181217}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2.19}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 6.7899933, y: 0, z: -2.1900024}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5005528483114257071}
+  m_Father: {fileID: 7633695116798648383}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3690814731174602339
 MonoBehaviour:
@@ -791,7 +791,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 1
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: d9db897e5952fb04b88b3c1f7ae6c989,
     type: 2}
   programSource: {fileID: 11400000, guid: 2f3350864be53414bb661662c54515f1, type: 2}
@@ -1129,7 +1129,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7259984615751819256}
-  - {fileID: 6038298721666181580}
   m_Father: {fileID: 7633695116798648383}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1149,6 +1148,7 @@ MonoBehaviour:
   m_Script: {fileID: -1533785930, guid: 661092b4961be7145bfbe56e1e62337b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowFocusView: 1
 --- !u!1 &4419777444449116848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1754,6 +1754,7 @@ RectTransform:
   m_Children:
   - {fileID: 7633695118148892800}
   - {fileID: 5821490111599192749}
+  - {fileID: 6038298721666181580}
   - {fileID: 5005528483114257071}
   m_Father: {fileID: 7633695118807737447}
   m_LocalEulerAnglesHint: {x: -180, y: 270, z: -180}
@@ -1837,6 +1838,7 @@ MonoBehaviour:
   m_Script: {fileID: -1533785930, guid: 661092b4961be7145bfbe56e1e62337b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowFocusView: 1
 --- !u!1 &7633695118148892801
 GameObject:
   m_ObjectHideFlags: 0
@@ -2280,7 +2282,7 @@ MonoBehaviour:
   VoiceFar: 200000
   VoiceGain: 0.05
   RadioEnabledTxt: {fileID: 0}
-  RadioEnabled: 1
+  RadioEnabled_: 1
   MyChannel: 1
   AllPlanes: []
   RadioZones:
@@ -2496,6 +2498,7 @@ MonoBehaviour:
   m_Script: {fileID: -1533785930, guid: 661092b4961be7145bfbe56e1e62337b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowFocusView: 1
 --- !u!1 &9043146614573797262
 GameObject:
   m_ObjectHideFlags: 0
