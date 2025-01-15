@@ -43,6 +43,11 @@ namespace SaccFlightAndVehicles
         private ParticleSystem.EmissionModule[] DisableInWater_ParticleEmission_EM;
         [SerializeField] private TrailRenderer[] DisableInWater_TrailEmission;
         [SerializeField] private GameObject[] DisableInWater;
+        [Header("Knockback")]
+        [SerializeField] float KnockbackRadius = 0;
+        [SerializeField] bool KnobckbackModeAcceleration = false;
+        [SerializeField] float KnockbackStrength_rigidbody = 150f;
+        [SerializeField] float KnockbackStrength_players = 1.5f;
         private Transform WakeParticle_Trans;
         private float TorpedoHeight;
         private Quaternion TorpedoRot;
@@ -280,6 +285,55 @@ namespace SaccFlightAndVehicles
             else { BombAnimator.SetTrigger("explode"); }
             BombAnimator.SetBool("hitwater", hitwater || UnderWater);
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
+
+
+            if (KnockbackRadius == 0) return;
+            //rigidbodies
+            int numHits = Physics.OverlapSphereNonAlloc(transform.position, KnockbackRadius, hitobjs);
+            int numRBs = 0;
+            for (int i = 0; i < numHits; i++)
+            {
+                if (!hitobjs[i]) continue;
+                Rigidbody thisRB = hitobjs[i].attachedRigidbody;
+                if (!thisRB) continue;
+                bool gayflag = false;
+                for (int o = 0; o < numRBs; o++)
+                {
+                    if (thisRB == HitRBs[o])
+                    {
+                        gayflag = true;
+                        break;
+                    }
+                }
+                if (gayflag) continue;
+                HitRBs[numRBs] = thisRB;
+                numRBs++;
+                if (numRBs == 30) break;
+            }
+            for (int i = 0; i < numRBs; i++)
+            {
+                if (HitRBs[i].isKinematic) continue;
+                Vector3 explosionDirRB = HitRBs[i].worldCenterOfMass - transform.position;
+                float knockbackRB = KnockbackRadius - explosionDirRB.magnitude;
+                if (knockbackRB > 0)
+                {
+                    HitRBs[i].AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnobckbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
+                    SaccEntity hitEntity = HitRBs[i].GetComponent<SaccEntity>();
+                    if (hitEntity && hitEntity.IsOwner)
+                    {
+                        hitEntity.SendEventToExtensions("SFEXT_L_WakeUp");
+                    }
+                }
+            }
+            //players
+            Vector3 explosionDir = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - transform.position;
+            float knockback = KnockbackRadius - explosionDir.magnitude;
+            if (knockback > 0)
+            {
+                Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + KnockbackStrength_players * knockback * explosionDir.normalized);
+            }
         }
+        Collider[] hitobjs = new Collider[100];
+        Rigidbody[] HitRBs = new Rigidbody[30];
     }
 }
