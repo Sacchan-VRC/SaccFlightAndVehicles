@@ -469,7 +469,6 @@ namespace SaccFlightAndVehicles
                 SusiSpring.damper *= RBMass;
                 wheel.suspensionSpring = SusiSpring;
             }
-            EntityControl.OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
             VehicleAnimator = EntityControl.GetComponent<Animator>();
 
             FullHealth = Health;

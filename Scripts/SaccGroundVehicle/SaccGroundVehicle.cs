@@ -287,8 +287,6 @@ namespace SaccFlightAndVehicles
             FullHealth = Health;
             FullFuel = Fuel;
 
-            EntityControl.OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
-
             IsOwner = EntityControl.IsOwner;
             UpdateWheelIsOwner();
             InVR = EntityControl.InVR;
@@ -374,7 +372,6 @@ namespace SaccFlightAndVehicles
             Initialized = true;
             VehicleRigidbody = EntityControl.gameObject.GetComponent<Rigidbody>();
             VehicleTransform = EntityControl.transform;
-            EntityControl.OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
         }
         private void Start()// awake function when
         {

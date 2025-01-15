@@ -41,9 +41,6 @@ namespace SaccFlightAndVehicles
         public Transform RespawnPoint;
         [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
         public Transform CenterOfMass;
-        [Tooltip("Used in vehicle scripts to set the VehicleMesh and it's children's layer when entering vehicle")]
-        [System.NonSerializedAttribute] public int OnboardVehicleLayer = 31;
-        [System.NonSerialized] public int OutsideVehicleLayer;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
         public bool DoVoiceVolumeChange = true;
         [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
@@ -85,6 +82,11 @@ namespace SaccFlightAndVehicles
         public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
         [Tooltip("Disable collision when held by changing the layer and setting the colliders to trigger")]
         [SerializeField] bool Pickup_DisableCollisionOnGrab;
+        [Space(8)]
+        [Tooltip("Vehicle scripts set vehicle to this layer when you're inside (also used by scripts to find vehicles with raycasts)")]
+        public int OnboardVehicleLayer = 31;
+        [Tooltip("Vehicle scripts set vehicle to this layer when you're outside (also used by scripts to find vehicles with raycasts)")]
+        public int OutsideVehicleLayer = 17;
         private int StartEntityLayer;
         [Header("For debugging, auto filled on build")]
         [Tooltip("These are automatically collected from the vehicle's seat scripts")]
@@ -1030,7 +1032,7 @@ namespace SaccFlightAndVehicles
             SendEventToExtensions("SFEXT_L_OnTriggerExit");
         }
 
-        public int DialFuncPos;
+        [System.NonSerialized] public int DialFuncPos;
         public void TellDFUNCsLR()
         {
             for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
@@ -1064,7 +1066,7 @@ namespace SaccFlightAndVehicles
                 { if (EXT && !EXT.Occupied) { EXT.TakeOwnerShipOfExtensions(); } }
             }
         }
-        public bool passengerFuncIgnorePassengerFlag;
+        [System.NonSerialized] public bool passengerFuncIgnorePassengerFlag;
         [RecursiveMethod]
         public void SendEventToExtensions(string eventname)
         {
