@@ -10,7 +10,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SGV_EffectsController : UdonSharpBehaviour
     {
-        public UdonSharpBehaviour SGVControl;
+        public SaccGroundVehicle SGVControl;
         [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
         public AudioSource[] EngineSounds;
         private Transform[] EngineSoundsT;
@@ -371,7 +371,13 @@ namespace SaccFlightAndVehicles
                 CheckDisableLoop();
             }
             Sleeping = true;
-            VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
+            if (SGVControl.TankMode)
+            {
+                VehicleAnimator.SetFloat(THROTTLE_STRING, .5f);
+                VehicleAnimator.SetFloat(STEERING_STRING, .5f);
+            }
+            else
+                VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(REVS_STRING, 0);
 
             for (int i = 0; i < DriveWheels.Length; i++)
