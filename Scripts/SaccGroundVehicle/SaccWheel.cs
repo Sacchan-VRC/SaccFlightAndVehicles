@@ -45,6 +45,8 @@ namespace SaccFlightAndVehicles
         public float WheelWeight = 0.1f;
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
         public float EngineInfluence = 225f;
+        [Tooltip("Max angle of ground at which vehicle can park on without sliding down")]
+        [SerializeField] float MaxParkingIncline = 20;
         public LayerMask WheelLayers;
         public float ClutchStrength = 100f;
         [Tooltip("Skip sound and skid effects completely")]
@@ -329,7 +331,7 @@ namespace SaccFlightAndVehicles
                 }
                 Grounded = true;
                 //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop on slopes
-                if (Vector3.Angle(SusOut.normal, Vector3.up) < 20 && !SGVControl.Bike_AutoSteer)
+                if (Vector3.Angle(SusOut.normal, Vector3.up) < MaxParkingIncline && !SGVControl.Bike_AutoSteer)
                 { SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f)); }
                 else
                 { SusDirection = SusOut.normal; }
