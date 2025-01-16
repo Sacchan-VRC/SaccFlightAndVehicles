@@ -302,7 +302,7 @@ namespace SaccFlightAndVehicles
             {
                 if (DriverHeading)
                 {
-                    float heading = Commander.eulerAngles.y + HeadingOffset;
+                    float heading = VehicleTransform.eulerAngles.y + HeadingOffset;
                     if (heading > 360) heading -= 360;
                     if (heading < 0) heading += 360;
                     heading -= 180;
@@ -319,7 +319,7 @@ namespace SaccFlightAndVehicles
                     }
                     if (GunnerHeading)
                     {
-                        float heading = Commander.eulerAngles.y + HeadingOffset;
+                        float heading = Turret.eulerAngles.y + HeadingOffset;
                         if (heading > 360) heading -= 360;
                         if (heading < 0) heading += 360;
                         heading -= 180;
