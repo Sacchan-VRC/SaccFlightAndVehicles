@@ -1062,8 +1062,6 @@ namespace SaccFlightAndVehicles
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
                 foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
-                foreach (SAV_PassengerFunctionsController EXT in PassengerFunctionControllers)
-                { if (EXT && !EXT.Occupied) { EXT.TakeOwnerShipOfExtensions(); } }
             }
         }
         [System.NonSerialized] public bool passengerFuncIgnorePassengerFlag;
@@ -1109,9 +1107,9 @@ namespace SaccFlightAndVehicles
                         EXT.SendCustomEvent(eventname);
                         if (
                             eventname == "SFEXT_L_EntityStart" ||
-                            eventname == "SFEXT_O_LoseOwnership"
+                            eventname == "SFEXT_O_LoseOwnership" ||
+                            eventname == "SFEXT_O_TakeOwnership"
                         ) continue;
-                        if (EXT.Occupied && eventname == "SFEXT_O_TakeOwnership") continue;
                         //Pilot from SaccEntity is the Pilot of the vehicle
                         //DFUNCs assume that the pilot of the vehicle should control the DFUNC
                         //but since this controls passenger functions we turn the pilot events into passenger events

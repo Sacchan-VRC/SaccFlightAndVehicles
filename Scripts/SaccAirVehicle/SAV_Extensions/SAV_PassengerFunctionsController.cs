@@ -346,7 +346,10 @@ namespace SaccFlightAndVehicles
             Occupied = true;
             currentUser = player;
             if (!player.isLocal && IsOwner)
+            {
                 SendEventToExtensions_Gunner("SFEXT_O_LoseOwnership");
+                IsOwner = false;
+            }
 
             SendEventToExtensions_Gunner("SFEXT_G_PilotEnter");
         }
