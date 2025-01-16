@@ -39,7 +39,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                LastForward_HOR = VehicleTransform.forward;
+                LastForward_HOR = TurretForwardEmpty.forward;
                 LastForward_VERT = TurretRotatorHor.forward;
                 Stabilize = value;
             }
@@ -70,7 +70,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [Header("Syncmode can be set to None if using DelegateFireCallback")]
         [System.NonSerialized] public UdonSharpBehaviour DelegateFireCallback;
-        private Transform VehicleTransform;
         private float InputXKeyb;
         private float InputYKeyb;
         private float RotationSpeedX = 0f;
@@ -121,7 +120,6 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InVR = EntityControl.InVR;
             InEditor = localPlayer == null;
-            VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
@@ -148,7 +146,7 @@ namespace SaccFlightAndVehicles
             IsOwner = true;
             Manning = true;
             InVR = EntityControl.InVR;
-            LastForward_HOR = VehicleTransform.forward;
+            LastForward_HOR = TurretForwardEmpty.forward;
             LastForward_VERT = TurretRotatorHor.forward;
             nextUpdateTime = Time.time - .01f;
         }
