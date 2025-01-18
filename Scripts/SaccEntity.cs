@@ -575,7 +575,7 @@ namespace SaccFlightAndVehicles
         private float LastJumpInput = 0f;
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
         {
-            if (InVehicle && InVR && args.boolValue)
+            if (InVehicle && InVR && args.boolValue && !Input.GetKey(KeyCode.Space))
             {
                 ExitVehicleCheck();
             }
