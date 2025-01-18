@@ -11,7 +11,7 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Only needs to be set if you want to be able to hold down the launch key to spam flares")]
-        public KeyCode LaunchKey = KeyCode.None;
+        public KeyCode LaunchKey = KeyCode.X;
         public int NumFlares = 60;
         [Range(0, 2)]
         [Tooltip("0 = Chaff(Radar), 1 = Flare(Heat), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
@@ -103,7 +103,8 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if ((Piloting && !InVR) || Selected)
+            if (!Piloting) return;
+            if (Input.GetKey(LaunchKey) || Selected)
             {
                 float Trigger;
                 if (LeftDial)
@@ -128,6 +129,7 @@ namespace SaccFlightAndVehicles
                 }
                 else { TriggerLastFrame = false; }
             }
+            else { TriggerLastFrame = false; }
         }
         private int NextFlare;
         public void LaunchFlare()
