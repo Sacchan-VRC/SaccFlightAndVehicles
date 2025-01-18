@@ -41,6 +41,8 @@ namespace SaccFlightAndVehicles
         public float PlaneWindMaxVolSpeed = 400f;
         [Tooltip("Sounds that can be played when vehicle causes a sonic boom")]
         public AudioSource[] SonicBoom;
+        [Tooltip("Play all sonic boom sound entries at once instead of one random one")]
+        [SerializeField] bool PlayAllSonicBoomSounds;
         [Tooltip("Sounds that can be played when vehicle explodes")]
         public AudioSource[] Explosion;
         [Tooltip("Sounds that can be played when vehicle is 'wrecked'")]
@@ -558,10 +560,23 @@ namespace SaccFlightAndVehicles
             {
                 if (SonicBoomPreventer > 5 && !EntityControl._dead)
                 {
-                    int rand = Random.Range(0, SonicBoom.Length);
-                    SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-                    SonicBoom[rand].Play();
-                    SonicBoomPreventer = 0;
+                    float newpitch = Random.Range(.94f, 1.2f);
+                    if (PlayAllSonicBoomSounds)
+                    {
+                        for (int i = 0; i < SonicBoom.Length; i++)
+                        {
+                            SonicBoom[i].pitch = newpitch;
+                            SonicBoom[i].Play();
+                        }
+                        SonicBoomPreventer = 0;
+                    }
+                    else
+                    {
+                        int rand = Random.Range(0, SonicBoom.Length);
+                        SonicBoom[rand].pitch = newpitch;
+                        SonicBoom[rand].Play();
+                        SonicBoomPreventer = 0;
+                    }
                 }
                 playsonicboom = false;
             }
