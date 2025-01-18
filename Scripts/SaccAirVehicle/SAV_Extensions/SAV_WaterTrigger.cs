@@ -34,7 +34,7 @@ namespace SaccFlightAndVehicles
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             {
-                if (localPlayer.isMaster)
+                if (EntityControl.IsOwner)
                 { OnEnable(); }
                 else
                 { gameObject.SetActive(false); }

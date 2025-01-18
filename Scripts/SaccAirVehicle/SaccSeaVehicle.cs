@@ -438,7 +438,7 @@ namespace SaccFlightAndVehicles
             {
                 InEditor = false;
                 InVR = EntityControl.InVR;
-                if (localPlayer.isMaster)
+                if (EntityControl.IsOwner)
                 {
                     IsOwner = true;
                     if (!UsingManualSync)

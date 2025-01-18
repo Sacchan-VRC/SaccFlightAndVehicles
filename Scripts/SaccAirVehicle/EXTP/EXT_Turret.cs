@@ -129,7 +129,7 @@ namespace SaccFlightAndVehicles
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
             Stabilize_ = Stabilize;
             //enable for 5 seconds to sync turret rotation to late joiners
-            if (localPlayer.isMaster) { OwnerSend(); }
+            if (EntityControl.IsOwner) { OwnerSend(); }
             else
             {
                 gameObject.SetActive(true);

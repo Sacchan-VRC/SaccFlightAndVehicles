@@ -181,7 +181,7 @@ namespace SaccFlightAndVehicles
             {
                 InEditor = false;
                 InVR = EntityControl.InVR;
-                IsOwner = localPlayer.isMaster;
+                IsOwner = EntityControl.IsOwner;
             }
             CenterOfMass = EntityControl.CenterOfMass;
 

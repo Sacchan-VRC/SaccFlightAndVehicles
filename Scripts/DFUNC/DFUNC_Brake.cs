@@ -64,7 +64,7 @@ namespace SaccFlightAndVehicles
             RotMultiMaxSpeedDivider = 1 / (float)SAVControl.GetProgramVariable("RotMultiMaxSpeed");
             IsOwner = EntityControl.IsOwner;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
-            if (localPlayer != null && !localPlayer.isMaster)
+            if (localPlayer != null && !EntityControl.IsOwner)
             { gameObject.SetActive(false); }
             else
             { gameObject.SetActive(true); }

@@ -670,7 +670,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                if (localPlayer.isMaster)
+                if (EntityControl.IsOwner)
                 {
                     if (!UsingManualSync)
                     {

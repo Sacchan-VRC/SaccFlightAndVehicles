@@ -56,6 +56,7 @@ namespace SaccFlightAndVehicles
         private float UpAngleMax = 89;
         private float DownAngleMax = 35;
         private Quaternion RotatorStartRot;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private void Start()
         {
             if (!Initialized)//shouldn't be active until entitystart
@@ -66,7 +67,7 @@ namespace SaccFlightAndVehicles
             Initialized = true;
             localPlayer = Networking.LocalPlayer;
             bool InEditor = localPlayer == null;
-            if (!InEditor && localPlayer.isMaster)
+            if (!InEditor && EntityControl.IsOwner)
             { IsOwner = true; }
             else if (!InEditor) { IsOwner = false; }//late joiner
             else { IsOwner = true; }//play mode in editor
