@@ -151,7 +151,10 @@ namespace SaccFlightAndVehicles
             else { ClucthDecaySpeed = 1 / AutoClutch_Length; }
             CurrentGear = NeutralGear;
             SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
+            gameObject.SetActive(true);
+            SendCustomEventDelayedSeconds(nameof(disableSelf), 5); // enable for a bit to run initial deserialization now instead of when you get in to prevent wrong gear bug
         }
+        public void disableSelf() { if (!Occupied) gameObject.SetActive(false); }
         private void LateUpdate()
         {
             if (Piloting)
@@ -294,12 +297,15 @@ namespace SaccFlightAndVehicles
             CurrentGear = NeutralGear;
             AutomaticReversing = false;
         }
+        bool Occupied;
         public void SFEXT_G_PilotEnter()
         {
+            Occupied = true;
             gameObject.SetActive(true);
         }
         public void SFEXT_G_PilotExit()
         {
+            Occupied = false;
             CurrentGear = NeutralGear;
             gameObject.SetActive(false);
         }
