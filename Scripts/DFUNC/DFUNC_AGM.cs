@@ -318,7 +318,13 @@ namespace SaccFlightAndVehicles
 
                             //check for agmtargets to lock to
                             float targetangle = 999;
-                            RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
+                            float spherecastLength = Mathf.Infinity;
+                            RaycastHit hit;
+                            if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out hit, Mathf.Infinity, 2065 /* Default, Water and Environment */))
+                            {
+                                spherecastLength = hit.distance;
+                            }
+                            RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, spherecastLength, AGMTargetsLayer);
                             if (agmtargs.Length > 0)
                             {//found one or more, find lowest angle one
                              //find target with lowest angle from crosshair
@@ -333,7 +339,7 @@ namespace SaccFlightAndVehicles
                                     }
                                 }
                                 //the spherecastall should really be a cone but this works for now
-                                if (targetangle > 20)
+                                if (targetangle > 5)
                                 { RaycastLock(); }
                                 else
                                 {
