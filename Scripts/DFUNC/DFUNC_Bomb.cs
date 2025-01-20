@@ -48,9 +48,9 @@ namespace SaccFlightAndVehicles
         public bool BombInheritVelocity = true;
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
-        public string AnimBoolName = "BombSelected";
+        public string AnimBoolName = string.Empty;
         [Tooltip("Animator float that represents how many bombs are left")]
-        public string AnimFloatName = "bombs";
+        public string AnimFloatName = string.Empty;
         [Tooltip("Animator trigger that is set when a bomb is dropped")]
         public string AnimFiredTriggerName = string.Empty;
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]

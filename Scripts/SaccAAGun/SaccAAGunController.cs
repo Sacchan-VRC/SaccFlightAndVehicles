@@ -194,6 +194,7 @@ namespace SaccFlightAndVehicles
             FullAAMs = NumAAM;
             FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
             AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+            AAGunAnimator.SetBool("owner", IsOwner);
             MGAmmoFull = MGAmmoSeconds;
             FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
@@ -1005,11 +1006,13 @@ namespace SaccFlightAndVehicles
                 }
             }
             if (AI_GUN) { AI_GUN_Enter(); }
+            AAGunAnimator.SetBool("owner", true);
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
             AI_GUN_Exit();
+            AAGunAnimator.SetBool("owner", false);
         }
         public void SFEXT_L_DamageFeedback()
         {

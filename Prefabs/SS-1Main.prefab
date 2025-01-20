@@ -1902,8 +1902,8 @@ MonoBehaviour:
   RecoilDirection: {fileID: 0}
   BombInheritVelocity: 1
   DoAnimBool: 0
-  AnimBoolName: BombSelected
-  AnimFloatName: bombs
+  AnimBoolName: 
+  AnimFloatName: 
   AnimFiredTriggerName: 
   AnimBoolStayTrueOnExit: 0
   KeyboardInput_InstantFire: 1
@@ -53944,9 +53944,9 @@ MonoBehaviour:
   RecoilDirection: {fileID: 1064588171}
   BombInheritVelocity: 1
   DoAnimBool: 0
-  AnimBoolName: BombSelected
-  AnimFloatName: bombs
-  AnimFiredTriggerName: bomblaunched
+  AnimBoolName: 
+  AnimFloatName: 
+  AnimFiredTriggerName: 
   AnimBoolStayTrueOnExit: 0
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
@@ -70446,6 +70446,8 @@ MonoBehaviour:
   AGM: {fileID: 9072628041462008830}
   NumAGM: 8
   HUDText_AGM_ammo: {fileID: 0}
+  HUDText_AGM_ammo_TMP: {fileID: 0}
+  HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 7105509204632478174}
   AtGScreen: {fileID: 7105509206018492734}
   CamZoomScale: 100
@@ -90650,6 +90652,7 @@ MonoBehaviour:
   PlaneWindMinVol: 3
   PlaneWindMaxVolSpeed: 1000
   SonicBoom: []
+  PlayAllSonicBoomSounds: 0
   Explosion:
   - {fileID: 3716760049986994699}
   Wrecked: []
@@ -92993,13 +92996,13 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &7105509205546161465
 MonoBehaviour:
   m_ObjectHideFlags: 0

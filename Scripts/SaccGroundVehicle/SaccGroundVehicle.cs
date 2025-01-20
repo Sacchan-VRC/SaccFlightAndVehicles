@@ -277,7 +277,6 @@ namespace SaccFlightAndVehicles
             SetCoMMeshOffset();
             if (NumStepsSec < 1f / Time.fixedDeltaTime)
             {
-                Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair.");
                 NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
             }
             UsingManualSync = !EntityControl.EntityObjectSync;
