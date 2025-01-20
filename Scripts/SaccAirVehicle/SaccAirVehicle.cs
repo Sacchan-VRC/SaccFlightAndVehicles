@@ -1941,7 +1941,16 @@ namespace SaccFlightAndVehicles
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
                 }
+                if (EntityControl.wrecked && Health > 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairWrecked));
+                }
             }
+        }
+        public void RepairWrecked()
+        {
+            EntityControl.SetWreckedFalse();
+            if (EngineOnOnEnter) { SetEngineOn(); }
         }
         public void SFEXT_G_RespawnButton()//called globally when using respawn button
         {
