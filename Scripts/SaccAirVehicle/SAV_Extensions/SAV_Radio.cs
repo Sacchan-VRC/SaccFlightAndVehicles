@@ -28,6 +28,7 @@ namespace SaccFlightAndVehicles
                     RadioBase.SetAllVoiceVolumesDefault();
                 }
                 RadioBase.SetVehicleVolumeDefault(EntityControl);
+                RadioBase.UpdateVehicle(EntityControl);
             }
             get => _Channel;
         }
@@ -99,7 +100,7 @@ namespace SaccFlightAndVehicles
             if (RadioBase)
             {
                 RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
-                RadioBase.SetProgramVariable("MyVehicle", EntityControl);
+                RadioBase.SetProgramVariable("MyEntity", EntityControl);
                 //if not pilot, set my channel on radiobase to vehicle's and set back on exit
                 NewChannel();
                 UpdateChannel();
@@ -139,7 +140,7 @@ namespace SaccFlightAndVehicles
                 RadioBase.SetProgramVariable("MyVehicleSetTimes", mvst);
                 if (mvst == 0)
                 {
-                    RadioBase.SetProgramVariable("MyVehicle", null);
+                    RadioBase.SetProgramVariable("MyEntity", null);
                     RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
                 }
             }
