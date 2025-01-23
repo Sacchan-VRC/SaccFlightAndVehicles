@@ -1031,24 +1031,22 @@ namespace SaccFlightAndVehicles
             LastTriggerExit = Trig;
             SendEventToExtensions("SFEXT_L_OnTriggerExit");
         }
-
-        [System.NonSerialized] public int DialFuncPos;
         public void TellDFUNCsLR()
         {
-            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
+            for (int i = 0; i < Dial_Functions_L.Length; i++)
             {
-                if (Dial_Functions_L[DialFuncPos])
+                if (Dial_Functions_L[i])
                 {
-                    Dial_Functions_L[DialFuncPos].SetProgramVariable("LeftDial", true);
-                    Dial_Functions_L[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                    Dial_Functions_L[i].SetProgramVariable("LeftDial", true);
+                    Dial_Functions_L[i].SetProgramVariable("DialPosition", i);
                 }
             }
-            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_R.Length; DialFuncPos++)
+            for (int i = 0; i < Dial_Functions_R.Length; i++)
             {
-                if (Dial_Functions_R[DialFuncPos])
+                if (Dial_Functions_R[i])
                 {
-                    Dial_Functions_R[DialFuncPos].SetProgramVariable("LeftDial", false);
-                    Dial_Functions_R[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                    Dial_Functions_R[i].SetProgramVariable("LeftDial", false);
+                    Dial_Functions_R[i].SetProgramVariable("DialPosition", i);
                 }
             }
         }
