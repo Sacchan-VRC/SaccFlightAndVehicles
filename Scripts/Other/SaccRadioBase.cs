@@ -194,12 +194,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetChannel(int inChannel)
         {
-            inChannel = mod(inChannel, 17);
+            inChannel = mod_noneg(inChannel, 17);
             CurrentChannel = MyChannel = (byte)(inChannel);
             if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
             UpdateRadioScripts();
         }
-        int mod(int x, int m)
+        int mod_noneg(int x, int m)
         {
             return (x % m + m) % m;
         }

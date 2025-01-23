@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
     {
         public SaccEntity EntityControl;
         [System.NonSerialized] public SaccRadioBase RadioBase;
+        [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
         // public bool RadioOn = true;
         [UdonSynced, FieldChangeCallback(nameof(Channel))] private byte _Channel;
         public byte Channel
@@ -114,7 +115,13 @@ namespace SaccFlightAndVehicles
         {
             if (EntityControl.Using)
             {
-                Channel = (byte)RadioBase.GetProgramVariable("MyChannel");
+                // PTT_MODE requires DFUNC_RadioPTT
+                // PTT_MODE has your radiobase channel set to what is selected as normal so that you hear that channel
+                // but sets your synced radio channel to +200 when you're not talking so that others see you as not on their channel and don't hear you
+                // it sets it back -200 to the 'real' value while you are holding PTT so that everyone in the channel can hear you
+                byte newChannel = (byte)RadioBase.GetProgramVariable("MyChannel");
+                if (PTT_MODE && newChannel != 0) newChannel += 200;
+                Channel = newChannel;
                 RequestSerialization();
             }
         }
@@ -172,7 +179,9 @@ namespace SaccFlightAndVehicles
 
 
 
-
+        //
+        // DFUNC STUFF:
+        //
 
         [Header("Optional, DFUNC Mode:")]
         [SerializeField] private KeyCode ChannelUpKey = KeyCode.RightBracket;
