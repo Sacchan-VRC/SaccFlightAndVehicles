@@ -13,6 +13,11 @@ namespace SaccFlightAndVehicles
     public class SAV_Radio : UdonSharpBehaviour
     {
         public SaccEntity EntityControl;
+        [Tooltip("Force this radio to always be on this channel (-1 to disable)")]
+        [SerializeField] int ForceChannel = -1;
+        bool ForceChannel_b = false;
+        byte myPrevChannel;
+        bool ForceChannel_swapped = false;
         [System.NonSerialized] public SaccRadioBase RadioBase;
         [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
         // public bool RadioOn = true;
@@ -56,6 +61,11 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < Dial_Funcon.Length; i++)
             {
                 Dial_Funcon[i].SetActive(RadioOn);
+            }
+            if (ForceChannel > -1)
+            {
+                if (ForceChannel > 255) ForceChannel = 255;
+                ForceChannel_b = true;
             }
         }
         public void SFEXT_L_EntityStart()
@@ -102,7 +112,13 @@ namespace SaccFlightAndVehicles
                 RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
                 RadioBase.SetProgramVariable("MyEntity", EntityControl);
                 //if not pilot, set my channel on radiobase to vehicle's and set back on exit
-                NewChannel();
+                if (ForceChannel_b && EntityControl.Using)
+                {
+                    myPrevChannel = RadioBase.MyChannel;
+                    ForceChannel_swapped = true;
+                    RadioBase.SetChannel(ForceChannel);
+                }
+                else { NewChannel(); }
                 UpdateChannel();
             }
             UpdateChannelText();
@@ -135,6 +151,11 @@ namespace SaccFlightAndVehicles
                 {
                     ChannelSwapped = false;
                     RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyChannel"));
+                }
+                if (ForceChannel_swapped)
+                {
+                    ForceChannel_swapped = false;
+                    RadioBase.SetChannel(myPrevChannel);
                 }
                 int mvst = (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") - 1;
                 RadioBase.SetProgramVariable("MyVehicleSetTimes", mvst);
