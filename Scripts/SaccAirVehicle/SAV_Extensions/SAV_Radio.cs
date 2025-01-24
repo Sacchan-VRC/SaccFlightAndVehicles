@@ -141,7 +141,7 @@ namespace SaccFlightAndVehicles
                 if (mvst == 0)
                 {
                     RadioBase.SetProgramVariable("MyEntity", null);
-                    RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
+                    RadioBase.SetAllVoiceVolumesDefault();
                 }
             }
         }

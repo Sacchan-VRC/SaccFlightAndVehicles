@@ -11,7 +11,7 @@ namespace SaccFlightAndVehicles
     public class SaccRadioBase : UdonSharpBehaviour
     {
         [Header("Vehicles must have SAV_Radio extension for this to work")]
-        private SAV_Radio[] _AllEntities_RD;
+        private SAV_Radio[] AllEntities_RD;
         public float VoiceNear = 199999;
         public float VoiceFar = 200000;
         // public float VoiceVolumetric = 1500;
@@ -23,11 +23,12 @@ namespace SaccFlightAndVehicles
         private byte CurrentChannel = 1;
         public byte MyChannel = 1;
         [Header("All Planes and RadioZones are filled automatically on build.")]
-        public Transform[] AllPlanes;
+        public Transform[] AllEntities_TF;
         public SaccRadioZone[] RadioZones;
         public TextMeshProUGUI ChannelText;
         [Header("Debug, leave empty:")]
         public SaccEntity MyEntity;
+        SaccEntity[] AllEntities;
         [System.NonSerialized] public int MyVehicleSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
         [System.NonSerialized] public SaccRadioZone MyZone;
         private int NextEntity;
@@ -39,31 +40,31 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel = 1;
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
-            SaccEntity[] _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
-            _AllEntities_RD = new SAV_Radio[AllPlanes.Length];
+            AllEntities = new SaccEntity[AllEntities_TF.Length];
+            AllEntities_RD = new SAV_Radio[AllEntities_TF.Length];
             string radioname = GetUdonTypeName<SAV_Radio>();
-            for (int i = 0; i < AllPlanes.Length; i++)
+            for (int i = 0; i < AllEntities_TF.Length; i++)
             {
-                _AllPlanes_ENT[i] = (SaccEntity)AllPlanes[i].GetComponent<SaccEntity>();
-                if (_AllPlanes_ENT[i]) { _AllEntities_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention(radioname); }
+                AllEntities[i] = (SaccEntity)AllEntities_TF[i].GetComponent<SaccEntity>();
+                if (AllEntities[i]) { AllEntities_RD[i] = (SAV_Radio)AllEntities[i].GetExtention(radioname); }
             }
             PruneRadiosArray();
-            for (int i = 0; i < _AllEntities_RD.Length; i++)
+            for (int i = 0; i < AllEntities_RD.Length; i++)
             {
-                _AllEntities_RD[i].RadioBase = this;
-                _AllEntities_RD[i].Init();
+                AllEntities_RD[i].RadioBase = this;
+                AllEntities_RD[i].Init();
             }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
         }
         private void PruneRadiosArray()
         {
-            int len = _AllEntities_RD.Length;
+            int len = AllEntities_RD.Length;
             bool[] valid = new bool[len];
             int numvalid = 0;
             for (int i = 0; i < len; i++)
             {
-                if (_AllEntities_RD[i])
+                if (AllEntities_RD[i])
                 {
                     valid[i] = true;
                     numvalid++;
@@ -79,10 +80,10 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    RD_New[i - offset] = _AllEntities_RD[i];
+                    RD_New[i - offset] = AllEntities_RD[i];
                 }
             }
-            _AllEntities_RD = RD_New;
+            AllEntities_RD = RD_New;
         }
         public void SetRadioVoiceVolumes()
         {
@@ -91,10 +92,10 @@ namespace SaccFlightAndVehicles
             if (DoZones)
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             NextEntity++;
-            if (NextEntity == _AllEntities_RD.Length) { NextEntity = 0; }
-            SaccEntity NextEntity_SE = _AllEntities_RD[NextEntity].EntityControl;
+            if (NextEntity == AllEntities_RD.Length) { NextEntity = 0; }
+            SaccEntity NextEntity_SE = AllEntities_RD[NextEntity].EntityControl;
             if (MyEntity == NextEntity_SE
-                || (byte)_AllEntities_RD[NextEntity].Channel != CurrentChannel
+                || (byte)AllEntities_RD[NextEntity].Channel != CurrentChannel
                 || CurrentChannel == 0) { return; }
             for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
             {
@@ -176,14 +177,37 @@ namespace SaccFlightAndVehicles
         }
         public void SetAllVoiceVolumesDefault()
         {
-            VRCPlayerApi[] AllPlayers = new VRCPlayerApi[100];
-            VRCPlayerApi.GetPlayers(AllPlayers);
-            int numplayers = VRCPlayerApi.GetPlayerCount();
-            for (int i = 0; i < numplayers; i++)
+            for (int i = 0; i < AllEntities.Length; i++)
             {
-                AllPlayers[i].SetVoiceDistanceNear(0);
-                AllPlayers[i].SetVoiceDistanceFar(25);
-                AllPlayers[i].SetVoiceGain(15);
+                for (int o = 0; o < AllEntities[i].VehicleSeats.Length; o++)
+                {
+                    VRCPlayerApi thisplayer = AllEntities[i].VehicleSeats[o].SeatedPlayer;
+                    if (thisplayer != null)
+                    {
+                        thisplayer.SetVoiceDistanceNear(0);
+                        thisplayer.SetVoiceDistanceFar(25);
+                        thisplayer.SetVoiceGain(15);
+                    }
+                }
+                if ((AllEntities[i].EntityPickup && AllEntities[i].EntityPickup.IsHeld) || AllEntities[i].CustomPickup_Synced_isHeld)
+                {
+                    VRCPlayerApi thisplayer = Networking.GetOwner(AllEntities[i].gameObject);
+                    if (thisplayer != null)
+                    {
+                        thisplayer.SetVoiceDistanceNear(0);
+                        thisplayer.SetVoiceDistanceFar(25);
+                        thisplayer.SetVoiceGain(15);
+                    }
+                }
+            }
+            for (int i = 0; i < RadioZones.Length; i++)
+            {
+                for (int o = 0; o < RadioZones[i].numPlayersInside; o++)
+                {
+                    RadioZones[i].playersinside[o].SetVoiceDistanceNear(0);
+                    RadioZones[i].playersinside[o].SetVoiceDistanceFar(25);
+                    RadioZones[i].playersinside[o].SetVoiceGain(15);
+                }
             }
         }
         public void SetVehicleVolumeDefault(SaccEntity Vehicle)
@@ -235,9 +259,9 @@ namespace SaccFlightAndVehicles
         }
         void UpdateRadioScripts()
         {
-            for (int i = 0; i < _AllEntities_RD.Length; i++)
+            for (int i = 0; i < AllEntities_RD.Length; i++)
             {
-                _AllEntities_RD[i].NewChannel();
+                AllEntities_RD[i].NewChannel();
             }
         }
     }

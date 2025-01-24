@@ -120,7 +120,7 @@ namespace SaccFlightAndVehicles
             var RZs = GetAllSaccRadioZones().ToArray();
             for (int i = 0; i < RBs.Length; i++)
             {
-                RBs[i].AllPlanes = SETransforms;
+                RBs[i].AllEntities_TF = SETransforms;
                 RBs[i].RadioZones = RZs;
                 PrefabUtility.RecordPrefabInstancePropertyModifications(RBs[i]);
                 EditorUtility.SetDirty(RBs[i]);

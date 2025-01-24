@@ -22,7 +22,7 @@ namespace SaccFlightAndVehicles
             set
             {
                 _Channel = value;
-                if (InZone) { SetAllVoicesDefault(); UpdateChannel(); }
+                if (InZone) { RadioBase.SetAllVoiceVolumesDefault(); UpdateChannel(); }
                 if (ChannelText) { ChannelText.text = value.ToString(); }
             }
             get => _Channel;
@@ -70,7 +70,7 @@ namespace SaccFlightAndVehicles
                     {
                         RadioBase.MyZone = null;
                         InZone = false;
-                        SetAllVoicesDefault();
+                        RadioBase.SetAllVoiceVolumesDefault();
                         ResetChannel();
                     }
                 }
@@ -87,18 +87,6 @@ namespace SaccFlightAndVehicles
         {
             ChannelSwapped = false;
             RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyChannel"));
-        }
-        public void SetAllVoicesDefault()
-        {
-            VRCPlayerApi[] players = new VRCPlayerApi[100];
-            VRCPlayerApi.GetPlayers(players);
-            int numplayers = VRCPlayerApi.GetPlayerCount();
-            for (int i = 0; i < numplayers; i++)
-            {
-                players[i].SetVoiceDistanceNear(0);
-                players[i].SetVoiceDistanceFar(25);
-                players[i].SetVoiceGain(15);
-            }
         }
         //this will break if a player enters a seat while within the trigger because OnPlayerTriggerExit doesn't run
         /*     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
