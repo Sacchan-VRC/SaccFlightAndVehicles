@@ -83,7 +83,6 @@ namespace SaccFlightAndVehicles
         private bool Initialized = false;
         public bool IdleUpdateMode;
         private bool Piloting;
-        private bool Occupied;
         private int EnterIdleModeNumber;
         private double lastframetime;
         private double lastframetime_extrap;
@@ -220,7 +219,6 @@ namespace SaccFlightAndVehicles
         }
         private void TakeOwnerStuff()
         {
-            L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -237,7 +235,8 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.drag = 0;
                 VehicleRigid.angularDrag = 0;
             }
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
+            L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
+            nextUpdateTime = L_UpdateTime - .01d;
             UpdatesSentWhileStill = 0;
         }
         private void LoseOwnerStuff()
@@ -261,12 +260,6 @@ namespace SaccFlightAndVehicles
             ExitIdleMode();
             SendCustomEventDelayedFrames(nameof(ResetSyncTimes), 1);// the frame the pilot enters is more likely to be a longer frame, so reset afterwards
         }
-        public void SFEXT_G_PilotEnter()
-        {
-            Occupied = true;
-        }
-        public void SFEXT_G_PilotExit()
-        { Occupied = false; }
         public void SFEXT_O_PilotExit()
         { Piloting = false; }
         public void SFEXT_G_RespawnButton()
@@ -488,12 +481,13 @@ namespace SaccFlightAndVehicles
         public override void OnDeserialization()
         {
             //time between this update and last
-            float updateDelta = (float)(O_UpdateTime - O_LastUpdateTime);
-            if (updateDelta < 0.0001f)
+            float update_gap = (float)(O_UpdateTime - O_LastUpdateTime);
+            if (update_gap < 0.0001f)
             {
                 O_LastUpdateTime = O_UpdateTime;
                 return;
             }
+            updateDelta = update_gap;
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
             {
@@ -512,6 +506,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
+                if (idleDetected) { ResetSyncTimes(); }
                 idleDetected = false;
                 idleTicks = 0;
             }
