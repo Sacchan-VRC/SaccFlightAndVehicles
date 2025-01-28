@@ -247,7 +247,7 @@ namespace SaccFlightAndVehicles
                                     }
                                     //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
                                     EntityControl.dead = true;
-                                    SendCustomEventDelayedFrames(nameof(deadfalse), 5);
+                                    SendCustomEventDelayedSeconds(nameof(deadfalse), (float)SAVControl.GetProgramVariable("GsAveragingTime"));
 
                                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockIn));
                                 }
@@ -363,7 +363,7 @@ namespace SaccFlightAndVehicles
                     Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                     VehicleRigidbody.angularVelocity = CatapultRotDifrad;
                     EntityControl.dead = true;
-                    SendCustomEventDelayedFrames(nameof(deadfalse), 5);
+                    SendCustomEventDelayedSeconds(nameof(deadfalse), (float)SAVControl.GetProgramVariable("GsAveragingTime"));
                 }
                 CatapultRotLastFrame = CatapultTransform.rotation;
                 CatapultPosLastFrame = CatapultTransform.position;

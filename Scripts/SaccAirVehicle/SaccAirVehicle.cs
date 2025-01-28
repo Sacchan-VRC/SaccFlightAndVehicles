@@ -1533,7 +1533,7 @@ namespace SaccFlightAndVehicles
                 LastFrameVel = VehicleVel;
             }
         }
-        float GsAveragingTime = .1f;
+        [System.NonSerialized] public float GsAveragingTime = .1f;
         private int NumFUinAvgTime = 1;
         private Vector3 Gs_all;
         private Vector3[] FrameGs;
