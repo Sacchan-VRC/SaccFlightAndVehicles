@@ -154,10 +154,9 @@ namespace SaccFlightAndVehicles
             else if (!KeepAwake) { DoEffects += DeltaTime; }
 
             VehicleAnimator.SetFloat(VTOLANGLE_STRING, (float)SAVControl.GetProgramVariable("VTOLAngle"));
-
-            vapor = (float)SAVControl.GetProgramVariable("Speed") > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
-
             VehicleAnimator.SetFloat(HEALTH_STRING, (float)SAVControl.GetProgramVariable("Health") * FullHealthDivider);
+
+            vapor = !(bool)SAVControl.GetProgramVariable("Taxiing") && ((float)SAVControl.GetProgramVariable("Speed") > 20);// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
             VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack") * 0.00555555556f /* Divide by 180 */ ) : 0);
 
             if (DoWheelPose)
