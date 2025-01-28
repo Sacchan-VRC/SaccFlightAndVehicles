@@ -185,7 +185,9 @@ namespace SaccFlightAndVehicles
             IntervalsMid = Mathf.Lerp(updateInterval, IdleModeUpdateInterval, 0.5f);
             // script activation is delayed to allow all scripts on this vehicle to activate first
             // 10 frames to be safe, 4 is the minimum for car wheels to not behave strangely (ingame only) if they're touching the ground at Start(), reason unknown.
-            SendCustomEventDelayedFrames(nameof(ActivateScript), 10);
+            // SendCustomEventDelayedFrames(nameof(ActivateScript), 10);
+            // just delay 5s because it causes too many problems to initialize too fast (vrc ownership race conditions when two people join a new instance together?)
+            SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
             InitSyncValues();
         }
         public void ActivateScript()
