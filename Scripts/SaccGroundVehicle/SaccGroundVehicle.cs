@@ -162,7 +162,10 @@ namespace SaccFlightAndVehicles
         [Tooltip("Make tank slower by this ratio when reversing")]
         public float TANK_ReverseSpeed = 0.75f;
         [Tooltip("Multiply how much the VR throttle moves from hand movement, for DFUNCS and TankMode")]
-        [System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
+        [SerializeField] KeyCode TANK_CruiseKey = KeyCode.F2;
+        bool TANK_Cruising;
+        [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
+        public float ThrottleSensitivity = 6f;
         [Header("Debug")]
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
         public float Clutch;
@@ -477,7 +480,10 @@ namespace SaccFlightAndVehicles
             {
                 if (ThrottleGripLastFrame[SliderIndex])
                 {
-                    TankThrottles[SliderIndex] = 0;
+                    if (Mathf.Abs(TankThrottles[SliderIndex]) < DeadZone)
+                    {
+                        TankThrottles[SliderIndex] = 0;
+                    }
                     if (LeftHand)
                     {
                         localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
@@ -488,14 +494,10 @@ namespace SaccFlightAndVehicles
                         localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                         EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped_R");
                     }
+                    ThrottleGripLastFrame[SliderIndex] = false;
                 }
-                ThrottleGripLastFrame[SliderIndex] = false;
             }
             float result = TankThrottles[SliderIndex];
-            if (Mathf.Abs(result) < DeadZone)
-            {
-                result = 0f;
-            }
             return result;
         }
         private void LateUpdate()
@@ -584,12 +586,18 @@ namespace SaccFlightAndVehicles
                 {
                     if (TankMode)
                     {
+                        if (Input.GetKeyDown(TANK_CruiseKey))
+                        {
+                            TANK_Cruising = !TANK_Cruising;
+                        }
+                        float LeftThrottle;
+                        float RightThrottle;
                         float VRThrottleL = 0;
                         float VRThrottleR = 0;
                         if (InVR)
                         {
-                            VRThrottleL = ThrottleSlider(-1, 1, true, 0.02f);
-                            VRThrottleR = ThrottleSlider(-1, 1, false, 0.02f);
+                            VRThrottleL = ThrottleSlider(-1, 1, true, 0.2f);
+                            VRThrottleR = ThrottleSlider(-1, 1, false, 0.2f);
                         }
                         int LeftTrackF = 0;
                         int LeftTrackB = 0;
@@ -614,8 +622,18 @@ namespace SaccFlightAndVehicles
                             RightTrackB = Input.GetKey(KeyCode.D) ? -1 : 0;
                         }
 
-                        float LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
-                        float RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
+                        LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
+                        RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
+                        if (TANK_Cruising)
+                        {
+                            if (RightThrottle != 0 || LeftThrottle != 0)
+                            {
+                                if (Mathf.Abs(RightThrottle + LeftThrottle) == 2)
+                                { TANK_Cruising = false; }
+                            }
+                            else LeftThrottle = RightThrottle = 1;
+                        }
+
                         //For animations
                         ThrottleInput = LeftThrottle * .5f + .5f;
                         YawInput = RightThrottle;
@@ -660,7 +678,7 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
                             Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || ACCELTEST ? 1 : 0;
 #else
-                        Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                            Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
 #endif
                             //int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
                             Ai = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
@@ -972,7 +990,7 @@ namespace SaccFlightAndVehicles
         }
         float Steps_Error;
         bool frame_even = true;
-        [System.NonSerialized] public float GsAveragingTime = .1f;
+        float GsAveragingTime = .1f;
         private int NumFUinAvgTime = 1;
         private Vector3 Gs_all;
         private Vector3[] FrameGs;
@@ -1236,6 +1254,8 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            TANK_Cruising = false;
+            System.Array.Clear(TankThrottles, 0, 2);
             GDamageToTake = 0f;
             AllGs = 0f;
             InVR = EntityControl.InVR;
@@ -1248,6 +1268,8 @@ namespace SaccFlightAndVehicles
             WheelGrippingLastFrame_toggleR = false;
             WheelReleaseCountR = 0;
             WheelGrabToggleR = false;
+            TANK_Cruising = false;
+            System.Array.Clear(TankThrottles, 0, 2);
             for (int i = 0; i < DriveWheels.Length; i++)
             {
                 DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
