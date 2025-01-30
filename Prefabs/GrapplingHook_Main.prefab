@@ -1474,7 +1474,7 @@ MonoBehaviour:
   CenterOfMass: {fileID: 0}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
-  DisableBulletHitEvent: 0
+  DisableBulletHitEvent: 1
   BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
@@ -1489,6 +1489,8 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets:
   - {fileID: 0}
@@ -1508,8 +1510,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &6641467028754651308
 MonoBehaviour:
   m_ObjectHideFlags: 0
