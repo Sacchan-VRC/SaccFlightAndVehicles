@@ -46,8 +46,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("How long for the clutch to return to 0 after changing gear")]
         public float AutoClutch_Length = 0.5f;
         private SaccEntity EntityControl;
-        [UdonSynced, FieldChangeCallback(nameof(CurrentGear))] public int _CurrentGear = 1;
-        public int CurrentGear
+        [UdonSynced, FieldChangeCallback(nameof(CurrentGear))] public byte _CurrentGear = 1;
+        public byte CurrentGear
         {
             set
             {
@@ -115,7 +115,7 @@ namespace SaccFlightAndVehicles
             }
             get => ClutchOverride;
         }
-        private int NeutralGear;
+        private byte NeutralGear;
         private bool InNeutralGear = false;
         private bool InMaxGear = false;
         private bool InMinGear = false;
@@ -145,7 +145,7 @@ namespace SaccFlightAndVehicles
             {
                 if (GearRatios[i] == 0f)
                 {
-                    NeutralGear = i;
+                    NeutralGear = (byte)i;
                     break;
                 }
             }
@@ -282,7 +282,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetGear(int newgear)
         {
-            CurrentGear = Mathf.Clamp(newgear, 0, GearRatios.Length);
+            CurrentGear = (byte)Mathf.Clamp(newgear, 0, GearRatios.Length);
             LastGearChangeTime = Time.time;
             RequestSerialization();
         }
