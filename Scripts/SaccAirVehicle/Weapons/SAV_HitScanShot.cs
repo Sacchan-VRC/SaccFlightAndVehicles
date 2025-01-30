@@ -18,6 +18,7 @@ namespace SaccFlightAndVehicles
         public float TotalLifeTime = 1;
         public float BeamWidth = 1f;
         public float BeamRange = 3000f;
+        [SerializeField] private bool ExplodeIfNoHit = false;
         [SerializeField] private bool RunFunctionOnHit = false;
         [SerializeField] private string Func_Name = "_interact";
         [SerializeField] private float HitForce = 0f;
@@ -107,11 +108,16 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
+                Explode(HitPoint);
             }
             else
             {
                 HitPoint = transform.position + transform.forward * BeamRange;
                 beamscale.z = BeamRange;
+            }
+            if (ExplodeIfNoHit)
+            {
+                Explode(HitPoint);
             }
             if (BeamMesh)
             {
@@ -119,19 +125,6 @@ namespace SaccFlightAndVehicles
                 beamscale.x *= BeamWidth;
                 beamscale.y *= BeamWidth;
                 BeamMesh.transform.localScale = beamscale;
-            }
-            if (Explosion)
-            {
-                Explosion.transform.position = HitPoint;
-                Explosion.SetActive(true);
-            }
-            if (IsOwner)
-            {
-                if (DamageParticles)
-                {
-                    DamageParticles.transform.position = HitPoint;
-                    DamageParticles.SetActive(true);
-                }
             }
             if (LaserParticle)
             {
@@ -145,6 +138,22 @@ namespace SaccFlightAndVehicles
                 LaserParticle_P.Emit((int)LaserParticle_S.radius);
             }
         }
+        void Explode(Vector3 hitpoint)
+        {
+            if (Explosion)
+            {
+                Explosion.transform.position = hitpoint;
+                Explosion.SetActive(true);
+            }
+            if (IsOwner)
+            {
+                if (DamageParticles)
+                {
+                    DamageParticles.transform.position = hitpoint;
+                    DamageParticles.SetActive(true);
+                }
+            }
+        }
         public void KillBeam()
         {
             if (BeamMesh) { BeamMesh.SetActive(false); }
@@ -154,7 +163,6 @@ namespace SaccFlightAndVehicles
         {
             if (Explosion) { Explosion.SetActive(false); }
             if (DamageParticles) { DamageParticles.SetActive(false); }
-            if (Explosion) { Explosion.SetActive(false); }
             gameObject.SetActive(false);
             transform.SetParent(BombLauncherControl.transform);
             transform.localPosition = Vector3.zero;
