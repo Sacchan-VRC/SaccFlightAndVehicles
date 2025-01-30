@@ -152,9 +152,7 @@ namespace SaccFlightAndVehicles
             NumAGM = FullAGMs;
             reloadspeed = FullAGMs / FullReloadTimeSec;
             FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
-            if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
-            if (HUDText_AGM_ammo_TMP) { HUDText_AGM_ammo_TMP.text = NumAGM.ToString("F0"); }
-            if (HUDText_AGM_ammo_TMPUGUI) { HUDText_AGM_ammo_TMPUGUI.text = NumAGM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         private GameObject InstantiateWeapon()
         {
@@ -168,11 +166,11 @@ namespace SaccFlightAndVehicles
             AGMLocked = false;
             Piloting = true;
             InVR = EntityControl.InVR;
-            if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         public void SFEXT_P_PassengerEnter()
         {
-            if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -219,6 +217,8 @@ namespace SaccFlightAndVehicles
         {
             if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider); }
             if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+            if (HUDText_AGM_ammo_TMP) { HUDText_AGM_ammo_TMP.text = NumAGM.ToString("F0"); }
+            if (HUDText_AGM_ammo_TMPUGUI) { HUDText_AGM_ammo_TMPUGUI.text = NumAGM.ToString("F0"); }
         }
         public void SFEXT_G_Explode()
         {
@@ -466,7 +466,7 @@ namespace SaccFlightAndVehicles
                 AGMAnimator.SetTrigger(AnimFiredTriggerName);
                 AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider);
             }
-            if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         public void SetBoolOn()
         {
