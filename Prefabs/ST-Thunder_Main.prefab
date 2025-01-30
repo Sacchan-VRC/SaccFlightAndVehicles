@@ -104,7 +104,6 @@ MonoBehaviour:
   IsOwner: 0
   FunctionsActive: 0
   Occupied: 0
-  DialFuncPos: 0
 --- !u!114 &8005464590886231918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28787,6 +28786,9 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_ReverseSpeed: 0.75
+  TANK_CruiseKey: 283
+  ThrottleSensitivity: 6
   Revs: 0
   Clutch: 0
   CurrentGear: 1
@@ -29389,10 +29391,10 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!95 &2935594654239514265
 Animator:
   serializedVersion: 5
@@ -35071,6 +35073,16 @@ MonoBehaviour:
   CogWheelsTrack2_rotSpeeds: []
   CogWheelsTrack3: []
   CogWheelsTrack3_rotSpeeds: []
+  TurretAngleIndicator: []
+  CommanderAngleIndicator: []
+  Turret: {fileID: 0}
+  Commander: {fileID: 0}
+  TrackSound: {fileID: 0}
+  TrackSoundPitchMulti: 1
+  HeadingOffset: 0
+  DriverHeading: {fileID: 0}
+  GunnerHeading: {fileID: 0}
+  CommanderHeading: {fileID: 0}
 --- !u!114 &2271131324685053666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100447,6 +100459,7 @@ MonoBehaviour:
   HandBrakeStrength: 70
   WheelWeight: 0.1
   EngineInfluence: 225
+  MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -100810,6 +100823,7 @@ MonoBehaviour:
   HandBrakeStrength: 70
   WheelWeight: 0.1
   EngineInfluence: 225
+  MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -101046,6 +101060,7 @@ MonoBehaviour:
   HandBrakeStrength: 70
   WheelWeight: 0.1
   EngineInfluence: 225
+  MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -101352,6 +101367,7 @@ MonoBehaviour:
   HandBrakeStrength: 70
   WheelWeight: 0.1
   EngineInfluence: 225
+  MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121

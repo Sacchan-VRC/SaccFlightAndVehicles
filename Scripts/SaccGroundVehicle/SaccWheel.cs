@@ -46,7 +46,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
         public float EngineInfluence = 225f;
         [Tooltip("Max angle of ground at which vehicle can park on without sliding down")]
-        [SerializeField] float MaxParkingIncline = 20;
+        [SerializeField] float MaxParkingIncline = 30;
         public LayerMask WheelLayers;
         public float ClutchStrength = 100f;
         [Tooltip("Skip sound and skid effects completely")]
