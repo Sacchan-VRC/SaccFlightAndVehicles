@@ -41,6 +41,8 @@ namespace SaccFlightAndVehicles
         public float LowerDeadZone = .05f;
         [Tooltip("Set this to your neutral gear")]
         [System.NonSerialized] public bool InvertVRGearChangeDirection;
+        [Tooltip("How long the clutch to stays at max when changing gear")]
+        public float AutoClutch_StayPressed = 0;
         [Tooltip("How long for the clutch to return to 0 after changing gear")]
         public float AutoClutch_Length = 0.5f;
         private SaccEntity EntityControl;
@@ -67,7 +69,7 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
                 EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
-                AutoClutch = 1;
+                AutoClutch = 1 + ClucthDecaySpeed * AutoClutch_StayPressed;
                 if (!ClutchTransitioning)
                 {
                     ClutchTransitioning = true;
@@ -247,7 +249,7 @@ namespace SaccFlightAndVehicles
                     { Trigger = 1f; }
                     if (Trigger < LowerDeadZone)
                     { Trigger = 0f; }
-                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride, AutoClutch));
+                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride, Mathf.Min(1, AutoClutch)));
 
                     if (Input.GetKeyDown(GearUpKey))
                     {
