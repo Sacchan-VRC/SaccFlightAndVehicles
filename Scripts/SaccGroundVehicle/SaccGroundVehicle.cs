@@ -68,7 +68,7 @@ namespace SaccFlightAndVehicles
         public float Drag = .02f;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
         public Transform ControlsRoot;
-        [Tooltip("Efficiency of the engine at different revs, 0=0, 1=revlimiter")]
+        [Tooltip("Engine power curve over revs, 0=0, 1=revlimiter")]
         public AnimationCurve EngineResponseCurve = AnimationCurve.Linear(0, 1, 1, 1);
         [System.NonSerialized] public Vector3 CurrentVel;
         // [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
