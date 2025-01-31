@@ -680,8 +680,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            DoEffects = 9f;
-            Sleeping = false;
+            VehicleAnimator.SetFloat(HEALTH_STRING, (float)SGVControl.GetProgramVariable("Health") * FullHealthDivider);
             if (!BulletHitNull)
             {
                 int rand = Random.Range(0, BulletHit.Length);
