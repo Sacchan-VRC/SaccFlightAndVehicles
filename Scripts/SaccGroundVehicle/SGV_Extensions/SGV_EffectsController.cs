@@ -680,7 +680,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            DoEffects = 0f;
+            DoEffects = 9f;
+            Sleeping = false;
             if (!BulletHitNull)
             {
                 int rand = Random.Range(0, BulletHit.Length);
