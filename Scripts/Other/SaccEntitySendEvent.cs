@@ -122,10 +122,15 @@ namespace SaccFlightAndVehicles
         {
             if (!controlsActive) { return; }
             float Trigger;
-            if (LeftDial)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            if (HandHeldMode)
+                Trigger = HoldingTrigger_Held;
             else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            {
+                if (LeftDial)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            }
 
             if (Trigger > 0.75)
             {
@@ -159,6 +164,17 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
             controlsActive = false;
+        }
+        private bool HandHeldMode = false;
+        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
+        private int HoldingTrigger_Held = 0;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            HoldingTrigger_Held = 1;
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger_Held = 0;
         }
     }
 }

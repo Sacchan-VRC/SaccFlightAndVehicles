@@ -102,6 +102,7 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_Deselected()
         {
+            HoldingTrigger_Held = 0;
             gameObject.SetActive(false);
         }
         public void SFEXT_G_PilotEnter()
@@ -119,6 +120,10 @@ namespace SaccFlightAndVehicles
                     { SetBoolOn(); }
                 }
             }
+        }
+        public void SFEXT_O_PilotExit()
+        {
+            HoldingTrigger_Held = 0;
         }
         public void SFEXT_G_PilotExit()
         {
@@ -155,10 +160,15 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (LeftDial)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            if (HandHeldMode)
+                Trigger = HoldingTrigger_Held;
             else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            {
+                if (LeftDial)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            }
             if (Trigger > 0.75)
             {
                 if (!TriggerLastFrame)
@@ -303,8 +313,19 @@ namespace SaccFlightAndVehicles
             EngineOn = false;
             CheckToggleAllowed();
         }
+        private bool HandHeldMode = false;
+        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
+        private int HoldingTrigger_Held = 0;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            HoldingTrigger_Held = 1;
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger_Held = 0;
+        }
         public void SFEXT_O_TakeOwnership()
         {//disable if owner leaves while piloting
             if (!IsSecondary)
