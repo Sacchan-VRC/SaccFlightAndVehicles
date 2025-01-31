@@ -169,7 +169,7 @@ namespace SaccFlightAndVehicles
         [Header("Debug")]
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
         public float Clutch;
-        public int CurrentGear = 0;
+        public byte CurrentGear = 0;
         private bool LimitingRev = false;
         public Vector3 VehicleVel;
         public float debugSpeedSteeringMulti = 0f;
