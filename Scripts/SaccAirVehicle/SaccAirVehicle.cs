@@ -180,9 +180,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
         public float GDamage = 10f;
         [Tooltip("Speed at which vehicle will start to take damage from a crash (m/s)")]
-        public float CrashDmg_MinSpeed = 15f;
+        public float Crash_Damage_Speed = 10f;
         [Tooltip("Speed at which vehicle will take damage equal to its max health from a crash (m/s)")]
-        public float CrashDmg_MaxSpeed = 100f;
+        public float Crash_Death_Speed = 50f;
         [Tooltip("Length of the trace that looks for the ground to calculate ground effect")]
         public float GroundEffectMaxDistance = 7;
         [Tooltip("Multiply the force of the ground effect")]
@@ -2037,15 +2037,15 @@ namespace SaccFlightAndVehicles
             if (col == null) { return; }
             float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
             float colmag_dmg = colmag;
-            if (colmag_dmg > CrashDmg_MinSpeed)
+            if (colmag_dmg > Crash_Damage_Speed)
             {
-                if (colmag_dmg < CrashDmg_MaxSpeed)
+                if (colmag_dmg < Crash_Death_Speed)
                 {
-                    float dif = CrashDmg_MaxSpeed - CrashDmg_MinSpeed;
-                    float newcolT = (colmag_dmg - CrashDmg_MinSpeed) / dif;
-                    colmag_dmg = Mathf.Lerp(0, CrashDmg_MaxSpeed, newcolT);
+                    float dif = Crash_Death_Speed - Crash_Damage_Speed;
+                    float newcolT = (colmag_dmg - Crash_Damage_Speed) / dif;
+                    colmag_dmg = Mathf.Lerp(0, Crash_Death_Speed, newcolT);
                 }
-                float thisGDMG = (colmag_dmg / CrashDmg_MaxSpeed) * FullHealth;
+                float thisGDMG = (colmag_dmg / Crash_Death_Speed) * FullHealth;
                 Health -= thisGDMG;
 
                 if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
