@@ -54,7 +54,7 @@ namespace SaccFlightAndVehicles
         public Transform AGMLaunchPoint;
         public LayerMask AGMTargetsLayer = 1 << 26;
         public Transform WorldParent;
-        [SerializeField] private bool HandHeldMode = false;
+        private bool HandHeldMode = false;
         [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
@@ -498,6 +498,7 @@ namespace SaccFlightAndVehicles
             DFUNC_Deselected();
             SFEXT_O_PilotExit();
         }
+        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         private float HoldingTrigger_Held;
