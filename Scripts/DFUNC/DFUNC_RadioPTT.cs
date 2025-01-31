@@ -30,8 +30,10 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             if (!Piloting) return;
-            float Trigger = 0;
-            if (Selected)
+            float Trigger;
+            if (HandHeldMode)
+                Trigger = HoldingTrigger_Held;
+            else
             {
                 if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
@@ -69,6 +71,7 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_Deselected()
         {
+            HoldingTrigger_Held = 0;
             Selected = false;
         }
         bool PTT_ACTIVE;
@@ -115,16 +118,28 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             gameObject.SetActive(false);
+            HoldingTrigger_Held = 0;
             Piloting = false;
             PTT_OFF();
         }
         public void SFEXT_O_OnPickup()
         {
+            HandHeldMode = true;
             SFEXT_O_PilotEnter();
         }
         public void SFEXT_O_OnDrop()
         {
             SFEXT_O_PilotExit();
+        }
+        private bool HandHeldMode = false;
+        private int HoldingTrigger_Held = 0;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            HoldingTrigger_Held = 1;
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger_Held = 0;
         }
     }
 }
