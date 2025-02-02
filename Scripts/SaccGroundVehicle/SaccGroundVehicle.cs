@@ -22,6 +22,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public Rigidbody VehicleRigidbody;
         [Tooltip("Number of steps per second engine+wheel physics should run, if refresh rate is higher than this number, it will do nothing. Higher number = more fair physics over different refreshrates at cost of performance.")]
         public int NumStepsSec = 300;
+        int _numStepsSec = 1;
         [Tooltip("List of wheels to send Engine values to and from")]
         public UdonSharpBehaviour[] DriveWheels;
         [Tooltip("Wheels to get the 'Grounded' value from for autosteering")]
@@ -273,15 +274,23 @@ namespace SaccFlightAndVehicles
             }
             get => DisableInput;
         }
+        public void setStepsSec()
+        {
+            if (NumStepsSec < 1f / Time.fixedDeltaTime)
+            {
+                _numStepsSec = (int)Mathf.Round(1f / Time.fixedDeltaTime);
+            }
+            else { _numStepsSec = NumStepsSec; }
+            for (int i = 0; i < AllWheels.Length; i++)
+            {
+                AllWheels[i].SendCustomEvent("updateStepsSec");
+            }
+        }
         public void SFEXT_L_EntityStart()
         {
             if (!Initialized) { Init(); }
             CenterOfMass = EntityControl.CenterOfMass;
             SetCoMMeshOffset();
-            if (NumStepsSec < 1f / Time.fixedDeltaTime)
-            {
-                NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
-            }
             UsingManualSync = !EntityControl.EntityObjectSync;
 
             NumWheels = DriveWheels.Length + SteerWheels.Length + OtherWheels.Length;
@@ -363,6 +372,7 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
 
             SetupGCalcValues();
+            setStepsSec();
         }
         public void SetupGCalcValues()
         {
@@ -1017,8 +1027,8 @@ namespace SaccFlightAndVehicles
 
             if (Piloting)
             {
-                float StepsFloat = ((DeltaTime) * NumStepsSec);
-                int steps = (int)((DeltaTime) * NumStepsSec);
+                float StepsFloat = ((DeltaTime) * _numStepsSec);
+                int steps = (int)((DeltaTime) * _numStepsSec);
                 Steps_Error += StepsFloat - steps;
                 if (Steps_Error > 1)
                 {
@@ -1261,6 +1271,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             SetCollidersLayer(EntityControl.OnboardVehicleLayer);
             SetWheelDriver();
+            setStepsSec();
         }
         public void SFEXT_O_PilotExit()
         {

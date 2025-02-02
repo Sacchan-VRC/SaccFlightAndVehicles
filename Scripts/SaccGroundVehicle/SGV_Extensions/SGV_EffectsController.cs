@@ -55,6 +55,7 @@ namespace SaccFlightAndVehicles
         // public Transform testcamera;
         [Tooltip("Physics scripts that only need to be enabled if you're owner, and the vehicle is awake")]
         public GameObject[] Wings;
+        [Header("Tank Stuff:")]
         public bool DoCaterpillarTracks;
         public UdonSharpBehaviour[] TrackSourceWheels;
         public float[] TrackRotations;
@@ -78,6 +79,11 @@ namespace SaccFlightAndVehicles
         [SerializeField] Transform[] CommanderAngleIndicator;
         [SerializeField] Transform Turret;
         [SerializeField] Transform Commander;
+        [SerializeField] AudioSource TrackSound;
+        [SerializeField] float TrackSoundVolMulti = 1;
+        [SerializeField] float TrackSoundPitchMulti = 1;
+        [SerializeField] float TrackSoundMaxVol = 1;
+        [SerializeField] float TrackSoundMaxPitch = 1;
         private SaccEntity EntityControl;
         private Animator VehicleAnimator;
         private Transform VehicleTransform;
@@ -265,6 +271,14 @@ namespace SaccFlightAndVehicles
                     wheelRotUV.y = wheelRotUV.y - Mathf.Floor(wheelRotUV.x);
                     uvs = wheelRotUV;
                     Tracks[i].mainTextureOffset = uvs;
+                    if (TrackSound)
+                    {
+                        float TrackSoundPitch = Mathf.Abs((float)TrackSourceWheels[i].GetProgramVariable("WheelRotationSpeedRPS"));
+                        float TrackSoundVol = Mathf.Abs((float)TrackSourceWheels[i].GetProgramVariable("WheelRotationSpeedRPS"));
+                        TrackSound.volume = Mathf.Min(TrackSoundVol * TrackSoundVolMulti, TrackSoundMaxVol);
+                        TrackSound.pitch = Mathf.Min(TrackSoundPitch * TrackSoundPitchMulti, TrackSoundMaxPitch);
+                    }
+
                     switch (i)
                     {
                         case 0:

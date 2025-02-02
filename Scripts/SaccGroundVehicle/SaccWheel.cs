@@ -151,6 +151,7 @@ namespace SaccFlightAndVehicles
         }
         public void DEBUGAccelCar()
         {
+            SGVControl.SendCustomEvent("setStepsSec");
             CarRigid.velocity = Vector3.zero;
             CarRigid.angularVelocity = Vector3.zero;
             SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_2), Time.fixedDeltaTime * 2);
@@ -215,7 +216,7 @@ namespace SaccFlightAndVehicles
         {
             SkidSound_Min_THREEQUARTER = SkidSound_Min * .75f;
             SkidSound_Min_TWOTHRID = SkidSound_Min * .66f;
-            NumStepsSec = (int)SGVControl.GetProgramVariable("NumStepsSec");
+            updateStepsSec();
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
             if (!WheelRenderer)
             {
@@ -405,7 +406,7 @@ namespace SaccFlightAndVehicles
 
             if (IsDriveWheel && !GearNeutral)
             {
-                WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, 1 - Mathf.Pow(0.5f, (1f - Clutch) * ClutchStrength * WheelPhysicsDelta)  /* * Time.fixedDeltaTime * 90f */);
+                WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, 1 - Mathf.Pow(0.5f, (1f - Clutch) * ClutchStrength * .01f));
                 WheelRotationSpeedRPS = WheelRotationSpeedRPM / 60f;
                 WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
             }
@@ -643,6 +644,10 @@ namespace SaccFlightAndVehicles
                     { StopSkidParticle(); }
                 }
             }
+        }
+        public void updateStepsSec()
+        {
+            NumStepsSec = (int)SGVControl.GetProgramVariable("_numStepsSec");
         }
         public void PlayerEnterVehicle()
         {
