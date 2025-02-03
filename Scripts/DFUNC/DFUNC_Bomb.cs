@@ -281,7 +281,7 @@ namespace SaccFlightAndVehicles
             {
                 LaunchBomb();
             }
-            if (EntityControl.InVehicle && ReloadSound) SendCustomEventDelayedSeconds(nameof(PlayReloadSound), BombDelay + ReloadSound_offset);
+            if (EntityControl.InVehicle && ReloadSound) SendCustomEventDelayedSeconds(nameof(PlayReloadSound), ReloadSound_offset);
         }
         public void SFEXT_O_OnPickupUseUp()
         {
