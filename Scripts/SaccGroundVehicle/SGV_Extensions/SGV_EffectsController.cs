@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
         public AudioSource[] EngineSounds;
         private Transform[] EngineSoundsT;
+        bool EngineSoundsActive;
         public bool DespawnIfUnused = false;
         [SerializeField] private float DespawnDist = 50f;
         [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
@@ -58,7 +59,7 @@ namespace SaccFlightAndVehicles
         [Header("Tank Stuff:")]
         public bool DoCaterpillarTracks;
         public UdonSharpBehaviour[] TrackSourceWheels;
-        public float[] TrackRotations;
+        [System.NonSerialized] public float[] TrackRotations;
         public Renderer TracksRenderer;
         public Vector2[] TrackSpeedMulti = new Vector2[2];
         public int[] TrackMaterialSlots;
@@ -205,6 +206,11 @@ namespace SaccFlightAndVehicles
                     Tracks[i] = TracksRenderer.materials[TrackMaterialSlots[i]];
                 }
             }
+            for (int i = 0; i < EngineSounds.Length; i++)
+            {
+                EngineSounds[i].gameObject.SetActive(false);
+            }
+            if (TrackSound) { TrackSound.gameObject.SetActive(false); }
 
             FallAsleep();// sleep until sync script wakes up
             SendCustomEventDelayedSeconds(nameof(WakeUp), 5);// same activation delay as sync script
@@ -262,6 +268,7 @@ namespace SaccFlightAndVehicles
             }
             if (DoCaterpillarTracks)
             {
+                float wheelSpeed = 0;
                 for (int i = 0; i < TrackSourceWheels.Length; i++)
                 {
                     Vector2 uvs;
@@ -273,10 +280,9 @@ namespace SaccFlightAndVehicles
                     Tracks[i].mainTextureOffset = uvs;
                     if (TrackSound)
                     {
-                        float TrackSoundPitch = Mathf.Abs((float)TrackSourceWheels[i].GetProgramVariable("WheelRotationSpeedRPS"));
-                        float TrackSoundVol = Mathf.Abs((float)TrackSourceWheels[i].GetProgramVariable("WheelRotationSpeedRPS"));
-                        TrackSound.volume = Mathf.Min(TrackSoundVol * TrackSoundVolMulti, TrackSoundMaxVol);
-                        TrackSound.pitch = Mathf.Min(TrackSoundPitch * TrackSoundPitchMulti, TrackSoundMaxPitch);
+                        wheelSpeed += Mathf.Abs((float)TrackSourceWheels[i].GetProgramVariable("WheelRotationSpeedRPS"));
+                        TrackSound.volume = Mathf.Min(wheelSpeed * TrackSoundVolMulti, TrackSoundMaxVol);
+                        TrackSound.pitch = Mathf.Min(wheelSpeed * TrackSoundPitchMulti, TrackSoundMaxPitch);
                     }
 
                     switch (i)
@@ -385,6 +391,11 @@ namespace SaccFlightAndVehicles
                 CheckDisableLoop();
             }
             Sleeping = true;
+            for (int i = 0; i < EngineSounds.Length; i++)
+            {
+                EngineSounds[i].gameObject.SetActive(false);
+            }
+            if (TrackSound) { TrackSound.gameObject.SetActive(false); }
             if (SGVControl.TankMode)
             {
                 VehicleAnimator.SetFloat(THROTTLE_STRING, .5f);
@@ -496,6 +507,12 @@ namespace SaccFlightAndVehicles
             Occupied = true;
             WakeUp();
             VehicleAnimator.SetBool("occupied", true);
+
+            for (int i = 0; i < EngineSounds.Length; i++)
+            {
+                EngineSounds[i].gameObject.SetActive(true);
+            }
+            if (TrackSound) { TrackSound.gameObject.SetActive(true); }
         }
         public void SFEXT_G_PilotExit()
         {
