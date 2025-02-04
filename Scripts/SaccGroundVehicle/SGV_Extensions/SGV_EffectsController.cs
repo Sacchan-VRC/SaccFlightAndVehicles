@@ -206,8 +206,8 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-            DoEffects = 9f;//must be longer than syncscript activation time
-            Sleeping = false;
+            FallAsleep();// sleep until sync script wakes up
+            SendCustomEventDelayedSeconds(nameof(WakeUp), 5);// same activation delay as sync script
         }
         private bool KeepAwake = false;
         public void SFEXT_L_KeepAwake() { KeepAwake = true; WakeUp(); }
