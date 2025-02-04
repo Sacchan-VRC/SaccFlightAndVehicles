@@ -163,6 +163,8 @@ namespace SaccFlightAndVehicles
         {
             if (PickupObject)
             {
+                VRC_Pickup pickup = PickupObject.GetComponent<VRC_Pickup>();
+                if (pickup) { if (pickup.IsHeld) return; }
                 Networking.SetOwner(Networking.LocalPlayer, PickupObject.gameObject);
                 PickupObject.Respawn();
             }
