@@ -514,6 +514,7 @@ namespace SaccFlightAndVehicles
                     GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat;
                     GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * WheelPhysicsDelta;
                 }
+                // SGVControl.WheelFeedBack += Vector3.Dot(GripForcLat, transform.right);
 
                 // two way forces for wheel grip on rigidbodies, many problems
                 /* float WeightRatio = 1;

@@ -35,6 +35,8 @@ namespace SaccFlightAndVehicles
         //public Transform[] SteeringWheelsTrans;
         [Tooltip("How many revs are added when accelerating")]
         public float DriveSpeed;
+        [Tooltip("Max revs of the engine")]
+        public float RevLimiter = 8000;
         [Tooltip("How many revs are taken away all the time")]
         public float EngineSlowDown = .75f;
         [Tooltip("Throttle that is applied when not touching the controls")]
@@ -112,21 +114,15 @@ namespace SaccFlightAndVehicles
         [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
         public float SteeringReturnSpeedVR = 5f;
         public bool UseStickSteering;
-        [Header("Engine")]
-        public float RevLimiter = 8000;
-        [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
-        public float MaxGs = 10;
-        [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
-        public float GDamage = 10f;
-        [Tooltip("Speed at which vehicle will start to take damage from a crash (m/s)")]
-        public float CrashDmg_MinSpeed = 15f;
-        [Tooltip("Speed at which vehicle will take damage equal to its max health from a crash (m/s)")]
-        public float CrashDmg_MaxSpeed = 100f;
         [Header("Other")]
         [Tooltip("Time until vehicle reappears after exploding")]
         public float RespawnDelay = 10;
         [Tooltip("Time after reappearing the vehicle is invincible for")]
         public float InvincibleAfterSpawn = 2.5f;
+        [Tooltip("Speed at which vehicle will start to take damage from a crash (m/s)")]
+        public float Crash_Damage_Speed = 10f;
+        [Tooltip("Speed at which vehicle will take damage equal to its max health from a crash (m/s)")]
+        public float Crash_Death_Speed = 100f;
         [Tooltip("Damage taken when hit by a bullet")]
         public float BulletDamageTaken = 10f;
         [Tooltip("Impact speed that defines a small crash")]
@@ -179,7 +175,6 @@ namespace SaccFlightAndVehicles
         public bool Grounded_Steering;
         public bool Grounded;
         public float GearRatio = 0f;
-        private float GDamageToTake;
         private float HandDistanceZLastFrame;
         private float VRThrottlePos;
         //twist throttle values
@@ -236,6 +231,7 @@ namespace SaccFlightAndVehicles
         public bool CurrentlyDistant = true;
         float angleLast;
         int HandsOnWheel;
+        // public float WheelFeedBack;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(HasFuel_))] public bool HasFuel = true;
         public bool HasFuel_
         {
@@ -517,19 +513,12 @@ namespace SaccFlightAndVehicles
             {
                 if (!EntityControl._dead)
                 {
-                    //G/crash Damage
-                    if (GDamageToTake > 0)
-                    {
-                        Health -= GDamageToTake * DeltaTime * GDamage;//take damage of GDamage per second per G above MaxGs
-                        GDamageToTake = 0;
-                    }
                     if (Health <= 0f)//vehicle is ded
                     {
                         NetworkExplode();
                         return;
                     }
                 }
-                else { GDamageToTake = 0; }
                 if (!Sleeping)
                 {
                     DoRepeatingWorld();
@@ -1022,7 +1011,6 @@ namespace SaccFlightAndVehicles
             GsFrameCheck++;
             if (GsFrameCheck >= NumFUinAvgTime) { GsFrameCheck = 0; }
             AllGs = Gs_all.magnitude / NumFUinAvgTime;
-            GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
             LastFrameVel = VehicleVel;
 
             if (Piloting)
@@ -1192,7 +1180,6 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             AllGs = 0;
-            GDamageToTake = 0f;
             UpdateWheelIsOwner();
             for (int i = 0; i < NumFUinAvgTime; i++) { FrameGs[i] = Vector3.zero; }
         }
@@ -1266,7 +1253,6 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             TANK_Cruising = false;
             System.Array.Clear(TankThrottles, 0, 2);
-            GDamageToTake = 0f;
             AllGs = 0f;
             InVR = EntityControl.InVR;
             SetCollidersLayer(EntityControl.OnboardVehicleLayer);
@@ -1392,15 +1378,15 @@ namespace SaccFlightAndVehicles
             if (col == null) { return; }
             float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
             float colmag_dmg = colmag;
-            if (colmag_dmg > CrashDmg_MinSpeed)
+            if (colmag_dmg > Crash_Damage_Speed)
             {
-                if (colmag_dmg < CrashDmg_MaxSpeed)
+                if (colmag_dmg < Crash_Death_Speed)
                 {
-                    float dif = CrashDmg_MaxSpeed - CrashDmg_MinSpeed;
-                    float newcolT = (colmag_dmg - CrashDmg_MinSpeed) / dif;
-                    colmag_dmg = Mathf.Lerp(0, CrashDmg_MaxSpeed, newcolT);
+                    float dif = Crash_Death_Speed - Crash_Damage_Speed;
+                    float newcolT = (colmag_dmg - Crash_Damage_Speed) / dif;
+                    colmag_dmg = Mathf.Lerp(0, Crash_Death_Speed, newcolT);
                 }
-                float thisGDMG = (colmag_dmg / CrashDmg_MaxSpeed) * FullHealth;
+                float thisGDMG = (colmag_dmg / Crash_Death_Speed) * FullHealth;
                 Health -= thisGDMG;
 
                 if (Health <= 0 && thisGDMG > FullHealth * 0.5f)

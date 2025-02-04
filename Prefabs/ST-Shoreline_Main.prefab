@@ -2287,6 +2287,7 @@ MonoBehaviour:
   - {fileID: 8204297190439482269}
   OtherWheels: []
   DriveSpeed: 32000
+  RevLimiter: 8000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
   MinThrottle_PStrength: 2
@@ -2382,13 +2383,12 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  RevLimiter: 8000
-  MaxGs: 10
-  GDamage: 10
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 60
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  MaxGs: 10
+  GDamage: 10
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 60
   BulletDamageTaken: 0
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
@@ -7798,7 +7798,10 @@ MonoBehaviour:
   Turret: {fileID: 0}
   Commander: {fileID: 0}
   TrackSound: {fileID: 0}
+  TrackSoundVolMulti: 1
   TrackSoundPitchMulti: 1
+  TrackSoundMaxVol: 1
+  TrackSoundMaxPitch: 1
   HeadingOffset: 0
   DriverHeading: {fileID: 0}
   GunnerHeading: {fileID: 0}
