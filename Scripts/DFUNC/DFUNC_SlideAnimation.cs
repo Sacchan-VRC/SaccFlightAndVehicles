@@ -9,12 +9,14 @@ namespace SaccFlightAndVehicles
 {
     public class DFUNC_SlideAnimation : UdonSharpBehaviour
     {
+        [Header("Use Manual or None for Synchronization Method")]
         public UdonSharpBehaviour SAVControl;
         [SerializeField] private Transform ControlsRoot;
         public float SyncUpdateRate = .25f;
         [SerializeField] KeyCode AnimUpKey = KeyCode.PageUp;
         [SerializeField] KeyCode AnimDownKey = KeyCode.PageDown;
         [System.NonSerializedAttribute, UdonSynced] public float AnimValue;
+        float AnimValueLocal;
         [SerializeField] Animator VehicleAnimator;
         [SerializeField] string AnimFloatName;
         private float AnimLastValue;
@@ -27,8 +29,6 @@ namespace SaccFlightAndVehicles
         private bool InVR;
         private bool Selected;
         private bool UpdatingVar;
-        private bool UpdatingVR;
-        private bool UpdatingKeyb;
         private float NewAnimValue;
         private float AnimMover;
         private float UpdateTime;
@@ -48,16 +48,20 @@ namespace SaccFlightAndVehicles
             ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
             InVR = EntityControl.InVR;
             IsOwner = EntityControl.IsOwner;
-            AnimMover = AnimLastValue = NewAnimValue = AnimValue;
+            AnimMover = AnimLastValue = NewAnimValue = AnimValueLocal = AnimValue;
         }
         public void SFEXT_O_PilotEnter()
         {
             TriggerLastFrame = false;
             InVR = EntityControl.InVR;
             gameObject.SetActive(true);
-            AnimMover = AnimLastValue = NewAnimValue = AnimValue;
+            AnimMover = AnimLastValue = NewAnimValue = AnimValueLocal = AnimValue;
             if (ResetOnEnter) { ResetToDefault(); }
             RequestSerialization();
+        }
+        public void SFEXT_O_PilotExit()
+        {
+            UpdatingVar = false;
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -74,12 +78,20 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
+            if (UpdatingVar)
+            {
+                RequestSerialization();//make sure others recieve final position after finished adjusting
+                UpdateTime = Time.time;
+                UpdatingVar = false;
+            }
             RequestSerialization();
         }
         private void LateUpdate()
         {
             if (IsOwner)
             {
+                bool UpdatingVR = false;
+                bool UpdatingKeyb = false;
                 if (!InVR || Selected)
                 {
                     float pgup = Input.GetKey(AnimUpKey) ? 1 : 0;
@@ -107,7 +119,7 @@ namespace SaccFlightAndVehicles
                         if (!TriggerLastFrame)
                         {
                             AnimZeroPoint = handpos.z;
-                            AnimTemp = AnimValue;
+                            AnimTemp = AnimValueLocal;
                         }
                         float newAnim = AnimTemp + ((AnimZeroPoint - handpos.z) * ThrottleSensitivity);
                         AnimValueInput = newAnim;
@@ -115,25 +127,58 @@ namespace SaccFlightAndVehicles
                         TriggerLastFrame = true;
                     }
                     else { TriggerLastFrame = false; }
+                }
 
-                    if (UpdatingVR || UpdatingKeyb)
+                if (LoopingAnimation)
+                {
+                    //handle interpolations from 0.99 to 0.01 properly
+                    //set value to between 0 and 1
+                    if (AnimValueInput >= 0)
+                    { AnimValueInput = AnimValueInput - Mathf.Floor(AnimValueInput); }
+                    else
                     {
-                        if (!UpdatingVar) { UpdateTime = Time.time; }//prevent a tiny adjustment being sent that causes the movement to stutter 
-                        if (Time.time - UpdateTime > SyncUpdateRate)
-                        {
-                            RequestSerialization();
-                            UpdateTime = Time.time;
-                        }
-                        UpdatingVar = true;
+                        float AbsIn = Mathf.Abs(AnimValueInput);
+                        AnimValueInput = 1 - (AbsIn - Mathf.Floor(AbsIn));
+                    }
+                    //set value above or below current AnimValue to make it interpolate in the shortest direction
+                    if (AnimValueLocal > AnimValueInput)
+                    {
+                        if (Mathf.Abs(AnimValueLocal - AnimValueInput) > .5f)
+                        { AnimValueInput += 1; }
                     }
                     else
                     {
-                        if (UpdatingVar)
-                        {
-                            RequestSerialization();//make sure others recieve final position after finished adjusting
-                            UpdateTime = Time.time;
-                            UpdatingVar = false;
-                        }
+                        if (Mathf.Abs(AnimValueLocal - AnimValueInput) > .5f)
+                        { AnimValueInput -= 1; }
+                    }
+                }
+                else
+                {
+                    AnimValueInput = Mathf.Clamp(AnimValueInput, 0, 1);
+                }
+                AnimValueLocal = Mathf.MoveTowards(AnimValueLocal, AnimValueInput, AnimMoveSpeed * Time.deltaTime);
+                if (AnimValueLocal < 0) { AnimValueLocal++; }
+                else if (AnimValueLocal > 1) { AnimValueLocal--; }
+                AnimValue = AnimValueLocal;
+
+                if (UpdatingVR || UpdatingKeyb)
+                {
+                    if (!UpdatingVar) { UpdateTime = Time.time; }//prevent a tiny adjustment being sent that causes the movement to stutter 
+                    if (Time.time - UpdateTime > SyncUpdateRate)
+                    {
+                        RequestSerialization();
+                        UpdateTime = Time.time;
+                    }
+                    UpdatingVar = true;
+                }
+                else
+                {
+                    if (UpdatingVar)
+                    {
+                        //make sure others recieve final position after finished adjusting
+                        RequestSerialization();
+                        UpdateTime = Time.time;
+                        UpdatingVar = false;
                     }
                 }
             }
@@ -167,43 +212,9 @@ namespace SaccFlightAndVehicles
                 {
                     AnimMover = Mathf.MoveTowards(AnimMover, NewAnimValue, AnimMoveSpeed * Time.deltaTime);
                 }
-                AnimValue = AnimMover;
+                AnimValueLocal = AnimMover;
             }
-            SetAnimValues();
-        }
-        private void SetAnimValues()
-        {
-            if (LoopingAnimation)
-            {
-                //handle interpolations from 0.99 to 0.01 properly
-                //set value to between 0 and 1
-                if (AnimValueInput >= 0)
-                { AnimValueInput = AnimValueInput - Mathf.Floor(AnimValueInput); }
-                else
-                {
-                    float AbsIn = Mathf.Abs(AnimValueInput);
-                    AnimValueInput = 1 - (AbsIn - Mathf.Floor(AbsIn));
-                }
-                //set value above or below current AnimValue to make it interpolate in the shortest direction
-                if (AnimValue > AnimValueInput)
-                {
-                    if (Mathf.Abs(AnimValue - AnimValueInput) > .5f)
-                    { AnimValueInput += 1; }
-                }
-                else
-                {
-                    if (Mathf.Abs(AnimValue - AnimValueInput) > .5f)
-                    { AnimValueInput -= 1; }
-                }
-            }
-            else
-            {
-                AnimValueInput = Mathf.Clamp(AnimValueInput, 0, 1);
-            }
-            AnimValue = Mathf.MoveTowards(AnimValue, AnimValueInput, AnimMoveSpeed * Time.deltaTime);
-            if (AnimValue < 0) { AnimValue++; }
-            else if (AnimValue > 1) { AnimValue--; }
-            VehicleAnimator.SetFloat(AnimFloatName, AnimValue);
+            VehicleAnimator.SetFloat(AnimFloatName, AnimValueLocal);
         }
         public override void OnDeserialization()
         {
