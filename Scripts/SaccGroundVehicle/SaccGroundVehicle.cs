@@ -638,7 +638,12 @@ namespace SaccFlightAndVehicles
                         ThrottleInput = LeftThrottle * .5f + .5f;
                         YawInput = RightThrottle;
                         //
-                        FinalThrottle = 1;//Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
+                        FinalThrottle = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
+                        if (FinalThrottle < MinThrottle && Revs / RevLimiter < MinThrottle)
+                        {
+                            FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
+                            //P Controller for throttle
+                        }
 
                         // bool LeftNeg = LeftThrottle < 0;
                         // bool RightNeg = RightThrottle < 0;
