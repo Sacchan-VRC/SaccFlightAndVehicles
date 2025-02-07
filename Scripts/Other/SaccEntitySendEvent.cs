@@ -112,6 +112,8 @@ namespace SaccFlightAndVehicles
         }
 
         // can now be used as a DFUNC
+        [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
+        [SerializeField] bool use_OnPickupUseDown = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
@@ -122,7 +124,7 @@ namespace SaccFlightAndVehicles
         {
             if (!controlsActive) { return; }
             float Trigger;
-            if (HandHeldMode)
+            if (use_OnPickupUseDown)
                 Trigger = HoldingTrigger_Held;
             else
             {
@@ -165,8 +167,6 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             controlsActive = false;
         }
-        private bool HandHeldMode = false;
-        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
         private int HoldingTrigger_Held = 0;
         public void SFEXT_O_OnPickupUseDown()
         {

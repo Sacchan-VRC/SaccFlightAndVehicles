@@ -14,6 +14,8 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
         [SerializeField] bool ToggleMode = false;
+        [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
+        [SerializeField] bool use_OnPickupUseDown = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -31,7 +33,7 @@ namespace SaccFlightAndVehicles
         {
             if (!Piloting) return;
             float Trigger;
-            if (HandHeldMode)
+            if (use_OnPickupUseDown)
                 Trigger = HoldingTrigger_Held;
             else
             {
@@ -124,14 +126,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPickup()
         {
-            HandHeldMode = true;
             SFEXT_O_PilotEnter();
         }
         public void SFEXT_O_OnDrop()
         {
             SFEXT_O_PilotExit();
         }
-        private bool HandHeldMode = false;
         private int HoldingTrigger_Held = 0;
         public void SFEXT_O_OnPickupUseDown()
         {

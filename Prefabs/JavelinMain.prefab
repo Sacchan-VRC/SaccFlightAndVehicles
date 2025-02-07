@@ -91,7 +91,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 84813183395697963}
   SAVControl: {fileID: 0}
   AGMAnimator: {fileID: 0}
-  FireKey: 32
+  FireKey: 0
   AGM: {fileID: 543104622733814347}
   NumAGM: 4
   HUDText_AGM_ammo: {fileID: 0}
@@ -120,7 +120,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 67108864
   WorldParent: {fileID: 0}
-  HandHeldMode: 1
+  use_OnPickupUseDown: 1
 --- !u!114 &84813183395697963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -863,6 +863,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &385302126902660263
 MonoBehaviour:
   m_ObjectHideFlags: 0

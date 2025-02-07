@@ -54,7 +54,8 @@ namespace SaccFlightAndVehicles
         public Transform AGMLaunchPoint;
         public LayerMask AGMTargetsLayer = 1 << 26;
         public Transform WorldParent;
-        private bool HandHeldMode = false;
+        [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
+        [SerializeField] bool use_OnPickupUseDown = false;
         [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
@@ -271,7 +272,7 @@ namespace SaccFlightAndVehicles
                 TriggerTapTime += DeltaTime;
                 AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                 float Trigger;
-                if (HandHeldMode)
+                if (use_OnPickupUseDown)
                     Trigger = HoldingTrigger_Held;
                 else
                 {
@@ -290,7 +291,7 @@ namespace SaccFlightAndVehicles
                     if (AGMUnlock)
                     { AGMUnlock.Play(); }
                 }
-                if (Trigger > 0.75 || (!HandHeldMode && Input.GetKey(FireKey)))
+                if (Trigger > 0.75 || Input.GetKey(FireKey))
                 {
                     if (!TriggerLastFrame)
                     {//new button press
@@ -298,11 +299,11 @@ namespace SaccFlightAndVehicles
                         {//double tap detected
                             if (AGMLocked)
                             {//locked on, launch missile
-                                if (NumAGM > 0 && (HandHeldMode || (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
+                                if (NumAGM > 0 && (AllowFiringWhenGrounded || (SAVControl && !(bool)SAVControl.GetProgramVariable("Taxiing"))))
                                 {
-                                    if (DisallowFireIfWind && !HandHeldMode)
+                                    if (DisallowFireIfWind)
                                     {
-                                        if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                                        if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                                         { return; }
                                     }
                                     LaunchAGM_Owner();
@@ -372,7 +373,7 @@ namespace SaccFlightAndVehicles
                 {
                     Quaternion newangle;
 
-                    if (HandHeldMode)
+                    if (EntityControl.Holding)
                     {
                         newangle = VehicleTransform.rotation;
                     }
@@ -458,7 +459,7 @@ namespace SaccFlightAndVehicles
                 AGMRB.position = NewAGM.transform.position;
                 AGMRB.rotation = NewAGM.transform.rotation;
                 NewAGM.SetActive(true);
-                if (!HandHeldMode)
+                if (SAVControl)
                 { AGMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
             }
             if (AGMAnimator)
@@ -498,7 +499,6 @@ namespace SaccFlightAndVehicles
             DFUNC_Deselected();
             SFEXT_O_PilotExit();
         }
-        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         private float HoldingTrigger_Held;

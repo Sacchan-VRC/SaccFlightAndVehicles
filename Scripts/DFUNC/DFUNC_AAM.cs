@@ -14,6 +14,8 @@ namespace SaccFlightAndVehicles
         public Animator AAMAnimator;
         [Tooltip("Desktop key for firing when selected")]
         public KeyCode FireKey = KeyCode.Space;
+        [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
+        [SerializeField] bool use_OnPickupUseDown = false;
         [Range(0, 2)]
         [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingRadar NumActiveChaff, MissilesIncomingHeat NumActiveFlares, MissilesIncomingOther NumActiveOtherCM)")]
         public int MissileType = 1;
@@ -196,6 +198,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
             AAMLocked = false;
+            HoldingTrigger_Held = 0;
         }
         public void SFEXT_O_PilotExit()
         {
@@ -252,23 +255,25 @@ namespace SaccFlightAndVehicles
         {
             AAMLockTimer = 0;
         }
-        bool Holding;
-        public GameObject Handheld_HUD;
         public void SFEXT_O_OnPickup()
         {
-            Holding = true;
-            if (Handheld_HUD) { Handheld_HUD.gameObject.SetActive(true); }
             SFEXT_O_PilotEnter();
         }
         public void SFEXT_O_OnDrop()
         {
-            Holding = false;
-            if (Handheld_HUD) { Handheld_HUD.gameObject.SetActive(false); }
             SFEXT_O_PilotExit();
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
-        public void SFEXT_O_OnPickupUseDown() { LaunchAAM_Owner(); }
+        private float HoldingTrigger_Held;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            HoldingTrigger_Held = 1;
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger_Held = 0;
+        }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         public void DFUNC_Selected()
@@ -285,6 +290,7 @@ namespace SaccFlightAndVehicles
             if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
             if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
             if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
+            HoldingTrigger_Held = 0;
             AAMLockTimer = 0;
             AAMHasTarget = false;
             AAMLocked = false;
@@ -305,10 +311,15 @@ namespace SaccFlightAndVehicles
             if (func_active)
             {
                 float Trigger;
-                if (LeftDial)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                if (use_OnPickupUseDown)
+                    Trigger = HoldingTrigger_Held;
                 else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                {
+                    if (LeftDial)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                }
                 bool lockedLast = AAMLocked;
                 if (NumAAMTargets != 0)
                 {
@@ -332,7 +343,7 @@ namespace SaccFlightAndVehicles
                     if (lockedLast != AAMLocked) { RequestSerialization(); }
 
                     //firing AAM
-                    if (!Holding && (Trigger > 0.75 || Input.GetKey(FireKey)))
+                    if (Trigger > 0.75 || Input.GetKey(FireKey))
                     {
                         if (!TriggerLastFrame)
                         {
