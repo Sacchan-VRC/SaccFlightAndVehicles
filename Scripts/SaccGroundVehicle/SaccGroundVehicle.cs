@@ -1043,9 +1043,8 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                int numDWheels = AllWheels.Length - 1;
-                for (int i = 0; i < AllWheels.Length; i++)
-                { AllWheels[numDWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
+                for (int i = AllWheels.Length - 1; i > -1; i--)
+                { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
             }
             frame_even = !frame_even;
 
