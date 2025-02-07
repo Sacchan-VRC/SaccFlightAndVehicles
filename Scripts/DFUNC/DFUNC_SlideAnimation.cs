@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-//this script is a lazy copy of vtolangle
+//this script is based on DFUNC_VTOLAngle
 namespace SaccFlightAndVehicles
 {
     public class DFUNC_SlideAnimation : UdonSharpBehaviour
@@ -169,9 +169,9 @@ namespace SaccFlightAndVehicles
                 }
                 AnimValue = AnimMover;
             }
-            SetVTOLRotValues();
+            SetAnimValues();
         }
-        private void SetVTOLRotValues()
+        private void SetAnimValues()
         {
             if (LoopingAnimation)
             {
