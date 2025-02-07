@@ -229,6 +229,7 @@ namespace SaccFlightAndVehicles
         public int NumWheels = 4;
         public float CurrentDistance;
         public bool CurrentlyDistant = true;
+        [System.NonSerializedAttribute] public Vector3 FinalWind;//unused (for compatability)
         float angleLast;
         int HandsOnWheel;
         // public float WheelFeedBack;
