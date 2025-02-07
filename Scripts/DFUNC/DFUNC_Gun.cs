@@ -272,7 +272,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (DisallowFireIfWind)
                         {
-                            if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                            if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).sqrMagnitude > 0f)
                             { return; }
                         }
                         if (!_firing)

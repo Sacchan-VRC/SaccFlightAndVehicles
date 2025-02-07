@@ -303,7 +303,7 @@ namespace SaccFlightAndVehicles
                                 {
                                     if (DisallowFireIfWind)
                                     {
-                                        if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                                        if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).sqrMagnitude > 0f)
                                         { return; }
                                     }
                                     LaunchAGM_Owner();
