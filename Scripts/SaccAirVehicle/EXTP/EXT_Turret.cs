@@ -129,17 +129,21 @@ namespace SaccFlightAndVehicles
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
             Stabilize_ = Stabilize;
             //enable for 5 seconds to sync turret rotation to late joiners
-            if (EntityControl.IsOwner) { OwnerSend(); }
-            else
-            {
-                gameObject.SetActive(true);
-                SendCustomEventDelayedSeconds(nameof(InitalSyncDisable), 5f);
-            }
+            gameObject.SetActive(true);
+            SetSyncedVariables(); OnDeserialization(); // set values if owner or no serialization has been recieved
+            SendCustomEventDelayedSeconds(nameof(InitalSyncDisable), 5f);
         }
         public void InitalSyncDisable()
         {
             if (!Manned)
-            { gameObject.SetActive(false); }
+            {
+                gameObject.SetActive(false);
+                Extrapolation_Smooth = L_GunRotation;
+                Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
+                Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
+                HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
+                VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
+            }
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -333,15 +337,19 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
         public bool NetTestMode;
 #endif
-        public void OwnerSend()
+        void SetSyncedVariables()
         {
             Quaternion sendrot = TurretRotatorVert.rotation;
             if (sendrot.w < 0)
-            { sendrot = sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
+            { sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
             float smv = short.MaxValue;
             O_RotationX = (short)(sendrot.x * smv);
             O_RotationY = (short)(sendrot.y * smv);
             O_RotationZ = (short)(sendrot.z * smv);
+        }
+        public void OwnerSend()
+        {
+            SetSyncedVariables();
             RequestSerialization();
             nextUpdateTime = Time.time + updateInterval;
 #if UNITY_EDITOR
