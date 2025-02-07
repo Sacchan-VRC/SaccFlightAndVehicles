@@ -1534,8 +1534,8 @@ namespace SaccFlightAndVehicles
             }
         }
         [System.NonSerialized] public float GsAveragingTime = .1f;
-        private int NumFUinAvgTime = 1;
-        private Vector3 Gs_all;
+        public int NumFUinAvgTime = 1;
+        public Vector3 Gs_all;
         private Vector3[] FrameGs;
         private int GsFrameCheck;
         public void NetworkExplode()
