@@ -299,7 +299,7 @@ namespace SaccFlightAndVehicles
                         {//double tap detected
                             if (AGMLocked)
                             {//locked on, launch missile
-                                if (NumAGM > 0 && (AllowFiringWhenGrounded || (SAVControl && !(bool)SAVControl.GetProgramVariable("Taxiing"))))
+                                if (NumAGM > 0 && (AllowFiringWhenGrounded || !SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing")))
                                 {
                                     if (DisallowFireIfWind)
                                     {
