@@ -15,6 +15,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject[] Dial_Funcon;
         [SerializeField] private bool InvertFuncon = false;
+        [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
+        [SerializeField] bool use_OnPickupUseDown = false;
+        [Tooltip("Enable while holding trigger and disable when let go? (REQUIRES using ToggleKey instead of KeyboardInput script to use)")]
+        [SerializeField] bool ToggleWhileHeld;
+        [Tooltip("Key to toggle (REQUIRED FOR ToggleWhileHeld MODE) (as opposed to using KeyboardInput.cs)")]
+        [SerializeField] KeyCode ToggleKey;
         public bool DoAnimBool = true;
         public string AnimBoolName = "AnimBool";
         public bool OnDefault = false;
@@ -102,8 +108,18 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_Deselected()
         {
-            HoldingTrigger_Held = 0;
-            gameObject.SetActive(false);
+            if (!ToggleWhileHeld || EntityControl.InVR)
+            {
+                HoldingTrigger_Held = 0;
+                gameObject.SetActive(false);
+                if (ToggleWhileHeld)
+                {
+                    if (AnimOn)
+                    {
+                        Toggle();
+                    }
+                }
+            }
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -121,8 +137,17 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SFEXT_O_PilotEnter()
+        {
+            if (ToggleWhileHeld && !EntityControl.InVR)
+            {
+                TriggerLastFrame = true;
+                gameObject.SetActive(true);
+            }
+        }
         public void SFEXT_O_PilotExit()
         {
+            gameObject.SetActive(false);
             HoldingTrigger_Held = 0;
         }
         public void SFEXT_G_PilotExit()
@@ -134,7 +159,7 @@ namespace SaccFlightAndVehicles
                     if (!AnimOn)
                     { SetBoolOn(); }
                 }
-                if (PilotExitTurnOff)
+                if (PilotExitTurnOff || ToggleWhileHeld)
                 {
                     if (AnimOn)
                     { SetBoolOff(); }
@@ -160,7 +185,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (HandHeldMode)
+            if (use_OnPickupUseDown)
                 Trigger = HoldingTrigger_Held;
             else
             {
@@ -169,7 +194,7 @@ namespace SaccFlightAndVehicles
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
             }
-            if (Trigger > 0.75)
+            if (Trigger > 0.75 || Input.GetKey(ToggleKey))
             {
                 if (!TriggerLastFrame)
                 {
@@ -178,7 +203,20 @@ namespace SaccFlightAndVehicles
                 }
                 TriggerLastFrame = true;
             }
-            else { TriggerLastFrame = false; }
+            else
+            {
+                if (TriggerLastFrame)
+                {
+                    if (ToggleWhileHeld)
+                    {
+                        if (AnimOn)
+                        {
+                            Toggle();
+                        }
+                    }
+                    TriggerLastFrame = false;
+                }
+            }
         }
         public void Toggle()
         {
@@ -313,8 +351,8 @@ namespace SaccFlightAndVehicles
             EngineOn = false;
             CheckToggleAllowed();
         }
-        private bool HandHeldMode = false;
-        public void SFEXT_O_OnPickup() { HandHeldMode = true; }
+        public void SFEXT_O_OnPickup() { SFEXT_O_PilotEnter(); }
+        public void SFEXT_O_OnDrop() { SFEXT_O_PilotExit(); }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         private int HoldingTrigger_Held = 0;
