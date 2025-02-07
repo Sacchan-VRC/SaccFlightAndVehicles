@@ -194,7 +194,7 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             func_active = false;
             Piloting = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
         public void SFEXT_G_RespawnButton()
@@ -244,7 +244,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             func_active = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
@@ -273,7 +273,7 @@ namespace SaccFlightAndVehicles
                 AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                 float Trigger;
                 if (use_OnPickupUseDown)
-                    Trigger = HoldingTrigger_Held;
+                    Trigger = PickupTrigger;
                 else
                 {
                     if (LeftDial)
@@ -501,14 +501,14 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
-        private float HoldingTrigger_Held;
+        private float PickupTrigger;
         public void SFEXT_O_OnPickupUseDown()
         {
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         private void LaunchAGM_Owner()
         {

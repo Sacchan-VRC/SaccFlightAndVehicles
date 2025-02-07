@@ -110,7 +110,7 @@ namespace SaccFlightAndVehicles
         {
             if (!ToggleWhileHeld || EntityControl.InVR)
             {
-                HoldingTrigger_Held = 0;
+                PickupTrigger = 0;
                 gameObject.SetActive(false);
                 if (ToggleWhileHeld)
                 {
@@ -148,7 +148,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             gameObject.SetActive(false);
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_G_PilotExit()
         {
@@ -186,7 +186,7 @@ namespace SaccFlightAndVehicles
         {
             float Trigger;
             if (use_OnPickupUseDown)
-                Trigger = HoldingTrigger_Held;
+                Trigger = PickupTrigger;
             else
             {
                 if (LeftDial)
@@ -355,14 +355,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnDrop() { SFEXT_O_PilotExit(); }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
-        private int HoldingTrigger_Held = 0;
+        private int PickupTrigger = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_O_TakeOwnership()
         {//disable if owner leaves while piloting

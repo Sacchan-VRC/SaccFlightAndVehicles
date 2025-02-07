@@ -207,7 +207,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
@@ -239,7 +239,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
-        private int HoldingTrigger_Held = 0;
+        private int PickupTrigger = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
             if (HandHeld_UseEventToFire)
@@ -247,7 +247,7 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
                 return;
             }
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
             return;
         }
         void TryToFire()
@@ -285,7 +285,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -296,7 +296,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnDrop()
         {
             Held = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             SFEXT_O_PilotExit();
             DFUNC_Deselected();
         }
@@ -318,7 +318,7 @@ namespace SaccFlightAndVehicles
             {
                 float Trigger = 0;
                 if (EntityControl.Holding || !inVR && DT_UseToFire)
-                    Trigger = HoldingTrigger_Held;
+                    Trigger = PickupTrigger;
                 else if (Selected)
                 {
                     if (LeftDial)

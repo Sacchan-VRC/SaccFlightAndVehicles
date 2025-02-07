@@ -138,7 +138,7 @@ namespace SaccFlightAndVehicles
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected));
             Selected = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             if (_firing)
             {
                 Firing = false;
@@ -260,7 +260,7 @@ namespace SaccFlightAndVehicles
                     float DeltaTime = Time.deltaTime;
                     float Trigger = 0;
                     if (EntityControl.Holding || !inVR && DT_UseToFire)
-                        Trigger = HoldingTrigger_Held;
+                        Trigger = PickupTrigger;
                     else if (Selected)
                     {
                         if (LeftDial)
@@ -469,14 +469,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_TouchDown() { Grounded = true; }
         public void SFEXT_G_TouchDownWater() { Grounded = true; }
         public void SFEXT_G_TakeOff() { Grounded = false; }
-        private int HoldingTrigger_Held = 0;
+        private int PickupTrigger = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -485,7 +485,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnDrop()
         {
             SFEXT_O_PilotExit();
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }

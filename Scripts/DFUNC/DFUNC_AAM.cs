@@ -198,7 +198,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
             AAMLocked = false;
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_O_PilotExit()
         {
@@ -265,14 +265,14 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
-        private float HoldingTrigger_Held;
+        private float PickupTrigger;
         public void SFEXT_O_OnPickupUseDown()
         {
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
@@ -290,7 +290,7 @@ namespace SaccFlightAndVehicles
             if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
             if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
             if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
             AAMLockTimer = 0;
             AAMHasTarget = false;
             AAMLocked = false;
@@ -312,7 +312,7 @@ namespace SaccFlightAndVehicles
             {
                 float Trigger;
                 if (use_OnPickupUseDown)
-                    Trigger = HoldingTrigger_Held;
+                    Trigger = PickupTrigger;
                 else
                 {
                     if (LeftDial)

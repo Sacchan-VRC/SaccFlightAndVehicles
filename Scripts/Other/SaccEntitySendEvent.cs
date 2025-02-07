@@ -125,7 +125,7 @@ namespace SaccFlightAndVehicles
             if (!controlsActive) { return; }
             float Trigger;
             if (use_OnPickupUseDown)
-                Trigger = HoldingTrigger_Held;
+                Trigger = PickupTrigger;
             else
             {
                 if (LeftDial)
@@ -167,14 +167,14 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             controlsActive = false;
         }
-        private int HoldingTrigger_Held = 0;
+        private int PickupTrigger = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
-            HoldingTrigger_Held = 1;
+            PickupTrigger = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = 0;
+            PickupTrigger = 0;
         }
     }
 }
