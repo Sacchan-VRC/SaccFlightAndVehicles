@@ -13,6 +13,8 @@ namespace SaccFlightAndVehicles
         public SaccGroundVehicle SGVControl;
         [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
         public AudioSource[] EngineSounds;
+        public AudioSource[] EngineSounds_Interior;
+        bool noInteriorSounds;
         private Transform[] EngineSoundsT;
         bool EngineSoundsActive;
         public bool DespawnIfUnused = false;
@@ -207,10 +209,11 @@ namespace SaccFlightAndVehicles
                 }
             }
             for (int i = 0; i < EngineSounds.Length; i++)
-            {
-                EngineSounds[i].gameObject.SetActive(false);
-            }
+            { EngineSounds[i].gameObject.SetActive(false); }
+            for (int i = 0; i < EngineSounds_Interior.Length; i++)
+            { EngineSounds_Interior[i].gameObject.SetActive(false); }
             if (TrackSound) { TrackSound.gameObject.SetActive(false); }
+            noInteriorSounds = EngineSounds_Interior.Length == 0;
 
             FallAsleep();// sleep until sync script wakes up
             SendCustomEventDelayedSeconds(nameof(WakeUp), 5);// same activation delay as sync script
@@ -392,9 +395,9 @@ namespace SaccFlightAndVehicles
             }
             Sleeping = true;
             for (int i = 0; i < EngineSounds.Length; i++)
-            {
-                EngineSounds[i].gameObject.SetActive(false);
-            }
+            { EngineSounds[i].gameObject.SetActive(false); }
+            for (int i = 0; i < EngineSounds_Interior.Length; i++)
+            { EngineSounds_Interior[i].gameObject.SetActive(false); }
             if (TrackSound) { TrackSound.gameObject.SetActive(false); }
             if (SGVControl.TankMode)
             {
@@ -508,9 +511,22 @@ namespace SaccFlightAndVehicles
             WakeUp();
             VehicleAnimator.SetBool("occupied", true);
 
-            for (int i = 0; i < EngineSounds.Length; i++)
+            if (!InVehicle)
             {
-                EngineSounds[i].gameObject.SetActive(true);
+                if (HasFuel)
+                {
+                    for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                    { EngineSounds_Interior[i].gameObject.SetActive(true); }
+                }
+                for (int i = 0; i < EngineSounds.Length; i++)
+                { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
+            }
+            else
+            {
+                for (int i = 0; i < EngineSounds.Length; i++)
+                {
+                    EngineSounds[i].gameObject.SetActive(true);
+                }
             }
             if (TrackSound) { TrackSound.gameObject.SetActive(true); }
         }
@@ -525,6 +541,13 @@ namespace SaccFlightAndVehicles
             SetSoundsInside();
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("piloting", true);
+            if (HasFuel)
+            {
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(true); }
+            }
+            for (int i = 0; i < EngineSounds.Length; i++)
+            { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
 
             SendWheelEnter();
         }
@@ -535,6 +558,13 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("piloting", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
+            if (HasFuel)
+            {
+                for (int i = 0; i < EngineSounds.Length; i++)
+                { EngineSounds[i].gameObject.SetActive(true); }
+            }
+            for (int i = 0; i < EngineSounds_Interior.Length; i++)
+            { EngineSounds_Interior[i].gameObject.SetActive(false); }
 
             SendWheelExit();
         }
@@ -545,6 +575,16 @@ namespace SaccFlightAndVehicles
             SetSoundsInside();
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("passenger", true);
+            if (!Sleeping)
+            {
+                if (HasFuel)
+                {
+                    for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                    { EngineSounds_Interior[i].gameObject.SetActive(true); }
+                }
+                for (int i = 0; i < EngineSounds.Length; i++)
+                { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
+            }
 
             SendWheelEnter();
         }
@@ -555,6 +595,16 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("passenger", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
+            if (!Sleeping)
+            {
+                if (HasFuel)
+                {
+                    for (int i = 0; i < EngineSounds.Length; i++)
+                    { EngineSounds[i].gameObject.SetActive(true); }
+                }
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(false); }
+            }
 
             SendWheelExit();
         }

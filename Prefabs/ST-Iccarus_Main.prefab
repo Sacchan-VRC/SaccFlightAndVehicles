@@ -63563,6 +63563,8 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   EngineSounds:
   - {fileID: 3243243056983666413}
+  EngineSounds_Interior:
+  - {fileID: 5753183339710604783}
   DespawnIfUnused: 0
   DespawnDist: 50
   DopplerSounds: []
@@ -63597,7 +63599,6 @@ MonoBehaviour:
   - {fileID: 5390485614586610051}
   DoCaterpillarTracks: 0
   TrackSourceWheels: []
-  TrackRotations: []
   TracksRenderer: {fileID: 0}
   TrackSpeedMulti: []
   TrackMaterialSlots: 
@@ -63614,7 +63615,10 @@ MonoBehaviour:
   Turret: {fileID: 0}
   Commander: {fileID: 0}
   TrackSound: {fileID: 0}
+  TrackSoundVolMulti: 1
   TrackSoundPitchMulti: 1
+  TrackSoundMaxVol: 1
+  TrackSoundMaxPitch: 1
   HeadingOffset: 0
   DriverHeading: {fileID: 0}
   GunnerHeading: {fileID: 0}
@@ -63881,6 +63885,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &3243243056451226300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64147,6 +64152,7 @@ MonoBehaviour:
   - {fileID: 1803049917166894452}
   OtherWheels: []
   DriveSpeed: 30000
+  RevLimiter: 8000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
   MinThrottle_PStrength: 2
@@ -64242,13 +64248,10 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  RevLimiter: 8000
-  MaxGs: 20
-  GDamage: 12
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 100
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 100
   BulletDamageTaken: 0
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
@@ -64955,8 +64958,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 182979411768311905}
-  - {fileID: 2644453818403314487}
   - {fileID: 3243243056983666414}
+  - {fileID: 2644453818403314487}
   - {fileID: 6726772880079148916}
   - {fileID: 1803049916232501578}
   - {fileID: 6202543661966076690}
@@ -71286,6 +71289,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 801748050290386455}
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0

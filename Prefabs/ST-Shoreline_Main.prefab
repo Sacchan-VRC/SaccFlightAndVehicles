@@ -842,8 +842,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4570752113773346989}
-  - {fileID: 1825783752167545851}
   - {fileID: 1217889975643270690}
+  - {fileID: 1825783752167545851}
   - {fileID: 6971233925635233720}
   - {fileID: 2064668648420822621}
   - {fileID: 8134300477970032932}
@@ -1551,6 +1551,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &1217889975052110448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2385,8 +2386,6 @@ MonoBehaviour:
   UseStickSteering: 0
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
-  MaxGs: 10
-  GDamage: 10
   Crash_Damage_Speed: 10
   Crash_Death_Speed: 60
   BulletDamageTaken: 0
@@ -7745,6 +7744,8 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   EngineSounds:
   - {fileID: 1217889975643270689}
+  EngineSounds_Interior:
+  - {fileID: 8229178086468347171}
   DespawnIfUnused: 0
   DespawnDist: 50
   DopplerSounds: []
@@ -7779,7 +7780,6 @@ MonoBehaviour:
   - {fileID: 264292837108118855}
   DoCaterpillarTracks: 0
   TrackSourceWheels: []
-  TrackRotations: []
   TracksRenderer: {fileID: 0}
   TrackSpeedMulti:
   - {x: 4.82321e-40, y: 0}
@@ -78646,6 +78646,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 4809521826165885185}
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
