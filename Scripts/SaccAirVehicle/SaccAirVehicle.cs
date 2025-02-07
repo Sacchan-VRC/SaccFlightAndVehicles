@@ -1633,6 +1633,7 @@ namespace SaccFlightAndVehicles
         {
             EntityControl.SetWreckedFalse();
             EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
+            numGrapplesAttached = 0;
             WakeUp();
             if (IsOwner)
             {
@@ -2314,6 +2315,30 @@ namespace SaccFlightAndVehicles
             }
             //set vehicle's collider's layers back
             SetCollidersLayer(EntityControl.OutsideVehicleLayer);
+        }
+        int numGrapplesAttached;
+        public void SFEXT_L_GrappleAttach()
+        {
+            if (numGrapplesAttached == 0)
+            {
+                foreach (WheelCollider wheel in VehicleWheelColliders)
+                {
+                    wheel.motorTorque = 0.00000000000000000000000000000000001f;
+                    wheel.brakeTorque = 0;
+                }
+            }
+            numGrapplesAttached++;
+        }
+        public void SFEXT_L_GrappleDetach()
+        {
+            numGrapplesAttached--;
+            if (numGrapplesAttached < 0) { numGrapplesAttached = 0; }
+            if (EngineOn) return;
+            if (numGrapplesAttached != 0) return;
+            foreach (WheelCollider wheel in VehicleWheelColliders)
+            {
+                wheel.motorTorque = 0f;
+            }
         }
         public void SetCollidersLayer(int NewLayer)
         {
