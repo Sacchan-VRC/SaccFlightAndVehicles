@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 5808748684688106119}
   - component: {fileID: 7186168855621679397}
   m_Layer: 17
-  m_Name: EXTP_Turret
+  m_Name: EXT_Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10867,15 +10867,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 493329401785367491}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.0009999871, z: 1.213}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.0009994507, z: 1.2129965}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5681648210882071597}
   - {fileID: 3327872633374483979}
   - {fileID: 1345979705104083657}
-  m_Father: {fileID: 4059116585242752628}
+  m_Father: {fileID: 3165967599511147331}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4295169672655852700
 MonoBehaviour:
@@ -16184,6 +16184,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1452340363699823337}
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -17132,7 +17135,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 0
   MinDistance: 0
-  MaxDistance: 2500
+  MaxDistance: 1250
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -17398,6 +17401,9 @@ MonoBehaviour:
   BoolAnimator: {fileID: 1932946362016045969}
   Dial_Funcon: []
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 1
   AnimBoolName: hatch
   OnDefault: 1
@@ -39755,7 +39761,7 @@ Transform:
   m_GameObject: {fileID: 3393348896685685516}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.848}
+  m_LocalPosition: {x: 2.18, y: 0.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39854,6 +39860,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 5875102738059522355}
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -40500,7 +40509,7 @@ GameObject:
   - component: {fileID: 3135461452385792334}
   - component: {fileID: 8267090664234248146}
   m_Layer: 31
-  m_Name: Hud_crosshair_gun
+  m_Name: crosshair_gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40514,12 +40523,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4104873260777959341}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.000000012892434, y: 1, z: -0, w: -0.0000000023557245}
-  m_LocalPosition: {x: -0.0001511409, y: 0.10008765, z: 0.00026615587}
-  m_LocalScale: {x: 0.28043994, y: 0.28044, z: 0.49856004}
+  m_LocalRotation: {x: -0.7071068, y: -0.000000022351744, z: -1.5543123e-15, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0.45}
+  m_LocalScale: {x: 0.0116125485, y: 0.011612546, z: 0.011612546}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7070186793109301581}
+  m_Father: {fileID: 6925008144455296529}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &3135461452385792334
 MeshFilter:
@@ -40571,6 +40580,38 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4178354168457504090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3165967599511147331}
+  m_Layer: 17
+  m_Name: DriverSeat
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3165967599511147331
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4178354168457504090}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 565716577958460949}
+  m_Father: {fileID: 4059116585242752628}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4219706427075255786
 GameObject:
   m_ObjectHideFlags: 0
@@ -46743,6 +46784,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &47810518563963754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57792,7 +57834,7 @@ Transform:
   m_Children:
   - {fileID: 2593272028310133501}
   - {fileID: 2323988305344284405}
-  - {fileID: 565716577958460949}
+  - {fileID: 3165967599511147331}
   - {fileID: 344494754157660921}
   - {fileID: 5444017546856732887}
   - {fileID: 2606630290319971040}
@@ -62858,7 +62900,8 @@ Transform:
   m_LocalPosition: {x: -0.238, y: -0.187, z: 0.414}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 508123311439653961}
   m_Father: {fileID: 6301507941644306303}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &3126451703928550379
@@ -62894,7 +62937,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 50000
-  field of view: 14.4
+  field of view: 50
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -63623,7 +63666,7 @@ Transform:
   m_GameObject: {fileID: 6075628196929170416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.848}
+  m_LocalPosition: {x: -2.18, y: 0.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -70081,7 +70124,7 @@ GameObject:
   - component: {fileID: 3038712576708213829}
   - component: {fileID: 530130882632466151}
   m_Layer: 17
-  m_Name: EXTP_Turret
+  m_Name: EXT_Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70712,7 +70755,7 @@ Transform:
   m_GameObject: {fileID: 7431884968018894320}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.848}
+  m_LocalPosition: {x: 2.48, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -77899,7 +77942,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8790395860830406203}
-  - {fileID: 508123311439653961}
   m_Father: {fileID: 8245973769550701553}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 180}
 --- !u!33 &4359394700827742424
