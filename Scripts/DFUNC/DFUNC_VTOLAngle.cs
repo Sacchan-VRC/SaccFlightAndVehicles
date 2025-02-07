@@ -74,6 +74,12 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
+            if (UpdatingVar)
+            {
+                RequestSerialization();//make sure others recieve final position after finished adjusting
+                UpdateTime = Time.time;
+                UpdatingVar = false;
+            }
             RequestSerialization();
         }
         private void LateUpdate()
@@ -91,6 +97,7 @@ namespace SaccFlightAndVehicles
                         float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.deltaTime));
                         SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
                     }
+                    else UpdatingKeyb = false;
                     float Trigger;
                     if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
@@ -116,7 +123,7 @@ namespace SaccFlightAndVehicles
 
                         TriggerLastFrame = true;
                     }
-                    else { TriggerLastFrame = false; }
+                    else { TriggerLastFrame = false; UpdatingVR = false; }
 
                     if (UpdatingVR || UpdatingKeyb)
                     {
@@ -128,14 +135,11 @@ namespace SaccFlightAndVehicles
                         }
                         UpdatingVar = true;
                     }
-                    else
+                    else if (UpdatingVar)
                     {
-                        if (UpdatingVar)
-                        {
-                            RequestSerialization();//make sure others recieve final position after finished adjusting
-                            UpdateTime = Time.time;
-                            UpdatingVar = false;
-                        }
+                        RequestSerialization();//make sure others recieve final position after finished adjusting
+                        UpdateTime = Time.time;
+                        UpdatingVar = false;
                     }
                 }
             }
