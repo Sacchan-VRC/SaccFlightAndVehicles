@@ -11,7 +11,6 @@ namespace SaccFlightAndVehicles
     public class SaccRadioBase : UdonSharpBehaviour
     {
         [Header("Vehicles must have SAV_Radio extension for this to work")]
-        private SAV_Radio[] AllEntities_RD;
         public float VoiceNear = 199999;
         public float VoiceFar = 200000;
         // public float VoiceVolumetric = 1500;
@@ -19,11 +18,13 @@ namespace SaccFlightAndVehicles
         // public float VoiceLowPass;
         [Tooltip("Make this text object darker when radio is disabled. Not required.")]
         public TextMeshProUGUI RadioEnabledTxt;
-        public bool RadioEnabled_ = true;
         private byte CurrentChannel = 1;
         public byte MyChannel = 1;
         [Header("All Planes and RadioZones are filled automatically on build.")]
+        [Tooltip("All SaccEntities found")]
         public Transform[] AllEntities_TF;
+        [Tooltip("All SaccEntities with a radio")]
+        [SerializeField] private SAV_Radio[] AllEntities_RD;
         public SaccRadioZone[] RadioZones;
         public TextMeshProUGUI ChannelText;
         [Header("Debug, leave empty:")]
@@ -35,6 +36,7 @@ namespace SaccFlightAndVehicles
         private int NextZone;
         private int NumZones;
         private bool DoZones = false;
+        private bool DoEntities = true;
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
@@ -84,13 +86,19 @@ namespace SaccFlightAndVehicles
                 }
             }
             AllEntities_RD = RD_New;
+            if (AllEntities_RD.Length == 0)
+            {
+                Debug.LogWarning("RadioBase: No Entities with SAV_Radio found");
+                DoEntities = false;
+            }
         }
         public void SetRadioVoiceVolumes()
         {
             SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes), 5);
-            if ((!MyEntity || !RadioEnabled_) && !MyZone) { return; }
+            if (!MyEntity && !MyZone) { return; }
             if (DoZones)
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
+            if (!DoEntities) return;
             NextEntity++;
             if (NextEntity == AllEntities_RD.Length) { NextEntity = 0; }
             SaccEntity NextEntity_SE = AllEntities_RD[NextEntity].EntityControl;
@@ -120,7 +128,7 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateVehicle(SaccEntity Vehicle)
         {
-            if ((!MyEntity || !RadioEnabled_) && !MyZone) { return; }
+            if (!MyEntity && !MyZone) { return; }
             SaccEntity NextEntity_SE = Vehicle;
             SAV_Radio NextEntity_R = (SAV_Radio)NextEntity_SE.GetExtention(GetUdonTypeName<SAV_Radio>());
             if (MyEntity == NextEntity_SE
@@ -150,7 +158,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetRadioVoiceVolumes_Zones()
         {
-            if ((!MyEntity || !RadioEnabled_) && !MyZone) { return; }
+            if (!MyEntity && !MyZone) { return; }
             NextZone++;
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
