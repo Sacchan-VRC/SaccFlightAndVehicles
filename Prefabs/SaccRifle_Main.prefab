@@ -499,6 +499,7 @@ MonoBehaviour:
   AnimTrigger_Global: 1
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &6907224034448286659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -845,6 +846,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &386660908943169554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1087,7 +1089,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5728513504379896309}
   Lfunc1: {fileID: 1387977911939779378}
-  Lfunc1key: 49
+  Lfunc1key: 102
   Lfunc2: {fileID: 1187631336266408591}
   Lfunc2key: 101
   Lfunc3: {fileID: 0}
@@ -6621,6 +6623,9 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon: []
   InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleKey: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -6729,7 +6734,7 @@ MonoBehaviour:
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 6884195998127306782}
   FireKey: 0
-  FireNowKey: 52
+  FireNowKey: 306
   NumPreInstatiated: 2
   FullReloadTimeSec: 0.001
   HUDText_Bomb_ammo: {fileID: 0}

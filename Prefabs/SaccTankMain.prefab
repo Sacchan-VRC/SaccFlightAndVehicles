@@ -410,7 +410,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 862555621589385345}
   Lfunc1: {fileID: 2310807696361170476}
-  Lfunc1key: 102
+  Lfunc1key: 108
   Lfunc2: {fileID: 8403126999975887873}
   Lfunc2key: 116
   Lfunc3: {fileID: 0}
@@ -17403,7 +17403,7 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 0
+  ToggleKey: 122
   DoAnimBool: 1
   AnimBoolName: hatch
   OnDefault: 1
@@ -38412,9 +38412,9 @@ MonoBehaviour:
   Lfunc1: {fileID: 0}
   Lfunc1key: 0
   Lfunc2: {fileID: 8073538954869398820}
-  Lfunc2key: 102
+  Lfunc2key: 108
   Lfunc3: {fileID: 5423526595589576054}
-  Lfunc3key: 116
+  Lfunc3key: 102
   Lfunc4: {fileID: 0}
   Lfunc4key: 0
   Lfunc5: {fileID: 0}
@@ -38507,7 +38507,6 @@ Transform:
   - {fileID: 4046938890607057716}
   - {fileID: 7710040843693603884}
   - {fileID: 7492592297786378835}
-  - {fileID: 178482194336370561}
   - {fileID: 7325479738973097136}
   - {fileID: 7499659294645531849}
   m_Father: {fileID: 6721343808081654492}
@@ -38575,128 +38574,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2481080980267232774}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2845869510760135463
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 178482194336370561}
-  - component: {fileID: 7165976733775382357}
-  - component: {fileID: 506949204163528250}
-  m_Layer: 31
-  m_Name: KeyboardControls
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &178482194336370561
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2845869510760135463}
-  serializedVersion: 2
-  m_LocalRotation: {x: 3.2981435e-16, y: -0.000000018160792, z: -0.000000018160792,
-    w: 1}
-  m_LocalPosition: {x: -28.495039, y: 0.059180938, z: 1.2353821}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3819928459788970601}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7165976733775382357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2845869510760135463}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7e50903b1789a145a9fcb8e7ebde83b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 506949204163528250}
-  Lfunc1: {fileID: 1731801109497087425}
-  Lfunc1key: 52
-  Lfunc2: {fileID: 0}
-  Lfunc2key: 0
-  Lfunc3: {fileID: 0}
-  Lfunc3key: 0
-  Lfunc4: {fileID: 0}
-  Lfunc4key: 0
-  Lfunc5: {fileID: 0}
-  Lfunc5key: 0
-  Lfunc6: {fileID: 0}
-  Lfunc6key: 0
-  Lfunc7: {fileID: 0}
-  Lfunc7key: 0
-  Lfunc8: {fileID: 0}
-  Lfunc8key: 0
-  Lfunc9: {fileID: 0}
-  Lfunc9key: 0
-  Lfunc10: {fileID: 0}
-  Lfunc10key: 0
-  Rfunc1: {fileID: 0}
-  Rfunc1key: 0
-  Rfunc2: {fileID: 0}
-  Rfunc2key: 0
-  Rfunc3: {fileID: 0}
-  Rfunc3key: 0
-  Rfunc4: {fileID: 0}
-  Rfunc4key: 0
-  Rfunc5: {fileID: 0}
-  Rfunc5key: 0
-  Rfunc6: {fileID: 0}
-  Rfunc6key: 0
-  Rfunc7: {fileID: 0}
-  Rfunc7key: 0
-  Rfunc8: {fileID: 0}
-  Rfunc8key: 0
-  Rfunc9: {fileID: 0}
-  Rfunc9key: 0
-  Rfunc10: {fileID: 0}
-  Rfunc10key: 0
---- !u!114 &506949204163528250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2845869510760135463}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactTextPlacement: {fileID: 0}
-  interactText: Use
-  interactTextGO: {fileID: 0}
-  proximity: 2
-  SynchronizePosition: 0
-  AllowCollisionOwnershipTransfer: 0
-  Reliable: 0
-  _syncMethod: 1
-  serializedProgramAsset: {fileID: 11400000, guid: 1bf749c13d6bf5e48abcd454b2ea0005,
-    type: 2}
-  programSource: {fileID: 11400000, guid: 6ea52ced4c4d75349b7c73d892119ce5, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
-  publicVariablesUnityEngineObjects: []
-  publicVariablesSerializationDataFormat: 0
 --- !u!1 &2902025122943109196
 GameObject:
   m_ObjectHideFlags: 0
@@ -51825,7 +51702,7 @@ MonoBehaviour:
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 0}
   FireKey: 0
-  FireNowKey: 103
+  FireNowKey: 120
   NumPreInstatiated: 0
   FullReloadTimeSec: 8
   HUDText_Bomb_ammo: {fileID: 0}
@@ -64043,8 +63920,8 @@ MonoBehaviour:
   SAVControl: {fileID: 1554233077807406780}
   ControlsRoot: {fileID: 17224438998474793}
   SyncUpdateRate: 0.25
-  AnimUpKey: 50
-  AnimDownKey: 49
+  AnimUpKey: 101
+  AnimDownKey: 113
   VehicleAnimator: {fileID: 1932946362016045969}
   AnimFloatName: zoomcommander
   AnimDefaultValue: 0
@@ -77757,8 +77634,8 @@ MonoBehaviour:
   SAVControl: {fileID: 1554233077807406780}
   ControlsRoot: {fileID: 2566284437896167529}
   SyncUpdateRate: 0.25
-  AnimUpKey: 50
-  AnimDownKey: 49
+  AnimUpKey: 101
+  AnimDownKey: 113
   VehicleAnimator: {fileID: 1932946362016045969}
   AnimFloatName: zoom
   AnimDefaultValue: 0
