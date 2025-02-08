@@ -16186,8 +16186,7 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 0
-  DoAnimBool: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -17403,8 +17402,7 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 122
-  DoAnimBool: 1
+  ToggleWhileHeldKey: 0
   AnimBoolName: hatch
   OnDefault: 1
   PilotExitTurnOff: 0
@@ -39739,8 +39737,7 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 0
-  DoAnimBool: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -51786,13 +51783,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5070236663828295725}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.2971522, z: -7.1452837}
+  m_LocalRotation: {x: 0.13052599, y: 0.00000038195554, z: -0.000000002596437, w: 0.9914449}
+  m_LocalPosition: {x: 0, y: 3.29, z: -7.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8712257613924222018}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
 --- !u!1 &5162322402543579155
 GameObject:
   m_ObjectHideFlags: 0
@@ -57720,7 +57717,6 @@ Transform:
   - {fileID: 4375442202249936469}
   - {fileID: 7589314318617612509}
   - {fileID: 5103312466622362802}
-  - {fileID: 7291369534552766228}
   - {fileID: 2373808258536808976}
   - {fileID: 5126770652621887542}
   m_Father: {fileID: 197095192272654965}
@@ -63920,8 +63916,8 @@ MonoBehaviour:
   SAVControl: {fileID: 1554233077807406780}
   ControlsRoot: {fileID: 17224438998474793}
   SyncUpdateRate: 0.25
-  AnimUpKey: 101
-  AnimDownKey: 113
+  AnimUpKey: 113
+  AnimDownKey: 101
   VehicleAnimator: {fileID: 1932946362016045969}
   AnimFloatName: zoomcommander
   AnimDefaultValue: 0
@@ -71370,37 +71366,6 @@ Transform:
   - {fileID: 2540908465264621939}
   m_Father: {fileID: 2373808258536808976}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &7610758460132259298
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7291369534552766228}
-  m_Layer: 17
-  m_Name: :campos_tank_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7291369534552766228
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7610758460132259298}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.06104851, y: -0, z: -0, w: 0.99813485}
-  m_LocalPosition: {x: 0, y: 3.1500015, z: -8.059999}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4059116585242752628}
-  m_LocalEulerAnglesHint: {x: 7, y: 0, z: 0}
 --- !u!1 &7625648965010927320
 GameObject:
   m_ObjectHideFlags: 0
@@ -77634,8 +77599,8 @@ MonoBehaviour:
   SAVControl: {fileID: 1554233077807406780}
   ControlsRoot: {fileID: 2566284437896167529}
   SyncUpdateRate: 0.25
-  AnimUpKey: 101
-  AnimDownKey: 113
+  AnimUpKey: 113
+  AnimDownKey: 101
   VehicleAnimator: {fileID: 1932946362016045969}
   AnimFloatName: zoom
   AnimDefaultValue: 0
