@@ -19,10 +19,10 @@ namespace SaccFlightAndVehicles
         [SerializeField] bool use_OnPickupUseDown = false;
         [Tooltip("Enable while holding trigger and disable when let go? (REQUIRES using ToggleKey instead of KeyboardInput script to use)")]
         [SerializeField] bool ToggleWhileHeld;
-        [Tooltip("Key to toggle (REQUIRED FOR ToggleWhileHeld MODE) (as opposed to using KeyboardInput.cs)")]
-        [SerializeField] KeyCode ToggleKey;
-        public bool DoAnimBool = true;
-        public string AnimBoolName = "AnimBool";
+        [Tooltip("REQUIRED FOR ToggleWhileHeld MODE (as opposed to using KeyboardInput.cs)")]
+        [SerializeField] KeyCode ToggleWhileHeldKey;
+        bool DoAnimBool = false;
+        public string AnimBoolName = string.Empty;
         public bool OnDefault = false;
         [Tooltip("Set toggle to off when exiting?")]
         public bool PilotExitTurnOff = true;
@@ -90,6 +90,7 @@ namespace SaccFlightAndVehicles
             ToggleEmission_em = new ParticleSystem.EmissionModule[ParticleLength];
             for (int i = 0; i < ParticleLength; i++)
             { ToggleEmission_em[i] = ToggleEmission[i].emission; }
+            if (AnimBoolName.Length > 0) DoAnimBool = true;
         }
         public void SFEXT_O_OnPlayerJoined()
         {
@@ -103,8 +104,11 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_Selected()
         {
-            TriggerLastFrame = true;
-            gameObject.SetActive(true);
+            if (EntityControl.InVR || ToggleWhileHeld)
+            {
+                TriggerLastFrame = true;
+                gameObject.SetActive(true);
+            }
         }
         public void DFUNC_Deselected()
         {
@@ -194,7 +198,7 @@ namespace SaccFlightAndVehicles
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
             }
-            if (Trigger > 0.75 || Input.GetKey(ToggleKey))
+            if (Trigger > 0.75 || Input.GetKey(ToggleWhileHeldKey))
             {
                 if (!TriggerLastFrame)
                 {
