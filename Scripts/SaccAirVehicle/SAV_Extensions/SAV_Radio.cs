@@ -18,6 +18,7 @@ namespace SaccFlightAndVehicles
         bool ForceChannel_b = false;
         byte myPrevChannel;
         bool ForceChannel_swapped = false;
+        bool DFUNCMODE = false;
         [System.NonSerialized] public SaccRadioBase RadioBase;
         [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
         // public bool RadioOn = true;
@@ -67,6 +68,7 @@ namespace SaccFlightAndVehicles
                 if (ForceChannel > 255) ForceChannel = 255;
                 ForceChannel_b = true;
             }
+            if (DialPosition != -999) { DFUNCMODE = true; }
         }
         public void SFEXT_L_EntityStart()
         {
@@ -122,7 +124,7 @@ namespace SaccFlightAndVehicles
                 UpdateChannel();
             }
             UpdateChannelText();
-            if (!controlsRunning && Piloting)
+            if (DFUNCMODE && !controlsRunning && Piloting)
             {
                 controlsRunning = true;
                 Controls();
