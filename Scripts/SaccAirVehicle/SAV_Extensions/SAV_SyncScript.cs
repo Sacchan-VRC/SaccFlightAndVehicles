@@ -224,6 +224,7 @@ namespace SaccFlightAndVehicles
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            VehicleRigid.interpolation = RigidbodyInterpolation.Extrapolate;
             if (ObjectMode)
             {
                 VehicleRigid.drag = StartDrag;
@@ -250,8 +251,12 @@ namespace SaccFlightAndVehicles
             ExtrapDirection_Smooth = O_CurVel;
             RotExtrapolation_Raw = RotationLerper = O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
-            if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
+            if (!NonOwnerEnablePhysics)
+            {
+                VehicleRigid.isKinematic = true;
+            }
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            VehicleRigid.interpolation = RigidbodyInterpolation.None;
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
         }
@@ -409,6 +414,7 @@ namespace SaccFlightAndVehicles
             float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateDelta);
             //extrapolated position based on time passed since update
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
+            if (NonOwnerEnablePhysics) { VehicleRigid.velocity = VelEstimate; }
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
 
             //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
@@ -614,10 +620,12 @@ namespace SaccFlightAndVehicles
             {
                 VehicleRigid.isKinematic = false;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                VehicleRigid.interpolation = RigidbodyInterpolation.Extrapolate;
             }
             else
             {
                 if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
+                VehicleRigid.interpolation = RigidbodyInterpolation.None;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
         }
@@ -626,6 +634,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
         public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
         public void SFEXT_L_CancelRace() { DisableAntiWarp = false; }
+        public void SFEXT_L_WakeUp() { ExitIdleMode(); }
         //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
         public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
         {
