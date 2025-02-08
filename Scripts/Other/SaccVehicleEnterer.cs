@@ -16,7 +16,7 @@ namespace SaccFlightAndVehicles
         {
             players_choosepilot = new VRCPlayerApi[100];
             localPlayer = Networking.LocalPlayer;
-            MessageText.gameObject.SetActive(false);
+            if (MessageText) MessageText.gameObject.SetActive(false);
         }
 
         private int MyPilotID;
