@@ -26,6 +26,8 @@ namespace SaccFlightAndVehicles
         public Camera AtGCam;
         [Tooltip("Screen that displays target, that is enabled when selected")]
         public GameObject AtGScreen;
+        [Tooltip("Lower = slower response")]
+        public float CamTurnSmoothness = 100f;
         public float CamZoomScale = 100f;
         public float CamZoomScale_Locked = 60f;
         public GameObject Dial_Funcon;
@@ -53,6 +55,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Fired AGMs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform AGMLaunchPoint;
         public LayerMask AGMTargetsLayer = 1 << 26;
+        [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
+        public Transform TargetingTransform;
         public Transform WorldParent;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
@@ -373,30 +377,32 @@ namespace SaccFlightAndVehicles
                 {
                     Quaternion newangle;
 
-                    if (EntityControl.Holding)
+                    if (TargetingTransform)
+                    {
+                        newangle = TargetingTransform.rotation;
+                    }
+                    else if (EntityControl.Holding)
                     {
                         newangle = VehicleTransform.rotation;
                     }
-                    else
+                    else if (InVR)
                     {
-                        if (InVR)
-                        {
-                            if (LeftDial)
-                            { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
-                            else
-                            { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
-                        }
-                        else if (!InEditor)//desktop mode
-                        {
-                            newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-                        }
-                        else//editor
-                        {
-                            newangle = VehicleTransform.rotation;
-                        }
+                        if (LeftDial)
+                        { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
+                        else
+                        { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
                     }
+                    else if (!InEditor)//desktop mode
+                    {
+                        newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+                    }
+                    else//editor
+                    {
+                        newangle = VehicleTransform.rotation;
+                    }
+
                     float ZoomLevel = AtGCam.fieldOfView / 90;
-                    AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 220f * DeltaTime);
+                    AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, 1 - Mathf.Pow(0.5f, ZoomLevel * CamTurnSmoothness * DeltaTime));
 
                     if (AtGCam)
                     {
@@ -422,12 +428,12 @@ namespace SaccFlightAndVehicles
                         Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                         float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(CamZoomScale * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * deltaTime), 0.3f, 90);
+                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1 - Mathf.Pow(0.5f, 3f * deltaTime)), 0.3f, 90);
                     }
                     else
                     {
                         float newzoom = 80;
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1 - Mathf.Pow(0.5f, 10f * deltaTime)), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                     }
                 }
                 else
@@ -436,7 +442,7 @@ namespace SaccFlightAndVehicles
                     RaycastHit camhit;
                     Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     //dolly zoom //Mathf.Atan(60 <--the 60 is the height of the camera frustrum at the target distance
-                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * deltaTime), 0.3f);
+                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1 - Mathf.Pow(0.5f, 10 * deltaTime)), 0.3f);
                 }
             }
         }
