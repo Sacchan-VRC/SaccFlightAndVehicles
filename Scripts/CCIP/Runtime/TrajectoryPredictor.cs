@@ -60,6 +60,8 @@ namespace SaccFlightAndVehicles.KitKat
 
         private bool _gameObjectEnabled;
 
+        private Quaternion _45Down = Quaternion.Euler(45, 0, 0);
+
         #endregion // PRIVATE FIELDS
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +69,7 @@ namespace SaccFlightAndVehicles.KitKat
 
         private void OnEnable()
         {
-            if (!_initialized) Init();
+            Init(); // run every enable because FixedDeltaTime can change in VRC
             _gameObjectEnabled = true;
         }
 
@@ -79,12 +81,8 @@ namespace SaccFlightAndVehicles.KitKat
         }
 
 
-        private bool _initialized;
         private void Init()
         {
-            if (_initialized) return;
-            _initialized = true;
-
             _gravity = Physics.gravity;
             _fixedDeltaTime = Time.fixedDeltaTime;
 
@@ -110,7 +108,9 @@ namespace SaccFlightAndVehicles.KitKat
         private void LateUpdate()
         {
             if (!_gameObjectEnabled) return; // https://feedback.vrchat.com/udon/p/update-is-executed-for-one-frame-after-the-script-is-disabled
-            ApproximateRigidbodyTrajectory(transform.position, vehicleRigidbody.velocity);
+            _hitdetect = false;
+            if (vehicleRigidbody.velocity.sqrMagnitude > 0.1)
+            { ApproximateRigidbodyTrajectory(transform.position, vehicleRigidbody.velocity); }
             UpdateHud();
         }
 
@@ -120,7 +120,6 @@ namespace SaccFlightAndVehicles.KitKat
             Vector3 nextVelocity = (Mathf.Pow(_dragConstant, _stepsToPredict - 1) * (constants * _drag - _gravity * _dragConstant) + _gravity) / _drag;
             Vector3 nextPos = _fixedDeltaTime * (Mathf.Pow(_dragConstant, _stepsToPredict) * (constants * _drag - _dragConstant * _gravity) + _gravity * ((_dragConstant - 1) * _stepsToPredict + _dragConstant) - constants * _drag) / ((_dragConstant - 1) * _drag) + startPos;
 
-            _hitdetect = false;
             for (int i = 1; i < _trajectoryResolution; i++)
             {
                 constants = ((nextVelocity * _drag - _gravity) * _dragConstant + _gravity * _dragConstant) / _drag;
@@ -128,7 +127,8 @@ namespace SaccFlightAndVehicles.KitKat
                 Vector3 lastPredictedPos = nextPos;
                 nextPos = _fixedDeltaTime * (Mathf.Pow(_dragConstant, _stepsToPredict) * (constants * _drag - _dragConstant * _gravity) + _gravity * ((_dragConstant - 1) * _stepsToPredict + _dragConstant) - constants * _drag) / ((_dragConstant - 1) * _drag) + lastPredictedPos;
 
-                if (!Physics.Raycast(lastPredictedPos, nextPos - lastPredictedPos, out RaycastHit hit, (nextPos - lastPredictedPos).magnitude + 2, 2065 /* Default, Water and Environment */, QueryTriggerInteraction.Ignore)) continue;
+                if (!Physics.Raycast(lastPredictedPos, nextPos - lastPredictedPos, out RaycastHit hit, (nextPos - lastPredictedPos).magnitude + 2, 2065 /* Default, Water and Environment */, QueryTriggerInteraction.Ignore))
+                    continue;
 
                 _hitdetect = true;
                 _groundZero = hit.point;
@@ -159,13 +159,17 @@ namespace SaccFlightAndVehicles.KitKat
                 topOfCcipLine.SetPositionAndRotation(
                     linkedHudVelocityVector.position + Vector3.ProjectOnPlane(Vector3.up, linkedHudVelocityVector.forward).normalized * lineOffset,
                     lookAtPlaneUp);
+                if (atgCamera)
+                {
+                    float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(atgCamZoom * 0.5f / ccipLookDir.magnitude) * Mathf.Rad2Deg, 1.5f, 90);
+                    _atgCameraTransform.rotation = Quaternion.LookRotation(ccipLookDir, vehicleRigidbody.transform.up);
+                    atgCamera.fieldOfView = newzoom;
+                }
             }
-
-            if (atgCamera)
+            else
             {
-                float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(atgCamZoom * 0.5f / ccipLookDir.magnitude) * Mathf.Rad2Deg, 1.5f, 90);
-                _atgCameraTransform.rotation = Quaternion.LookRotation(ccipLookDir, vehicleRigidbody.transform.up);
-                atgCamera.fieldOfView = newzoom;
+                _atgCameraTransform.localRotation = _45Down;
+                atgCamera.fieldOfView = 50;
             }
         }
 

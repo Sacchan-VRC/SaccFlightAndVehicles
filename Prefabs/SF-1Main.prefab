@@ -49569,10 +49569,10 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &4371473018401239850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49985,6 +49985,7 @@ MonoBehaviour:
   DownIndicator: {fileID: 4371473019551928806}
   ElevationIndicator: {fileID: 4371473018894387353}
   HeadingIndicator: {fileID: 4371473019373498438}
+  HeadingOffset: 0
   VelocityIndicator: {fileID: 4371473018931394044}
   distance_from_head: 1.333
   updateInterval_vectors: 0
@@ -55318,6 +55319,8 @@ MonoBehaviour:
   AGM: {fileID: 8961574734450546672}
   NumAGM: 4
   HUDText_AGM_ammo: {fileID: 1490522283187972374}
+  HUDText_AGM_ammo_TMP: {fileID: 0}
+  HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 4371473019587610573}
   AtGScreen: {fileID: 4371473018734145325}
   CamZoomScale: 100
@@ -55341,7 +55344,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 67108864
   WorldParent: {fileID: 0}
-  HandHeldMode: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &4371473019125145362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66834,6 +66837,7 @@ MonoBehaviour:
   PlaneWindMaxVolSpeed: 400
   SonicBoom:
   - {fileID: 4371473018870298480}
+  PlayAllSonicBoomSounds: 0
   Explosion:
   - {fileID: 4371473018023411007}
   Wrecked:
@@ -72163,7 +72167,7 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 4371473019587610573}
-  SetAtGCamSettings: 1
+  SetAtGCamSettings: 0
   EnableOnSelected:
   - {fileID: 4371473018734145325}
   - {fileID: 427684810952554521}
@@ -88350,6 +88354,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &4371473019873987475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88573,6 +88578,7 @@ MonoBehaviour:
   SAVControl: {fileID: 4327496282912357153}
   AAMAnimator: {fileID: 4371473018849597658}
   FireKey: 32
+  use_OnPickupUseDown: 0
   MissileType: 1
   NumAAM: 6
   AAMLockAngle: 15
@@ -88603,10 +88609,11 @@ MonoBehaviour:
   AAMTargetLock: {fileID: 4371473018206384493}
   WorldParent: {fileID: 0}
   TargetingTransform: {fileID: 0}
-  Handheld_HUD: {fileID: 0}
   HUDControl: {fileID: -3233746014259053420}
   AAMMaxTargetDistance: 6000
   HUDText_AAM_ammo: {fileID: 1490522284403781679}
+  HUDText_AAM_ammo_TMP: {fileID: 0}
+  HUDText_AAM_ammo_TMPUGUI: {fileID: 0}
   AAMTargetIndicator: {fileID: 4371473019558103429}
 --- !u!114 &4371473019922305635
 MonoBehaviour:
@@ -94851,8 +94858,8 @@ MonoBehaviour:
   VelLiftMax: 10
   MaxGs: 40
   GDamage: 10
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 100
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 50
   GroundEffectMaxDistance: 7
   GroundEffectStrength: 4
   GroundEffectLiftMax: 100
@@ -94906,6 +94913,8 @@ MonoBehaviour:
   Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
+  NumFUinAvgTime: 1
+  Gs_all: {x: 0, y: 0, z: 0}
 --- !u!114 &5511535095792669435
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -64,7 +64,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         public Camera AtGCam;
-        public bool SetAtGCamSettings = true;
+        [Tooltip("Set rotation and FOV of AtGCam when selected? (Do not use with TrajectoryPredictor)")]
         public GameObject[] EnableOnSelected;
         [Header("")]
         [Tooltip("Delegate firing sync to EXT_Turret script to sync shoot direction properly.\nIf using FireSyncDelegate, syncmode can be set to None")]
@@ -197,11 +197,6 @@ namespace SaccFlightAndVehicles
             if (AtGCam)
             {
                 AtGCam.gameObject.SetActive(true);
-                if (SetAtGCamSettings)
-                {
-                    AtGCam.fieldOfView = 60;
-                    AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
-                }
             }
         }
         public void DFUNC_Deselected()
