@@ -759,6 +759,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = true;
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            InVR = localPlayer.IsUserInVR();
             localPlayer.SetPlayerTag("SF_LocalInVehicle", "T");
             if (LStickDisplayHighlighter)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
@@ -901,6 +902,7 @@ namespace SaccFlightAndVehicles
             Using = true;
             if (!Interact_CustomPickup) Pickup_Hand = (int)EntityPickup.currentHand;
             Pickup_LeftHand = Pickup_Hand == 1;
+            InVR = localPlayer.IsUserInVR();
             EnableWhenHolding_Enable();
             DisableWhenHolding_Disable();
             if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
