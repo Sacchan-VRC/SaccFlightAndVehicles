@@ -511,23 +511,19 @@ namespace SaccFlightAndVehicles
             WakeUp();
             VehicleAnimator.SetBool("occupied", true);
 
-            if (!InVehicle)
+            if (InVehicle)
             {
-                if (HasFuel)
-                {
-                    for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                    { EngineSounds_Interior[i].gameObject.SetActive(true); }
-                }
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
                 for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
+                { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
             }
             else
             {
                 for (int i = 0; i < EngineSounds.Length; i++)
-                {
-                    EngineSounds[i].gameObject.SetActive(true);
-                }
+                { EngineSounds[i].gameObject.SetActive(HasFuel); }
             }
+
             if (TrackSound) { TrackSound.gameObject.SetActive(true); }
         }
         public void SFEXT_G_PilotExit()
@@ -541,13 +537,11 @@ namespace SaccFlightAndVehicles
             SetSoundsInside();
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("piloting", true);
-            if (HasFuel)
-            {
-                for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                { EngineSounds_Interior[i].gameObject.SetActive(true); }
-            }
+
+            for (int i = 0; i < EngineSounds_Interior.Length; i++)
+            { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
             for (int i = 0; i < EngineSounds.Length; i++)
-            { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
+            { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
 
             SendWheelEnter();
         }
@@ -577,13 +571,10 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetBool("passenger", true);
             if (!Sleeping)
             {
-                if (HasFuel)
-                {
-                    for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                    { EngineSounds_Interior[i].gameObject.SetActive(true); }
-                }
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
                 for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(noInteriorSounds); }
+                { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
             }
 
             SendWheelEnter();
