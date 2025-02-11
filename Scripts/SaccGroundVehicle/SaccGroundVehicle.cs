@@ -638,12 +638,7 @@ namespace SaccFlightAndVehicles
                         ThrottleInput = LeftThrottle * .5f + .5f;
                         YawInput = RightThrottle;
                         //
-                        FinalThrottle = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
-                        if (FinalThrottle < MinThrottle && Revs / RevLimiter < MinThrottle)
-                        {
-                            FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
-                            //P Controller for throttle
-                        }
+                        ThrottleInput = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
 
                         // bool LeftNeg = LeftThrottle < 0;
                         // bool RightNeg = RightThrottle < 0;
@@ -959,29 +954,29 @@ namespace SaccFlightAndVehicles
                             DriveWheels[i].SetProgramVariable("Clutch", Clutch);
                             DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio);
                         }
-                        if (Fuel > 0)
-                        {
-                            if (!HasFuel_)
-                            {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHasFuel));
-                            }
-                            FinalThrottle = ThrottleInput;
-                            if (ThrottleInput < MinThrottle && Revs / RevLimiter < MinThrottle)
-                            {
-                                FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
-                                //P Controller for throttle
-                            }
-                        }
-                        else
-                        {
-                            if (HasFuel_)
-                            {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNoFuel));
-                            }
-                            FinalThrottle = 0;
-                        }
                     }
-                    Fuel -= Mathf.Max(FuelConsumption * Time.deltaTime * (Revs / RevLimiter), 0);
+                    if (Fuel > 0)
+                    {
+                        if (!HasFuel_)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHasFuel));
+                        }
+                        FinalThrottle = ThrottleInput;
+                        if (FinalThrottle < MinThrottle && Revs / RevLimiter < MinThrottle)
+                        {
+                            FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
+                            //P Controller for throttle
+                        }
+                        Fuel = Mathf.Max(Fuel - (FuelConsumption * Time.deltaTime * (Revs / RevLimiter)), 0);
+                    }
+                    else
+                    {
+                        if (HasFuel_)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNoFuel));
+                        }
+                        FinalThrottle = 0;
+                    }
                 }
                 CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
             }
