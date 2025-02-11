@@ -204,10 +204,11 @@ namespace SaccFlightAndVehicles
             }
             get => _dead;
         }
-        [System.NonSerializedAttribute] public bool Using = false;
-        [System.NonSerializedAttribute] public bool Occupied = false;
-        [System.NonSerializedAttribute] public bool Passenger = false;
-        [System.NonSerializedAttribute] public bool InVehicle = false;
+        [System.NonSerializedAttribute] public bool Using = false; // is pilot or holding (local)
+        [System.NonSerializedAttribute] public bool Occupied = false; // has a pilot (synced)
+        [System.NonSerializedAttribute] public int PlayersInside = 0; // has a user in any seat (synced)
+        [System.NonSerializedAttribute] public bool Passenger = false; // local user is passenger (local)
+        [System.NonSerializedAttribute] public bool InVehicle = false; // local user is in vehicle, pilot or passenger (local)
         [System.NonSerializedAttribute] public bool InVR = false;
         [System.NonSerializedAttribute] public bool IsOwner;
         [System.NonSerializedAttribute] public bool Initialized;
@@ -716,6 +717,7 @@ namespace SaccFlightAndVehicles
         }
         public void PilotEnterVehicleGlobal(VRCPlayerApi player)
         {
+            PlayersInside++;
             if (player != null)
             {
                 Occupied = true;
@@ -731,6 +733,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public bool pilotLeftFlag;
         public void PilotExitVehicle(VRCPlayerApi player)
         {
+            PlayersInside--;
             if (player.isLocal)
             {
                 Using = false;
@@ -781,12 +784,14 @@ namespace SaccFlightAndVehicles
         }
         public void PassengerEnterVehicleGlobal(VRCPlayerApi player)
         {
+            PlayersInside++;
             player.SetPlayerTag("SF_InVehicle", "T");
             player.SetPlayerTag("SF_VehicleName", HierarchyName);
             SendEventToExtensions("SFEXT_G_PassengerEnter");
         }
         public void PassengerExitVehicleGlobal(VRCPlayerApi player)
         {
+            PlayersInside--;
             player.SetPlayerTag("SF_InVehicle", string.Empty);
             player.SetPlayerTag("SF_VehicleName", string.Empty);
             SendEventToExtensions("SFEXT_G_PassengerExit");
@@ -1137,7 +1142,7 @@ namespace SaccFlightAndVehicles
             if (Time.time - lastRespawnTime < 3) { return; }
             VRCPlayerApi currentOwner = Networking.GetOwner(gameObject);
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero);
-            if (Occupied || _dead || BlockedCheck) { return; }
+            if (Occupied || _dead || BlockedCheck || PlayersInside > 0) { return; }
             if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld) && !CustomPickup_Synced_isHeld)
             {
                 lastRespawnTime = Time.time;
