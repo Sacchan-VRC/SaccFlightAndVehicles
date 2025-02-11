@@ -26,18 +26,17 @@ namespace SaccFlightAndVehicles
         public float PlaySplashSpeed = 7;
         [Header("Wheel Posing/Rolling")]
         [Header("Both Arrays must be the same length")]
-        [Tooltip("List of all wheel colliders to use")]
+        [Tooltip("List of all wheel colliders to use, elements should correspond to the WheelVisuals array")]
         public WheelCollider[] WheelColliders;
-        [Tooltip("List of mesh objects or bones to rotate and position to the wheel collider pose")]
+        [Tooltip("List of transforms to rotate and position to the wheel collider pose, elements should correspond to the WheelColliders array")]
         public Transform[] WheelVisuals;
         private Vector3[] WheelStartPos;
         private float[] WheelRotations;
         private float[] WheelRadii;
         [Tooltip("Wheel will only be animated after the gear has finished deploying. This number should match the animation length, and the value in DFUNC_Gear")]
         public float GearTransitionTime = 5;
-        [Tooltip("Tick if this vehicle has no gear toggle functionality")]
-        public bool NoGearFunction = false;
-        private bool GearDown = false;
+        private bool GearDown_raw = true;
+        private bool GearDown = true;
         private bool TrailsOn;
         private bool HasTrails;
         private bool vapor;
@@ -111,8 +110,6 @@ namespace SaccFlightAndVehicles
                     WheelStartPos[i] = WheelVisuals[i].localPosition;
                 }
             }
-            if (NoGearFunction)
-            { GearDown = true; }
         }
         private void Update()
         {
@@ -179,8 +176,15 @@ namespace SaccFlightAndVehicles
                         float VehSpeed = (float)SAVControl.GetProgramVariable("Speed");
                         for (int i = 0; i < WheelVisuals.Length; i++)
                         {
-                            WheelRotations[i] += VehSpeed / WheelRadii[i];
-                            Quaternion newrot = Quaternion.AngleAxis(WheelRotations[i], Vector3.right);
+                            Vector3 pos;
+                            Quaternion rot;
+                            WheelColliders[i].GetWorldPose(out pos, out rot);
+                            WheelVisuals[i].position = pos;
+
+                            // rot isn't correct because rigidbody properties are different when nonowner
+                            WheelRotations[i] += (VehSpeed * Time.deltaTime) / WheelRadii[i];
+                            float degrees = Mathf.Rad2Deg * WheelRotations[i];
+                            Quaternion newrot = Quaternion.AngleAxis(degrees, Vector3.right);
                             WheelVisuals[i].localRotation = newrot;
                         }
                     }
@@ -236,14 +240,16 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         public void GearDownEvent()
         {
-            GearDown = true;
+            if (GearDown_raw) GearDown = true;
         }
         public void SFEXT_G_GearDown()
         {
+            GearDown_raw = true;
             SendCustomEventDelayedSeconds(nameof(GearDownEvent), GearTransitionTime);
         }
         public void SFEXT_G_GearUp()
         {
+            GearDown_raw = false;
             GearDown = false;
         }
         public void SFEXT_G_PilotEnter()
