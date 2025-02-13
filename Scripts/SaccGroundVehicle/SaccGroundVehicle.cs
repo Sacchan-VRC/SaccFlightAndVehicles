@@ -638,7 +638,7 @@ namespace SaccFlightAndVehicles
                         ThrottleInput = LeftThrottle * .5f + .5f;
                         YawInput = RightThrottle;
                         //
-                        ThrottleInput = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
+                        FinalThrottle = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
 
                         // bool LeftNeg = LeftThrottle < 0;
                         // bool RightNeg = RightThrottle < 0;
@@ -954,6 +954,7 @@ namespace SaccFlightAndVehicles
                             DriveWheels[i].SetProgramVariable("Clutch", Clutch);
                             DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio);
                         }
+                        FinalThrottle = ThrottleInput;
                     }
                     if (Fuel > 0)
                     {
@@ -961,7 +962,6 @@ namespace SaccFlightAndVehicles
                         {
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHasFuel));
                         }
-                        FinalThrottle = ThrottleInput;
                         if (FinalThrottle < MinThrottle && Revs / RevLimiter < MinThrottle)
                         {
                             FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
