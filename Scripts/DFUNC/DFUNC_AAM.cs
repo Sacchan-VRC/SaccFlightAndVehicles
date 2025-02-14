@@ -38,6 +38,7 @@ namespace SaccFlightAndVehicles
         public bool AllowFiringWhenGrounded = false;
         [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
         public bool DisallowFireIfWind = false;
+        public bool AAMInheritVelocity = true;
         [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
         public bool AllowNoAmmoLock = false;
         [Tooltip("Require re-lock after firing?")]
@@ -125,6 +126,7 @@ namespace SaccFlightAndVehicles
             NumAAMTargets = AAMTargets.Length;
             CenterOfMass = (Transform)EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
+            VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             OutsideVehicleLayer = EntityControl.OutsideVehicleLayer;
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
@@ -392,6 +394,7 @@ namespace SaccFlightAndVehicles
         private int AAMTargetChecker = 0;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         private Transform VehicleTransform;
+        private Rigidbody VehicleRigid;
         private SaccAirVehicle AAMCurrentTargetSAVControl;
         private int OutsideVehicleLayer;
         private Vector3 AAMCurrentTargetDirection;
@@ -609,10 +612,36 @@ namespace SaccFlightAndVehicles
                 else { NewAAM.transform.SetParent(null); }
                 NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
                 Rigidbody AAMRB = NewAAM.GetComponent<Rigidbody>();
-                AAMRB.position = NewAAM.transform.position;
-                AAMRB.rotation = NewAAM.transform.rotation;
+                if (AAMRB)
+                {
+                    if (EntityControl.IsOwner && IsOwner)// these can be different for passenger functions      
+                    {
+                        //set launch position relative to rigidbody instead of transform so the physics matches
+                        Vector3 LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(NewAAM.transform.position - EntityControl.transform.position);
+                        AAMRB.position = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                        Quaternion WeaponRotDif = NewAAM.transform.rotation * Quaternion.Inverse(VehicleRigid.rotation);
+                        AAMRB.rotation = WeaponRotDif * VehicleRigid.rotation;
+                    }
+                    else
+                    {
+                        AAMRB.position = NewAAM.transform.position + (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+                        AAMRB.rotation = NewAAM.transform.rotation;
+                    }
+                }
                 NewAAM.SetActive(true);
-                if (SAVControl) { AAMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                if (AAMInheritVelocity)
+                {
+                    if (AAMRB)
+                    {
+                        if (SAVControl)
+                        { AAMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                        else
+                        { AAMRB.velocity = VehicleRigid.velocity; }
+                    }
+                }
+                UdonSharpBehaviour USB = NewAAM.GetComponent<UdonSharpBehaviour>();
+                if (USB)
+                { USB.SendCustomEvent("EnableWeapon"); }
             }
             UpdateAmmoVisuals();
         }

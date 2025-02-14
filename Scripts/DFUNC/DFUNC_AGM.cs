@@ -42,6 +42,7 @@ namespace SaccFlightAndVehicles
         public bool AllowFiringWhenGrounded = false;
         [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
         public bool DisallowFireIfWind = false;
+        public bool AGMInheritVelocity = true;
         [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
@@ -120,6 +121,7 @@ namespace SaccFlightAndVehicles
         private bool InVR;
         private bool InEditor;
         private Transform VehicleTransform;
+        private Rigidbody VehicleRigid;
         private Quaternion AGMCamRotSlerper;
         private Quaternion AGMCamRotLastFrame;
         private bool func_active;
@@ -137,6 +139,7 @@ namespace SaccFlightAndVehicles
             if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
             IsOwner = EntityControl.IsOwner;
             VehicleTransform = EntityControl.transform;
+            VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             InVR = EntityControl.InVR;
 
@@ -462,11 +465,36 @@ namespace SaccFlightAndVehicles
                 else { NewAGM.transform.SetParent(null); }
                 NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
                 Rigidbody AGMRB = NewAGM.GetComponent<Rigidbody>();
-                AGMRB.position = NewAGM.transform.position;
-                AGMRB.rotation = NewAGM.transform.rotation;
+                if (AGMRB)
+                {
+                    if (EntityControl.IsOwner && IsOwner)// these can be different for passenger functions      
+                    {
+                        //set launch position relative to rigidbody instead of transform so the physics matches
+                        Vector3 LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(NewAGM.transform.position - EntityControl.transform.position);
+                        AGMRB.position = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                        Quaternion WeaponRotDif = NewAGM.transform.rotation * Quaternion.Inverse(VehicleRigid.rotation);
+                        AGMRB.rotation = WeaponRotDif * VehicleRigid.rotation;
+                    }
+                    else
+                    {
+                        AGMRB.position = NewAGM.transform.position;
+                        AGMRB.rotation = NewAGM.transform.rotation;
+                    }
+                }
                 NewAGM.SetActive(true);
-                if (SAVControl)
-                { AGMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                if (AGMInheritVelocity)
+                {
+                    if (AGMRB)
+                    {
+                        if (SAVControl)
+                        { AGMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                        else
+                        { AGMRB.velocity = VehicleRigid.velocity; }
+                    }
+                }
+                UdonSharpBehaviour USB = NewAGM.GetComponent<UdonSharpBehaviour>();
+                if (USB)
+                { USB.SendCustomEvent("EnableWeapon"); }
             }
             if (AGMAnimator)
             {

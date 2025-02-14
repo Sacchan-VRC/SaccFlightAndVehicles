@@ -360,8 +360,19 @@ namespace SaccFlightAndVehicles
                 Rigidbody BombRB = NewBomb.GetComponent<Rigidbody>();
                 if (BombRB)
                 {
-                    BombRB.position = NewBomb.transform.position;
-                    BombRB.rotation = NewBomb.transform.rotation;
+                    if (EntityControl.IsOwner && IsOwner)// these can be different for passenger functions      
+                    {
+                        //set launch position relative to rigidbody instead of transform so the physics matches
+                        Vector3 LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(NewBomb.transform.position - EntityControl.transform.position);
+                        BombRB.position = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                        Quaternion WeaponRotDif = NewBomb.transform.rotation * Quaternion.Inverse(VehicleRigid.rotation);
+                        BombRB.rotation = WeaponRotDif * VehicleRigid.rotation;
+                    }
+                    else
+                    {
+                        BombRB.position = NewBomb.transform.position;
+                        BombRB.rotation = NewBomb.transform.rotation;
+                    }
                 }
                 NewBomb.SetActive(true);
                 if (BombInheritVelocity)
@@ -374,6 +385,9 @@ namespace SaccFlightAndVehicles
                         { BombRB.velocity = VehicleRigid.velocity; }
                     }
                 }
+                UdonSharpBehaviour USB = NewBomb.GetComponent<UdonSharpBehaviour>();
+                if (USB)
+                { USB.SendCustomEvent("EnableWeapon"); }
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }

@@ -10,6 +10,7 @@ namespace SaccFlightAndVehicles
     public class SAV_AGMController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour AGMLauncherControl;
+        UdonSharpBehaviour SAVControl;
         [Tooltip("Missile will explode after this time")]
         public float MaxLifetime = 35;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -63,31 +64,44 @@ namespace SaccFlightAndVehicles
         {
             initialized = true;
             EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
+            SAVControl = (UdonSharpBehaviour)AGMLauncherControl.GetProgramVariable("SAVControl");
             AGMCollider = gameObject.GetComponent<Collider>();
             AGMRigid = gameObject.GetComponent<Rigidbody>();
             VehicleRigid = EntityControl.VehicleRigidbody;
             MissileAnimator = gameObject.GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
         }
-        public void ThrowMissile()
-        {
-            AGMRigid.velocity += (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
-        }
-        private void OnEnable()
+        public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (EntityControl.InEditor) { IsOwner = true; }
+            else { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
             if (ColliderAlwaysActive) { AGMCollider.enabled = true; ColliderActive = true; }
             else { AGMCollider.enabled = false; ColliderActive = false; }
+            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            AGMRigid.velocity += ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity);
             TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
             TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
-            if (EntityControl.InEditor) { IsOwner = true; }
-            else
-            { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
-            SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
+
+            if (ColliderAlwaysActive && !EntityControl.IsOwner && AGMRigid && !AGMRigid.isKinematic && SAVControl)
+            {
+                // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
+                // So in the updates until then move projectile by vehiclespeed
+                ensureNoSelfCollision_time = Time.fixedTime;
+                ensureNoSelfCollision();
+            }
+        }
+        float ensureNoSelfCollision_time;
+        public void ensureNoSelfCollision()
+        {
+            if (ensureNoSelfCollision_time != Time.fixedTime) return;
+
+            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            AGMRigid.position = transform.position;
+            SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
         void LateUpdate()
         {

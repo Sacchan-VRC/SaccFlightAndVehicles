@@ -29,7 +29,7 @@ namespace SaccFlightAndVehicles
         public GameObject LaserParticle;
         private SaccEntity EntityControl;
         private bool IsOwner;
-        private void OnEnable()
+        public void EnableWeapon()
         {
             EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
             // if (EntityControl) { VehicleCenterOfMass = EntityControl.CenterOfMass; }

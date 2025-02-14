@@ -10,6 +10,7 @@ namespace SaccFlightAndVehicles
     public class SAV_BombController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour BombLauncherControl;
+        UdonSharpBehaviour SAVControl;
         [Tooltip("Bomb will explode after this time")]
         [SerializeField] private float MaxLifetime = 40;
         [Tooltip("Maximum liftime of bomb is randomized by +- this many seconds on appearance")]
@@ -72,6 +73,7 @@ namespace SaccFlightAndVehicles
             EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
             BombCollider = GetComponent<Collider>();
             BombRigid = GetComponent<Rigidbody>();
+            SAVControl = (UdonSharpBehaviour)BombLauncherControl.GetProgramVariable("SAVControl");
             VehicleRigid = EntityControl.VehicleRigidbody;
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
             BombAnimator = GetComponent<Animator>();
@@ -88,22 +90,34 @@ namespace SaccFlightAndVehicles
                 DisableInWater_ParticleEmission_EM[i] = DisableInWater_ParticleEmission[i].emission;
             }
         }
-        public void AddLaunchSpeed()
-        {
-            BombRigid.velocity += transform.forward * LaunchSpeed;
-        }
-        private void OnEnable()
+        public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
             if (ColliderAlwaysActive) { BombCollider.enabled = true; ColliderActive = true; }
             else { BombCollider.enabled = false; ColliderActive = false; }
+            BombRigid.velocity += transform.forward * LaunchSpeed;
+            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
             if (EntityControl && EntityControl.InEditor) { IsOwner = true; }
             else
             { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime + Random.Range(-MaxLifetimeRadnomization, MaxLifetimeRadnomization));
             LifeTimeExplodesSent++;
-            SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
+            if (ColliderAlwaysActive && !EntityControl.IsOwner && BombRigid && !BombRigid.isKinematic && SAVControl)
+            {
+                // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
+                // So in the updates until then move projectile by vehiclespeed
+                ensureNoSelfCollision_time = Time.fixedTime;
+                ensureNoSelfCollision();
+            }
+        }
+        float ensureNoSelfCollision_time;
+        public void ensureNoSelfCollision()
+        {
+            if (ensureNoSelfCollision_time != Time.fixedTime) return;
+
+            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            BombRigid.position = transform.position;
+            SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
         void LateUpdate()
         {

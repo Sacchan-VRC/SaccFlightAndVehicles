@@ -10,6 +10,7 @@ namespace SaccFlightAndVehicles
     public class SAV_AAMController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour AAMLauncherControl;
+        UdonSharpBehaviour SAVControl;
         [Tooltip("Missile will explode after this time")]
         public float MaxLifetime = 12;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -122,6 +123,7 @@ namespace SaccFlightAndVehicles
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
+            SAVControl = (UdonSharpBehaviour)AAMLauncherControl.GetProgramVariable("SAVControl");
             VehicleTransform = EntityControl.transform;
             //whatever script is launching the missiles must contain all of these variables
             InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
@@ -145,23 +147,26 @@ namespace SaccFlightAndVehicles
         {
             StartTrack = true;
         }
-        public void ThrowMissile()
-        {
-            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
-        }
-        private void OnEnable()
+        public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (EntityControl.InEditor) { IsOwner = true; }
+            else { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
             if (ColliderAlwaysActive) { AAMCollider.enabled = true; ColliderActive = true; }
             else { AAMCollider.enabled = false; ColliderActive = false; }
-            if (EntityControl.InEditor) { IsOwner = true; }
-            else
-            { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
+            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
             int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
             AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
             Target = AAMTargets[aamtarg].transform;
-            SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
+
+            if (ColliderAlwaysActive && !EntityControl.IsOwner && AAMRigid && !AAMRigid.isKinematic && SAVControl)
+            {
+                // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
+                // So in the updates until then move projectile by vehiclespeed
+                ensureNoSelfCollision_time = Time.fixedTime;
+                ensureNoSelfCollision();
+            }
 
             //FixedUpdate runs one time after MoveBackToPool so these must be here
             ColliderActive = false;
@@ -217,6 +222,15 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
+        }
+        float ensureNoSelfCollision_time;
+        public void ensureNoSelfCollision()
+        {
+            if (ensureNoSelfCollision_time != Time.fixedTime) return;
+
+            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            AAMRigid.position = transform.position;
+            SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
         void FixedUpdate()
         {
