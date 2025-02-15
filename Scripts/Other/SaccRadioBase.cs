@@ -187,6 +187,7 @@ namespace SaccFlightAndVehicles
         {
             for (int i = 0; i < AllEntities.Length; i++)
             {
+                if (!AllEntities[i].Initialized) continue;
                 for (int o = 0; o < AllEntities[i].VehicleSeats.Length; o++)
                 {
                     VRCPlayerApi thisplayer = AllEntities[i].VehicleSeats[o].SeatedPlayer;
