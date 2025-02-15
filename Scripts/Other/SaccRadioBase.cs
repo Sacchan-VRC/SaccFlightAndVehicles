@@ -108,7 +108,7 @@ namespace SaccFlightAndVehicles
             for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
             {
                 VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
-                if (thisplayer != null)
+                if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
                     thisplayer.SetVoiceDistanceFar(VoiceFar);
@@ -118,7 +118,7 @@ namespace SaccFlightAndVehicles
             if ((NextEntity_SE.EntityPickup && NextEntity_SE.EntityPickup.IsHeld) || NextEntity_SE.CustomPickup_Synced_isHeld)
             {
                 VRCPlayerApi thisplayer = Networking.GetOwner(NextEntity_SE.gameObject);
-                if (thisplayer != null)
+                if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
                     thisplayer.SetVoiceDistanceFar(VoiceFar);
@@ -138,7 +138,7 @@ namespace SaccFlightAndVehicles
             for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
             {
                 VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
-                if (thisplayer != null)
+                if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
                     thisplayer.SetVoiceDistanceFar(VoiceFar);
@@ -148,7 +148,7 @@ namespace SaccFlightAndVehicles
             if ((NextEntity_SE.EntityPickup && NextEntity_SE.EntityPickup.IsHeld) || NextEntity_SE.CustomPickup_Synced_isHeld)
             {
                 VRCPlayerApi thisplayer = Networking.GetOwner(NextEntity_SE.gameObject);
-                if (thisplayer != null)
+                if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
                     thisplayer.SetVoiceDistanceFar(VoiceFar);
@@ -191,7 +191,7 @@ namespace SaccFlightAndVehicles
                 for (int o = 0; o < AllEntities[i].VehicleSeats.Length; o++)
                 {
                     VRCPlayerApi thisplayer = AllEntities[i].VehicleSeats[o].SeatedPlayer;
-                    if (thisplayer != null)
+                    if (Utilities.IsValid(thisplayer))
                     {
                         thisplayer.SetVoiceDistanceNear(0);
                         thisplayer.SetVoiceDistanceFar(25);
@@ -201,7 +201,7 @@ namespace SaccFlightAndVehicles
                 if ((AllEntities[i].EntityPickup && AllEntities[i].EntityPickup.IsHeld) || AllEntities[i].CustomPickup_Synced_isHeld)
                 {
                     VRCPlayerApi thisplayer = Networking.GetOwner(AllEntities[i].gameObject);
-                    if (thisplayer != null)
+                    if (Utilities.IsValid(thisplayer))
                     {
                         thisplayer.SetVoiceDistanceNear(0);
                         thisplayer.SetVoiceDistanceFar(25);
@@ -228,7 +228,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetSingleVoiceVolumeDefault(VRCPlayerApi player)
         {
-            if (player == null) { return; }
+            if (!Utilities.IsValid(player)) { return; }
             player.SetVoiceDistanceNear(0);
             player.SetVoiceDistanceFar(25);
             player.SetVoiceGain(15);
