@@ -13,7 +13,9 @@ namespace SaccFlightAndVehicles
         public SaccGroundVehicle SGVControl;
         [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
         public AudioSource[] EngineSounds;
+        bool EngineSounds_playing;
         public AudioSource[] EngineSounds_Interior;
+        bool EngineSounds_Interior_playing;
         bool noInteriorSounds;
         private Transform[] EngineSoundsT;
         bool EngineSoundsActive;
@@ -214,6 +216,7 @@ namespace SaccFlightAndVehicles
             { EngineSounds_Interior[i].gameObject.SetActive(false); }
             if (TrackSound) { TrackSound.gameObject.SetActive(false); }
             noInteriorSounds = EngineSounds_Interior.Length == 0;
+            EngineSounds_Interior_playing = EngineSounds_playing = false;
 
             FallAsleep();// sleep until sync script wakes up
             SendCustomEventDelayedSeconds(nameof(WakeUp), 5);// same activation delay as sync script
@@ -394,6 +397,7 @@ namespace SaccFlightAndVehicles
                 CheckDisableLoop();
             }
             Sleeping = true;
+            EngineSounds_playing = EngineSounds_Interior_playing = false;
             for (int i = 0; i < EngineSounds.Length; i++)
             { EngineSounds[i].gameObject.SetActive(false); }
             for (int i = 0; i < EngineSounds_Interior.Length; i++)
@@ -511,19 +515,24 @@ namespace SaccFlightAndVehicles
             WakeUp();
             VehicleAnimator.SetBool("occupied", true);
 
-            if (InVehicle)
+            if (!IsOwner)
             {
-                for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
-                for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
+                if (InVehicle)
+                {
+                    if (EntityControl.MySeat != -1)
+                    {
+                        InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+                    }
+                    if (AllDoorsClosed && InVehicle_Sounds)
+                    { SetSoundsInside(); }
+                    else
+                    { SetSoundsOutside(); }
+                }
+                else
+                {
+                    SetSoundsOutside();
+                }
             }
-            else
-            {
-                for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(HasFuel); }
-            }
-
             if (TrackSound) { TrackSound.gameObject.SetActive(true); }
         }
         public void SFEXT_G_PilotExit()
@@ -534,31 +543,26 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             InVehicle = true;
-            SetSoundsInside();
+            if (EntityControl.MySeat != -1)
+            {
+                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+            }
+            if (AllDoorsClosed && InVehicle_Sounds)
+            { SetSoundsInside(); }
+            else { SetSoundsOutside(); }
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("piloting", true);
-
-            for (int i = 0; i < EngineSounds_Interior.Length; i++)
-            { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
-            for (int i = 0; i < EngineSounds.Length; i++)
-            { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
 
             SendWheelEnter();
         }
         public void SFEXT_O_PilotExit()
         {
-            InVehicle = false;
+            InVehicle = InVehicle_Sounds = false;
+            if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
             SetSoundsOutside();
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("piloting", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
-            if (HasFuel)
-            {
-                for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(true); }
-            }
-            for (int i = 0; i < EngineSounds_Interior.Length; i++)
-            { EngineSounds_Interior[i].gameObject.SetActive(false); }
 
             SendWheelExit();
         }
@@ -566,46 +570,68 @@ namespace SaccFlightAndVehicles
         {
             InVehicle = true;
             WakeUp();
-            SetSoundsInside();
+            if (EntityControl.MySeat != -1)
+            {
+                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+            }
+            if (EngineSounds_playing)
+            {
+                if (AllDoorsClosed && InVehicle_Sounds)
+                { SetSoundsInside(); }
+                else { SetSoundsOutside(); }
+            }
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("passenger", true);
-            if (!Sleeping)
-            {
-                for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                { EngineSounds_Interior[i].gameObject.SetActive(HasFuel); }
-                for (int i = 0; i < EngineSounds.Length; i++)
-                { EngineSounds[i].gameObject.SetActive(noInteriorSounds && HasFuel); }
-            }
 
             SendWheelEnter();
         }
         public void SFEXT_P_PassengerExit()
         {
             InVehicle = false;
-            SetSoundsOutside();
+            if (EngineSounds_Interior_playing)
+            {
+                SetSoundsOutside();
+            }
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("passenger", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
-            if (!Sleeping)
-            {
-                if (HasFuel)
-                {
-                    for (int i = 0; i < EngineSounds.Length; i++)
-                    { EngineSounds[i].gameObject.SetActive(true); }
-                }
-                for (int i = 0; i < EngineSounds_Interior.Length; i++)
-                { EngineSounds_Interior[i].gameObject.SetActive(false); }
-            }
 
             SendWheelExit();
         }
-        //for later when I add opening doors and stuff, for parity with aircraft
         public void SetSoundsInside()
         {
+            if (!EngineSounds_Interior_playing)
+            {
+                EngineSounds_Interior_playing = HasFuel;
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(EngineSounds_Interior_playing); }
+            }
+
+            if (EngineSounds_playing)
+            {
+                EngineSounds_playing = false;
+                for (int i = 0; i < EngineSounds.Length; i++)
+                { EngineSounds[i].gameObject.SetActive(EngineSounds_playing); }
+            }
+
             VehicleAnimator.SetBool("insidesounds", true);
         }
         public void SetSoundsOutside()
         {
+            if (EngineSounds_Interior_playing)
+            {
+                EngineSounds_Interior_playing = false;
+                for (int i = 0; i < EngineSounds_Interior.Length; i++)
+                { EngineSounds_Interior[i].gameObject.SetActive(false); }
+            }
+
+            if (!EngineSounds_playing)
+            {
+                EngineSounds_playing = HasFuel;
+                for (int i = 0; i < EngineSounds.Length; i++)
+                { EngineSounds[i].gameObject.SetActive(EngineSounds_playing); }
+            }
+
             VehicleAnimator.SetBool("insidesounds", false);
         }
         public void SendWheelExit()
@@ -856,6 +882,36 @@ namespace SaccFlightAndVehicles
             {
                 SendCustomEventDelayedSeconds(nameof(CheckDisableLoop), 1);
             }
+        }
+        private int DoorsOpen = 0;
+        [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
+        public bool AllDoorsClosed = true;
+        private bool InVehicle_Sounds;
+        public void DoorClose()
+        {
+            DoorsOpen -= 1;
+            if (DoorsOpen == 0)
+            {
+                AllDoorsClosed = true;
+                if (InVehicle_Sounds)
+                { SetSoundsInside(); }
+                if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
+            }
+            if (DoorsOpen < 0) Debug.LogWarning("DoorsOpen is negative");
+            //Debug.Log("DoorClose");
+        }
+        public void DoorOpen()
+        {
+            DoorsOpen += 1;
+            if (DoorsOpen != 0)
+            {
+                if (InVehicle_Sounds && AllDoorsClosed)//only run exitplane if doors were closed before
+                { SetSoundsOutside(); }
+                if (IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
+                { EntityControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
+                AllDoorsClosed = false;
+            }
+            //Debug.Log("DoorOpen");
         }
     }
 }
