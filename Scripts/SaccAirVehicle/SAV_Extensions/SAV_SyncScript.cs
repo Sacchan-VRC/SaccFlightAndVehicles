@@ -422,16 +422,18 @@ namespace SaccFlightAndVehicles
             Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
             RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
 
-            //apply positional update
+            //positional update
             Extrapolation_Raw = O_Position + (ExtrapolationDirection * (float)(time - O_UpdateTime));
-            SyncTransform.position += ExtrapDirection_Smooth * deltatime;
-            //apply rotational update
-            Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
-            RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
-            Quaternion FrameRotExtrap_Smooth = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime);
-            SyncTransform.rotation = FrameRotExtrap_Smooth * SyncTransform.rotation;
+            Vector3 newpos = SyncTransform.position + ExtrapDirection_Smooth * deltatime;
+            //rotational update
+            //rotate raw rot extrapolation by frames worth
+            RotExtrapolation_Raw = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime) * RotExtrapolation_Raw;
+            //rotate smooth rot extrapolation by frames worth
+            Quaternion newrot = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime) * SyncTransform.rotation;
             //correct rotational desync
-            SyncTransform.rotation = RealSlerp(SyncTransform.rotation, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
+            newrot = RealSlerp(newrot, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
+            
+            SyncTransform.SetPositionAndRotation(newpos, newrot);
 #if UNITY_EDITOR
             if (SyncTransform_Raw)
             {
