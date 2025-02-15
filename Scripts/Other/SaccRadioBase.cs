@@ -107,6 +107,7 @@ namespace SaccFlightAndVehicles
                 || CurrentChannel == 0) { return; }
             for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
             {
+                if (!NextEntity_SE.VehicleSeats[o]) continue;
                 VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
                 if (Utilities.IsValid(thisplayer))
                 {
@@ -137,6 +138,7 @@ namespace SaccFlightAndVehicles
                 || CurrentChannel == 0) { return; }
             for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
             {
+                if (!NextEntity_SE.VehicleSeats[o]) continue;
                 VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
                 if (Utilities.IsValid(thisplayer))
                 {
@@ -190,6 +192,7 @@ namespace SaccFlightAndVehicles
                 if (!AllEntities[i].Initialized) continue;
                 for (int o = 0; o < AllEntities[i].VehicleSeats.Length; o++)
                 {
+                    if (!AllEntities[i].VehicleSeats[o]) continue;
                     VRCPlayerApi thisplayer = AllEntities[i].VehicleSeats[o].SeatedPlayer;
                     if (Utilities.IsValid(thisplayer))
                     {
@@ -223,6 +226,7 @@ namespace SaccFlightAndVehicles
         {
             for (int i = 0; i < Vehicle.VehicleSeats.Length; i++)
             {
+                if (!Vehicle.VehicleSeats[i]) continue;
                 SetSingleVoiceVolumeDefault(Vehicle.VehicleSeats[i].SeatedPlayer);
             }
         }
