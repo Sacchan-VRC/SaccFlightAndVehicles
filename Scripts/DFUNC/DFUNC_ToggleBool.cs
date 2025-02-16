@@ -17,7 +17,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] private bool InvertFuncon = false;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
-        [Tooltip("Enable while holding trigger and disable when let go? (REQUIRES using ToggleKey instead of KeyboardInput script to use)")]
+        [Tooltip("Enable while holding trigger and disable when let go? (REQUIRES using ToggleWhileHeldKey instead of KeyboardInput script to use)")]
         [SerializeField] bool ToggleWhileHeld;
         [Tooltip("REQUIRED FOR ToggleWhileHeld MODE (as opposed to using KeyboardInput.cs)")]
         [SerializeField] KeyCode ToggleWhileHeldKey;
@@ -58,6 +58,10 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SoundControl;
         [Tooltip("How long it takes for the sound to change after toggle to closed")]
         public float DoorCloseTime = 2;
+        [Tooltip("How long it takes for the sound to change after toggle to open")]
+        public float DoorOpenTime = 0;
+        [Tooltip("Leave empty to effect all seats")]
+        public SaccVehicleSeat[] EffectedSeats;
         [System.NonSerializedAttribute] public bool AnimOn = false;
         [System.NonSerializedAttribute] public float ToggleTime;
         [System.NonSerializedAttribute] public bool LeftDial = false;
@@ -78,7 +82,7 @@ namespace SaccFlightAndVehicles
             }
             else//this object is master
             {
-                if (OpensDoor && (ToggleMinDelay < DoorCloseTime)) { ToggleMinDelay = DoorCloseTime; }
+                if (OpensDoor && (ToggleMinDelay < DoorCloseTime) || (ToggleMinDelay < DoorOpenTime)) { ToggleMinDelay = Mathf.Max(DoorCloseTime, DoorOpenTime); }
                 if (OnDefault)
                 {
                     SetBoolOn();
@@ -258,7 +262,24 @@ namespace SaccFlightAndVehicles
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(InvertFuncon ? !true : true); }
             if (OpensDoor)
-            { SoundControl.SendCustomEvent("DoorOpen"); }
+            {
+                if (EffectedSeats.Length == 0)
+                {
+                    for (int i = 0; i < EntityControl.VehicleSeats.Length; i++)
+                    {
+                        EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") + 1);
+                    }
+                    SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", DoorOpenTime);
+                }
+                else
+                {
+                    for (int i = 0; i < EffectedSeats.Length; i++)
+                    {
+                        EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") + 1);
+                    }
+                    SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", DoorOpenTime);
+                }
+            }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(true); }
             foreach (GameObject obj in ToggleObjects_Off)
@@ -275,7 +296,24 @@ namespace SaccFlightAndVehicles
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(InvertFuncon ? !false : false); }
             if (OpensDoor)
-            { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
+            {
+                if (EffectedSeats.Length == 0)
+                {
+                    for (int i = 0; i < EntityControl.VehicleSeats.Length; i++)
+                    {
+                        EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") - 1);
+                    }
+                    SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", DoorCloseTime);
+                }
+                else
+                {
+                    for (int i = 0; i < EffectedSeats.Length; i++)
+                    {
+                        EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") - 1);
+                    }
+                    SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", DoorCloseTime);
+                }
+            }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(false); }
             foreach (GameObject obj in ToggleObjects_Off)

@@ -10946,6 +10946,7 @@ MonoBehaviour:
   PassengerFunctions: {fileID: 0}
   EnableInSeat:
   - {fileID: 2108285435714396907}
+  - {fileID: 3666391109732268843}
   DisableInSeat:
   - {fileID: 7228322188886426379}
   AdjustSeatPosition: 1
@@ -16208,6 +16209,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &5575940459069381638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17423,6 +17426,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &1154289842044943515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18004,6 +18009,89 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1826946152429739492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1043162753863231468}
+  - component: {fileID: 2816512507760575055}
+  - component: {fileID: 6111516731351983527}
+  m_Layer: 31
+  m_Name: MFD_Zoom_FUNCON
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1043162753863231468
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826946152429739492}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.58778524, w: 0.809017}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7989169573772440074}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -72}
+--- !u!33 &2816512507760575055
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826946152429739492}
+  m_Mesh: {fileID: 4300044, guid: a753c14a91335054282f470f1c93f533, type: 3}
+--- !u!23 &6111516731351983527
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826946152429739492}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 926bfdc1b229b1e488e1b45dd5701356, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1891830729109720714
 GameObject:
   m_ObjectHideFlags: 0
@@ -18189,7 +18277,7 @@ MonoBehaviour:
   - {fileID: 5808748684688106119}
   Dial_Functions_L:
   - {fileID: 3286946122174885724}
-  - {fileID: 1949873901642985834}
+  - {fileID: 6236782976509341814}
   - {fileID: 5423526595589576054}
   - {fileID: 5630527419273877287}
   - {fileID: 8073538954869398820}
@@ -38409,14 +38497,14 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 880839476569357569}
   Lfunc1: {fileID: 0}
   Lfunc1key: 0
-  Lfunc2: {fileID: 8073538954869398820}
-  Lfunc2key: 102
+  Lfunc2: {fileID: 6236782976509341814}
+  Lfunc2key: 113
   Lfunc3: {fileID: 5423526595589576054}
   Lfunc3key: 103
   Lfunc4: {fileID: 0}
   Lfunc4key: 0
-  Lfunc5: {fileID: 0}
-  Lfunc5key: 0
+  Lfunc5: {fileID: 8073538954869398820}
+  Lfunc5key: 102
   Lfunc6: {fileID: 0}
   Lfunc6key: 0
   Lfunc7: {fileID: 0}
@@ -38992,7 +39080,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6024658654036501185}
-  SAVControl: {fileID: 0}
+  SAVControl: {fileID: 1554233077807406780}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 4927169679595820196}
   FireKey: 0
@@ -39028,7 +39116,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 0
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 7186168855621679397}
 --- !u!114 &6024658654036501185
@@ -39727,6 +39814,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &8665719478296603020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39818,7 +39907,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6721343808081654492}
   m_Layer: 17
-  m_Name: InTurretOnly
+  m_Name: InVehicleOnly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51671,7 +51760,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &5848131408096378676
@@ -57425,6 +57513,7 @@ Transform:
   - {fileID: 6070215405323153992}
   - {fileID: 6868903833978605118}
   - {fileID: 2537070679628081872}
+  - {fileID: 1043162753863231468}
   - {fileID: 7857201742611352565}
   - {fileID: 1897445830917674019}
   m_Father: {fileID: 3426985165014350554}
@@ -63763,10 +63852,15 @@ MonoBehaviour:
   Turret: {fileID: 8712257613924222018}
   Commander: {fileID: 6763358643854456039}
   TrackSound: {fileID: 2482338106800960865}
+  TrackSound_Interior: {fileID: 0}
   TrackSoundVolMulti: 0.25
   TrackSoundPitchMulti: 0.25
   TrackSoundMaxVol: 1
   TrackSoundMaxPitch: 1
+  TrackSoundVolMulti_Interior: 0.25
+  TrackSoundPitchMulti_Interior: 0.25
+  TrackSoundMaxVol_Interior: 1
+  TrackSoundMaxPitch_Interior: 1
   HeadingOffset: 0
   DriverHeading: {fileID: 5521160988715925524}
   GunnerHeading: {fileID: 8751895999963460899}
@@ -69264,7 +69358,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ZOOM
+  m_text: 'ZOOM
+
+    SLIDER'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 76f1914f4f82852458d2250d86c7f472, type: 2}
   m_sharedMaterial: {fileID: -3398402084506154318, guid: 76f1914f4f82852458d2250d86c7f472,
@@ -70383,7 +70479,6 @@ GameObject:
   - component: {fileID: 2073811058173942271}
   - component: {fileID: 6360156371127014067}
   - component: {fileID: 131150256388661842}
-  - component: {fileID: 6502721396744465494}
   m_Layer: 17
   m_Name: stencil
   m_TagString: Untagged
@@ -70456,28 +70551,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6502721396744465494
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7347645131235312810}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &7392923202290321331
 GameObject:
   m_ObjectHideFlags: 0
@@ -77270,7 +77343,6 @@ GameObject:
   - component: {fileID: 8511815068275711609}
   - component: {fileID: 6051802218118758608}
   - component: {fileID: 4854882027739367608}
-  - component: {fileID: 5766879893514530084}
   m_Layer: 17
   m_Name: stencil
   m_TagString: Untagged
@@ -77343,28 +77415,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5766879893514530084
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8260848276584495555}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &8389909154833934395
 GameObject:
   m_ObjectHideFlags: 0
@@ -77489,8 +77539,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9054533896143838296}
-  - component: {fileID: 1949873901642985834}
-  - component: {fileID: 5495263352351238959}
+  - component: {fileID: 6236782976509341814}
+  - component: {fileID: 1715080539516392874}
   m_Layer: 0
   m_Name: DFUNC_Zoom
   m_TagString: Untagged
@@ -77513,7 +77563,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4334748542858089058}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1949873901642985834
+--- !u!114 &6236782976509341814
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77522,7 +77572,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8454273952539236314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e83b4872fc1d5641b28fb162b8c4768, type: 3}
+  m_Script: {fileID: 11500000, guid: fe33337a821edcf488ee3eb8a8dbb507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -77534,19 +77584,37 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 5495263352351238959}
-  SAVControl: {fileID: 1554233077807406780}
-  ControlsRoot: {fileID: 2566284437896167529}
-  SyncUpdateRate: 0.25
-  AnimUpKey: 113
-  AnimDownKey: 101
-  VehicleAnimator: {fileID: 1932946362016045969}
-  AnimFloatName: zoom
-  AnimDefaultValue: 0
-  AnimMoveSpeed: 2
-  ResetOnEnter: 1
-  LoopingAnimation: 0
---- !u!114 &5495263352351238959
+  _udonSharpBackingUdonBehaviour: {fileID: 1715080539516392874}
+  MasterToggle: {fileID: 0}
+  BoolAnimator: {fileID: 1932946362016045969}
+  Dial_Funcon:
+  - {fileID: 1826946152429739492}
+  InvertFuncon: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
+  AnimBoolName: zoomgunner
+  OnDefault: 0
+  PilotExitTurnOff: 0
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
+  ToggleMinDelay: 0
+  ToggleObjects: []
+  ToggleObjects_Off: []
+  ToggleEmission: []
+  AllowToggleFlying: 1
+  AllowToggleGrounded: 1
+  AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
+  OpensDoor: 0
+  SoundControl: {fileID: 0}
+  DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
+--- !u!114 &1715080539516392874
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77566,9 +77634,9 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 1
-  serializedProgramAsset: {fileID: 11400000, guid: 3b7d67207a916674da07fb4275bb9d8a,
+  serializedProgramAsset: {fileID: 11400000, guid: 70cbd24791fbef449a544355d2df3f64,
     type: 2}
-  programSource: {fileID: 11400000, guid: c83d4ae68e97b7a4cb89d473003d6744, type: 2}
+  programSource: {fileID: 11400000, guid: 13b3afa1cb7686c4187808dfb673655a, type: 2}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
@@ -78682,7 +78750,6 @@ GameObject:
   - component: {fileID: 5702762715136930360}
   - component: {fileID: 82193112192277278}
   - component: {fileID: 6502839427197879948}
-  - component: {fileID: 5232166907882580658}
   m_Layer: 17
   m_Name: stencil
   m_TagString: Untagged
@@ -78755,28 +78822,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5232166907882580658
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9056107494079582070}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &9099194435048993809
 GameObject:
   m_ObjectHideFlags: 0

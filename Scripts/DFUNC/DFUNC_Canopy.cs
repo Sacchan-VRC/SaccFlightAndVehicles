@@ -14,8 +14,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
         public Animator CanopyAnimator;
+        [Tooltip("How long to wait before telling the sound controller to change the sounds to outside vehicle sounds when opening")]
+        public float CanopyOpenTime = 0f;
         [Tooltip("The length of the canopy close animation, or how long to wait before telling the sound controller to change the sounds to inside vehicle sounds when closing")]
         public float CanopyCloseTime = 1.8f;
+        [Tooltip("Seats whos sound to change when opening canopy. Leave empty to effect all seats")]
+        public SaccVehicleSeat[] EffectedSeats;
         [Tooltip("The canopy can break off? Requires animation setup")]
         public bool CanopyCanBreakOff = false;
         [Header("Meters/s")]
@@ -157,7 +161,6 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             CanopyOpen = true;
             CanopyAnimator.SetBool(AnimCanopyBool, true);
-            SoundControl.SendCustomEvent("DoorOpen");
             if (EntityControl.IsOwner)
             {
                 SendCustomEventDelayedFrames(nameof(SendCanopyOpened), 1);
@@ -167,6 +170,23 @@ namespace SaccFlightAndVehicles
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + CanopyDragMulti);
                 DragApplied = true;
+            }
+
+            if (EffectedSeats.Length == 0)
+            {
+                for (int i = 0; i < EntityControl.VehicleSeats.Length; i++)
+                {
+                    EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") + 1);
+                }
+                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
+            }
+            else
+            {
+                for (int i = 0; i < EffectedSeats.Length; i++)
+                {
+                    EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") + 1);
+                }
+                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
             }
         }
         public void CanopyClosing()
@@ -187,6 +207,22 @@ namespace SaccFlightAndVehicles
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - CanopyDragMulti);
                 DragApplied = false;
+            }
+            if (EffectedSeats.Length == 0)
+            {
+                for (int i = 0; i < EntityControl.VehicleSeats.Length; i++)
+                {
+                    EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") - 1);
+                }
+                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
+            }
+            else
+            {
+                for (int i = 0; i < EffectedSeats.Length; i++)
+                {
+                    EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") - 1);
+                }
+                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
             }
         }
         //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.

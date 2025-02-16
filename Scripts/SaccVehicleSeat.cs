@@ -61,6 +61,7 @@ namespace SaccFlightAndVehicles
         private bool DoVoiceVolumeChange = true;
         [System.NonSerializedAttribute] public VRCStation Station;
         [System.NonSerializedAttribute] public bool Fake;//'Fake' exit from seat disables stuf flike seat adjuster, used for pilot swapping
+        [System.NonSerialized] public int numOpenDoors;
         private Transform Seat;
         private Vector3 SeatPosTarget;
         private Quaternion SeatRotTarget;

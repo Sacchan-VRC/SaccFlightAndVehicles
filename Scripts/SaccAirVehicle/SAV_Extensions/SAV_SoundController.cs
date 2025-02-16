@@ -96,7 +96,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Amount the outside thrust volume is multiplied by when you're inside the vehicle")]
         public float InVehicleThrustVolumeFactor = .09f;
         [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
-        public bool AllDoorsClosed = true;
+        public bool AllDoorsClosed = true;// Tracks whether the current user is hearing the insde or outside sounds.
         [Tooltip("If ticked, don't turn down the volume of the engine sounds when user throttles down")]
         public bool IsHelicopter = false;
         [Header("For use with Engine Toggle functionality")]
@@ -232,7 +232,6 @@ namespace SaccFlightAndVehicles
         private bool Passenger;
         private bool InVehicle;
         private bool InVehicle_Sounds;
-        private int DoorsOpen = 0;
         private bool InWater;
         private bool Taxiing;
         private bool EngineOn;
@@ -379,6 +378,9 @@ namespace SaccFlightAndVehicles
             PlaneIdleVolLerpValueOnStart = PlaneIdleVolLerpValueOn;
 
             EngineLerpSpeedMultiplier = _EngineLerpSpeedMultiplier;//initialize this
+
+            if (!AllDoorsClosed)
+                for (int i = 0; i < EntityControl.VehicleSeats.Length; i++) { EntityControl.VehicleSeats[i].numOpenDoors++; }
 
             DoSound = 20;
         }
@@ -732,8 +734,7 @@ namespace SaccFlightAndVehicles
             {
                 InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
             }
-            if (AllDoorsClosed && InVehicle_Sounds)
-            { SetSoundsInside(); }
+            UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
             { PlaneWind.volume = 0; PlaneWind.Play(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
@@ -756,8 +757,7 @@ namespace SaccFlightAndVehicles
             {
                 InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
             }
-            if (AllDoorsClosed && InVehicle_Sounds)
-            { SetSoundsInside(); }
+            UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
             { PlaneWind.volume = 0; PlaneWind.Play(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
@@ -1050,32 +1050,30 @@ namespace SaccFlightAndVehicles
                 TouchDownWater[Random.Range(0, TouchDownWater.Length)].Play();
             }
         }
-        //called by DFUNC_Canopy Delayed by canopy close time when playing the canopy animation, can be used to close any door
-        public void DoorClose()
+        public void UpdateDoorsOpen()
         {
-            DoorsOpen -= 1;
-            if (DoorsOpen == 0)
+            int mySeatDoorsOpen = 0;
+            if (EntityControl.MySeat != -1)
             {
-                AllDoorsClosed = true;
-                if (InVehicle_Sounds)
-                { SetSoundsInside(); }
-                if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
+                mySeatDoorsOpen += EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors;
             }
-            if (DoorsOpen < 0) Debug.LogWarning("DoorsOpen is negative");
-            //Debug.Log("DoorClose");
-        }
-        public void DoorOpen()
-        {
-            DoorsOpen += 1;
-            if (DoorsOpen != 0)
+            if (mySeatDoorsOpen != 0)
             {
-                if (InVehicle_Sounds && AllDoorsClosed)//only run exitplane if doors were closed before
-                { SetSoundsOutside(); }
-                if (IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
-                { EntityControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
+                if (InVehicle_Sounds && AllDoorsClosed)
+                {
+                    SetSoundsOutside();
+                }
                 AllDoorsClosed = false;
             }
-            //Debug.Log("DoorOpen");
+            else if (mySeatDoorsOpen == 0)
+            {
+                if (InVehicle_Sounds)
+                {
+                    SetSoundsInside();
+                }
+                AllDoorsClosed = true;
+            }
+            else if (mySeatDoorsOpen < 0) Debug.LogWarning("localDoorsOpen is negative");
         }
         private void SetSoundsInside()
         {
