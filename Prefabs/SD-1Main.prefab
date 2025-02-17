@@ -1099,8 +1099,8 @@ MonoBehaviour:
   VelLiftMax: 7
   MaxGs: 40
   GDamage: 22
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 40
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 50
   GroundEffectMaxDistance: 4
   GroundEffectStrength: 0.36818185
   GroundEffectLiftMax: 100
@@ -1154,6 +1154,8 @@ MonoBehaviour:
   Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
+  NumFUinAvgTime: 1
+  Gs_all: {x: 0, y: 0, z: 0}
 --- !u!114 &5034180576103066696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7096,7 +7098,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 429010248641897695}
   InvertFuncon: 0
-  DoAnimBool: 1
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: ChairPos
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -7116,6 +7120,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &9070160117367595447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33433,6 +33439,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &1858284560118274772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34119,7 +34126,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 4674088258984450813}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -35303,6 +35310,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &867173687996354088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35402,7 +35410,6 @@ MonoBehaviour:
   WheelColliders: []
   WheelVisuals: []
   GearTransitionTime: 5
-  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &4085898691515346758
 MonoBehaviour:
@@ -57959,7 +57966,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 372604268613719583}
   InvertFuncon: 0
-  DoAnimBool: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -57980,6 +57989,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &818621841506092913
 MonoBehaviour:
   m_ObjectHideFlags: 0

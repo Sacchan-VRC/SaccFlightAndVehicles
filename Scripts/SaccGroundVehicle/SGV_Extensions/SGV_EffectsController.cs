@@ -542,10 +542,6 @@ namespace SaccFlightAndVehicles
             {
                 if (InVehicle)
                 {
-                    if (EntityControl.MySeat != -1)
-                    {
-                        InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
-                    }
                     if (InVehicle_Sounds)
                     { SetSoundsInside(); }
                     else
@@ -598,18 +594,18 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetBool("passenger", true);
 
             if (EngineSounds_playing || EngineSounds_Interior_playing || TrackSound_playing || TrackSound_Interior_playing)
-                UpdateDoorsOpen();
+            { UpdateDoorsOpen(); }
             SendWheelEnter();
         }
         public void SFEXT_P_PassengerExit()
         {
-            InVehicle = false;
+            InVehicle = InVehicle_Sounds = false;
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("passenger", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
 
             if (EngineSounds_playing || EngineSounds_Interior_playing || TrackSound_playing || TrackSound_Interior_playing)
-                SetSoundsOutside();
+            { SetSoundsOutside(); }
             SendWheelExit();
         }
         public void SetSoundsInside()
@@ -738,7 +734,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_OnCollisionEnter() { WakeUp(); }
         public void SFEXT_G_SmallCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (SmallCrashInsideNULL) { return; }
                 int rand = Random.Range(0, SmallCrashInside.Length);
@@ -763,7 +759,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_MediumCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (MediumCrashInsideNULL) { return; }
                 int rand = Random.Range(0, MediumCrashInside.Length);
@@ -788,7 +784,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BigCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (BigCrashInsideNULL) { return; }
                 int rand = Random.Range(0, BigCrashInside.Length);
@@ -947,11 +943,11 @@ namespace SaccFlightAndVehicles
             }
             if (mySeatDoorsOpen != 0)
             {
-                SetSoundsOutside();
+                if (AllDoorsClosed) SetSoundsOutside();
             }
             else if (mySeatDoorsOpen == 0)
             {
-                SetSoundsInside();
+                if (InVehicle_Sounds && !AllDoorsClosed) SetSoundsInside();
             }
             else if (mySeatDoorsOpen < 0) Debug.LogWarning("localDoorsOpen is negative");
         }

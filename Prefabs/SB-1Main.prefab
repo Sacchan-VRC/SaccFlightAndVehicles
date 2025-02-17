@@ -31014,6 +31014,7 @@ MonoBehaviour:
   PlaneWindMaxVolSpeed: 50
   SonicBoom:
   - {fileID: 2934804654972944781}
+  PlayAllSonicBoomSounds: 0
   Explosion:
   - {fileID: 2934804653798985898}
   Wrecked:
@@ -37873,7 +37874,6 @@ MonoBehaviour:
   WheelColliders: []
   WheelVisuals: []
   GearTransitionTime: 5
-  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &2934804654298486114
 MonoBehaviour:
@@ -42995,6 +42995,7 @@ MonoBehaviour:
   DownIndicator: {fileID: 8101121278289072770}
   ElevationIndicator: {fileID: 8101121279883868309}
   HeadingIndicator: {fileID: 8101121278588262014}
+  HeadingOffset: 0
   VelocityIndicator: {fileID: 8101121278731571343}
   distance_from_head: 1.333
   updateInterval_vectors: 0
@@ -53331,7 +53332,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 374746152193602298}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -98960,6 +98961,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &2934804655299911390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100483,7 +100485,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2809707790251052369}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -100820,10 +100822,10 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &2934804655656756585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106741,8 +106743,8 @@ MonoBehaviour:
   VelLiftMax: 0
   MaxGs: 20
   GDamage: 20
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 100
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 50
   GroundEffectMaxDistance: 0
   GroundEffectStrength: 0
   GroundEffectLiftMax: 0
@@ -106796,6 +106798,8 @@ MonoBehaviour:
   Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
+  NumFUinAvgTime: 1
+  Gs_all: {x: 0, y: 0, z: 0}
 --- !u!114 &5934194373947756573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112376,7 +112380,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1808767953855557614}
   InvertFuncon: 0
-  DoAnimBool: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -112397,6 +112403,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &7243260429258765712
 MonoBehaviour:
   m_ObjectHideFlags: 0

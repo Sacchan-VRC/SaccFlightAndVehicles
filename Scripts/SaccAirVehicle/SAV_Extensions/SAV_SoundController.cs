@@ -95,8 +95,7 @@ namespace SaccFlightAndVehicles
         public AudioSource[] DopplerSounds;
         [Tooltip("Amount the outside thrust volume is multiplied by when you're inside the vehicle")]
         public float InVehicleThrustVolumeFactor = .09f;
-        [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
-        public bool AllDoorsClosed = true;// Tracks whether the current user is hearing the insde or outside sounds.
+        [System.NonSerialized] public bool AllDoorsClosed = false;// Tracks whether the current user is hearing the insde or outside sounds.
         [Tooltip("If ticked, don't turn down the volume of the engine sounds when user throttles down")]
         public bool IsHelicopter = false;
         [Header("For use with Engine Toggle functionality")]
@@ -238,7 +237,6 @@ namespace SaccFlightAndVehicles
         private bool Occupied;
         private bool EngineStarted;
         private bool DoRollingSwap;
-        private bool SoundsOutside = true;
         public void SFEXT_L_EntityStart()
         {
             IsOwner = EntityControl.IsOwner;
@@ -379,9 +377,6 @@ namespace SaccFlightAndVehicles
 
             EngineLerpSpeedMultiplier = _EngineLerpSpeedMultiplier;//initialize this
 
-            if (!AllDoorsClosed)
-                for (int i = 0; i < EntityControl.VehicleSeats.Length; i++) { EntityControl.VehicleSeats[i].numOpenDoors++; }
-
             DoSound = 20;
         }
         private void Update()
@@ -446,7 +441,7 @@ namespace SaccFlightAndVehicles
                     doppletemp = .0001f; // prevent divide by 0
 
                     //Only Supersonic if the vehicle is actually moving faster than sound, and you're not inside it (prevents sonic booms from occuring if you move past a stationary vehicle)
-                    if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude > 343 && !InVehicle_Sounds)
+                    if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude > 343 && !InVehicle)
                     {
                         if (!silent)
                         {
@@ -608,7 +603,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_EnterWater()
         {
             InWater = true;
-            if (InVehicle_Sounds)
+            if (InVehicle)
             {
                 if (EnterWater) { EnterWater.Play(); }
                 if (UnderWater) { UnderWater.Play(); }
@@ -1059,27 +1054,25 @@ namespace SaccFlightAndVehicles
             }
             if (mySeatDoorsOpen != 0)
             {
-                if (InVehicle_Sounds && AllDoorsClosed)
+                if (AllDoorsClosed)
                 {
                     SetSoundsOutside();
                 }
-                AllDoorsClosed = false;
             }
             else if (mySeatDoorsOpen == 0)
             {
-                if (InVehicle_Sounds)
+                if (InVehicle_Sounds && !AllDoorsClosed)
                 {
                     SetSoundsInside();
                 }
-                AllDoorsClosed = true;
             }
             else if (mySeatDoorsOpen < 0) Debug.LogWarning("localDoorsOpen is negative");
         }
         private void SetSoundsInside()
         {
-            if (!SoundsOutside) { return; }
+            if (AllDoorsClosed) { return; }
             if (VehicleAnimator) { VehicleAnimator.SetBool("insidesounds", true); }
-            SoundsOutside = false;
+            AllDoorsClosed = true;
             //change stuff when you get in/canopy closes
             if (ABOnOutside) { ABOnOutside.Stop(); }
             if (EngineStartup) { EngineStartup.Stop(); }
@@ -1115,9 +1108,9 @@ namespace SaccFlightAndVehicles
         }
         private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
         {
-            if (SoundsOutside) { return; }
+            if (!AllDoorsClosed) { return; }
             if (VehicleAnimator) { VehicleAnimator.SetBool("insidesounds", false); }
-            SoundsOutside = true;
+            AllDoorsClosed = false;
             if (RadarLocked) { RadarLocked.Stop(); }
             if (!RollingOnWater && _rolling) { _rolling.Stop(); }
             if (EngineStartupInside) { EngineStartupInside.Stop(); }

@@ -164,7 +164,6 @@ MonoBehaviour:
   IsOwner: 0
   FunctionsActive: 0
   Occupied: 0
-  DialFuncPos: 0
 --- !u!114 &241204804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -447,7 +446,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 515467600}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -589,7 +588,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2246501683413073306}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -805,7 +804,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1460606752}
   InvertFuncon: 0
-  DoAnimBool: 1
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -826,6 +827,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &4032014314250641724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1670,7 +1673,6 @@ MonoBehaviour:
   IsOwner: 0
   FunctionsActive: 0
   Occupied: 0
-  DialFuncPos: 0
 --- !u!114 &1695366941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1892,6 +1894,7 @@ MonoBehaviour:
   - {fileID: 3852796878477215237}
   - {fileID: 3852796878609073751}
   LaunchSound: {fileID: 0}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -1911,7 +1914,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &6278865674925798219
@@ -22273,7 +22275,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3411756929047500885}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -53934,6 +53936,7 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 1064588171}
   LaunchSound: {fileID: 1060008484}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 5693358537823994957}
@@ -53953,7 +53956,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 1469228353}
-  SetAtGCamSettings: 0
   EnableOnSelected:
   - {fileID: 1386235095}
   FireSyncDelegate: {fileID: 0}
@@ -70450,6 +70452,7 @@ MonoBehaviour:
   HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 7105509204632478174}
   AtGScreen: {fileID: 7105509206018492734}
+  CamTurnSmoothness: 100
   CamZoomScale: 100
   CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 1945679728186786808}
@@ -70461,6 +70464,7 @@ MonoBehaviour:
     m_Bits: 133121
   AllowFiringWhenGrounded: 1
   DisallowFireIfWind: 0
+  AGMInheritVelocity: 1
   DoAnimBool: 0
   AnimBoolName: AGMSelected
   AnimFloatName: AGMs
@@ -70470,8 +70474,9 @@ MonoBehaviour:
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  TargetingTransform: {fileID: 0}
   WorldParent: {fileID: 0}
-  HandHeldMode: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &7105509204289583361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75546,7 +75551,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 627682400261023669}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -90681,7 +90686,6 @@ MonoBehaviour:
   DamageFeedBack: {fileID: 0}
   DopplerSounds: []
   InVehicleThrustVolumeFactor: 0.09
-  AllDoorsClosed: 0
   IsHelicopter: 0
   DoEngineLerpSpeedMultiplierChanges: 1
   EngineStartingLerpSpeedMulti: 0.5
@@ -90697,12 +90701,12 @@ MonoBehaviour:
   PlaneInsideVolLerpValueOn: 0.72
   PlaneInsideVolLerpValueOff: 0.72
   PlaneDistantVolLerpValueOn: 0.72
-  PlaneDistantVolLerpValueOff: 0.72
+  PlaneDistantVolLerpValueOff: 1.2
   PlaneThrustVolLerpValueOn: 1.08
   PlaneThrustVolLerpValueOff: 1.08
   PlaneIdlePitchLerpValueOn: 0.54
-  PlaneIdlePitchLerpValueOff: 0.09
-  PlaneIdleVolLerpValueOff: 0.09
+  PlaneIdlePitchLerpValueOff: 1
+  PlaneIdleVolLerpValueOff: 1
   PlaneIdleVolLerpValueOn: 0.72
 --- !u!114 &7105509204671563318
 MonoBehaviour:
@@ -90976,7 +90980,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1554130111}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -91285,6 +91289,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &7105509204878781824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93468,7 +93473,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2415259330074371874}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -93879,7 +93884,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 4057865969602712601}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}

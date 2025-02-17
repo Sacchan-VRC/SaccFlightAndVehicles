@@ -28397,7 +28397,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2393009876853872156}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -28569,7 +28569,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2374662920228413907}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -28702,6 +28702,7 @@ MonoBehaviour:
   - {fileID: 9045122725599844176}
   OtherWheels: []
   DriveSpeed: 15000
+  RevLimiter: 8000
   EngineSlowDown: 1
   MinThrottle: 0.08
   MinThrottle_PStrength: 2
@@ -28806,13 +28807,10 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  RevLimiter: 8000
-  MaxGs: 10
-  GDamage: 5
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 100
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 100
   BulletDamageTaken: 10
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
@@ -29016,7 +29014,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2374662921348105082}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -29257,7 +29255,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2935594654823327813}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -29766,6 +29764,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &2935594654760479891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29913,7 +29912,9 @@ MonoBehaviour:
   BoolAnimator: {fileID: 2935594654239514265}
   Dial_Funcon: []
   InvertFuncon: 0
-  DoAnimBool: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -29934,6 +29935,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &964093275380290907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30070,7 +30073,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 8898729298587184617}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -35074,6 +35077,7 @@ MonoBehaviour:
   SGVControl: {fileID: 2935594653847325617}
   EngineSounds:
   - {fileID: 2935594654303570114}
+  EngineSounds_Interior: []
   DespawnIfUnused: 0
   DespawnDist: 50
   DopplerSounds: []
@@ -35107,7 +35111,6 @@ MonoBehaviour:
   Wings: []
   DoCaterpillarTracks: 0
   TrackSourceWheels: []
-  TrackRotations: []
   TracksRenderer: {fileID: 0}
   TrackSpeedMulti: []
   TrackMaterialSlots: 
@@ -35124,7 +35127,15 @@ MonoBehaviour:
   Turret: {fileID: 0}
   Commander: {fileID: 0}
   TrackSound: {fileID: 0}
+  TrackSound_Interior: {fileID: 0}
+  TrackSoundVolMulti: 1
   TrackSoundPitchMulti: 1
+  TrackSoundMaxVol: 1
+  TrackSoundMaxPitch: 1
+  TrackSoundVolMulti_Interior: 1
+  TrackSoundPitchMulti_Interior: 1
+  TrackSoundMaxVol_Interior: 1
+  TrackSoundMaxPitch_Interior: 1
   HeadingOffset: 0
   DriverHeading: {fileID: 0}
   GunnerHeading: {fileID: 0}
@@ -52250,7 +52261,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 342589200067224348}
   InvertFuncon: 0
-  DoAnimBool: 0
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
@@ -52271,6 +52284,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &3797043493513406999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73444,7 +73459,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 8179344056730957155}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
@@ -99425,7 +99440,7 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2676985898177457631}
-  SeatOutSideVehicle: 0
+  SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
   AnimBoolAnimator: {fileID: 0}
