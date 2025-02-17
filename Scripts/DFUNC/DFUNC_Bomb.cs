@@ -32,6 +32,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
         public Transform[] BombLaunchPoints;
         public AudioSource LaunchSound;
+        public AudioSource LaunchSound_Interior;
         public AudioSource ReloadSound;
         [Tooltip("Play the Reload sound after BombDelay + this (negative values encouraged)")]
         public float ReloadSound_offset = 0f;
@@ -93,6 +94,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         [System.NonSerializedAttribute] public bool IsOwner;
         bool inVR;
+        private UdonSharpBehaviour SoundControl;
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -110,6 +112,9 @@ namespace SaccFlightAndVehicles
             EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
             StartEntityLayer = EntityControl.gameObject.layer;
             if (FireSyncDelegate) { FireSyncDelegate.SetProgramVariable("DelegateFireCallback", this); }
+            SoundControl = (SAV_SoundController)EntityControl.GetExtention(GetUdonTypeName<SAV_SoundController>());
+            if (!SoundControl)
+                SoundControl = (SGV_EffectsController)EntityControl.GetExtention(GetUdonTypeName<SGV_EffectsController>());
 
             UpdateAmmoVisuals();
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
@@ -396,7 +401,15 @@ namespace SaccFlightAndVehicles
                 if (!EntityControl.Piloting) { EntityControl.SendEventToExtensions("SFEXT_L_WakeUp"); }
                 VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
             }
-            if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
+            if (LaunchSound_Interior)
+            {
+                if (SoundControl && (bool)SoundControl.GetProgramVariable("AllDoorsClosed"))
+                {
+                    LaunchSound_Interior.PlayOneShot(LaunchSound_Interior.clip);
+                }
+                else if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
+            }
+            else if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_num); }
 
             UpdateAmmoVisuals();
