@@ -6625,9 +6625,8 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 0
-  DoAnimBool: 0
-  AnimBoolName: AnimBool
+  ToggleWhileHeldKey: 0
+  AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 1
   PilotExitTurnOn: 0
@@ -6647,6 +6646,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &7847083531814166175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6747,6 +6748,7 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 2219767112375617838}
   LaunchSound: {fileID: 8895717855025018714}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -6766,7 +6768,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &6096054439070880412

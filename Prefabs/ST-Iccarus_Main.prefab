@@ -63615,10 +63615,15 @@ MonoBehaviour:
   Turret: {fileID: 0}
   Commander: {fileID: 0}
   TrackSound: {fileID: 0}
+  TrackSound_Interior: {fileID: 0}
   TrackSoundVolMulti: 1
   TrackSoundPitchMulti: 1
   TrackSoundMaxVol: 1
   TrackSoundMaxPitch: 1
+  TrackSoundVolMulti_Interior: 1
+  TrackSoundPitchMulti_Interior: 1
+  TrackSoundMaxVol_Interior: 1
+  TrackSoundMaxPitch_Interior: 1
   HeadingOffset: 0
   DriverHeading: {fileID: 0}
   GunnerHeading: {fileID: 0}
@@ -71291,9 +71296,8 @@ MonoBehaviour:
   InvertFuncon: 0
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
-  ToggleKey: 0
-  DoAnimBool: 0
-  AnimBoolName: AnimBool
+  ToggleWhileHeldKey: 0
+  AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 1
   PilotExitTurnOn: 0
@@ -71313,6 +71317,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &3534988536281074744
 MonoBehaviour:
   m_ObjectHideFlags: 0

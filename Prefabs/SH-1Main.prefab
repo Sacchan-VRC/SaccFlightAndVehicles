@@ -7367,7 +7367,9 @@ MonoBehaviour:
   - {fileID: 8922977315312981250}
   - {fileID: 7604477877241135387}
   InvertFuncon: 0
-  DoAnimBool: 1
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: sidedoor
   OnDefault: 0
   PilotExitTurnOff: 0
@@ -7387,6 +7389,8 @@ MonoBehaviour:
   OpensDoor: 1
   SoundControl: {fileID: -333974543967690982}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &2452078378740462998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7506,8 +7510,10 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 4525370790198140218}
   InvertFuncon: 0
-  DoAnimBool: 0
-  AnimBoolName: AnimBool
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
+  AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 1
   PilotExitTurnOn: 0
@@ -7527,6 +7533,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &438315858759981833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7853,7 +7861,6 @@ MonoBehaviour:
   IsOwner: 0
   FunctionsActive: 0
   Occupied: 0
-  DialFuncPos: 0
 --- !u!114 &3672560189053500627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38172,7 +38179,9 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon: []
   InvertFuncon: 0
-  DoAnimBool: 1
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 0
@@ -38192,6 +38201,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &2653143540773659217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44099,6 +44110,7 @@ MonoBehaviour:
   - {fileID: 7240980354073692193}
   - {fileID: 7240980354209745011}
   LaunchSound: {fileID: 0}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -44118,7 +44130,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &1283717154052526582
@@ -44373,8 +44384,8 @@ MonoBehaviour:
   VelLiftMax: 7
   MaxGs: 10
   GDamage: 22
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 50
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 50
   GroundEffectMaxDistance: 4
   GroundEffectStrength: 3
   GroundEffectLiftMax: 100
@@ -44428,6 +44439,8 @@ MonoBehaviour:
   Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
+  NumFUinAvgTime: 1
+  Gs_all: {x: 0, y: 0, z: 0}
 --- !u!114 &3974340786403165104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51177,8 +51190,10 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 753692971129492952}
   InvertFuncon: 0
-  DoAnimBool: 0
-  AnimBoolName: AnimBool
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
+  AnimBoolName: 
   OnDefault: 1
   PilotExitTurnOff: 0
   PilotExitTurnOn: 1
@@ -51198,6 +51213,8 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &4217865800906215776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77486,6 +77503,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   AAMAnimator: {fileID: 8333115239819171383}
   FireKey: 32
+  use_OnPickupUseDown: 0
   MissileType: 1
   NumAAM: 2
   AAMLockAngle: 15
@@ -77497,6 +77515,7 @@ MonoBehaviour:
   SendLockWarning: 1
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AAMInheritVelocity: 1
   AllowNoAmmoLock: 0
   LoseLockWhenFired: 0
   PitBullIndicator: {fileID: 0}
@@ -77516,7 +77535,6 @@ MonoBehaviour:
   AAMTargetLock: {fileID: 8333115238359307028}
   WorldParent: {fileID: 0}
   TargetingTransform: {fileID: 0}
-  Handheld_HUD: {fileID: 0}
   HUDControl: {fileID: -7071171659312887935}
   AAMMaxTargetDistance: 6000
   HUDText_AAM_ammo: {fileID: 8333115238396513880}
@@ -77658,7 +77676,6 @@ MonoBehaviour:
   WheelColliders: []
   WheelVisuals: []
   GearTransitionTime: 5
-  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &8333115238184276952
 MonoBehaviour:
@@ -94240,7 +94257,6 @@ MonoBehaviour:
   IsOwner: 0
   FunctionsActive: 0
   Occupied: 0
-  DialFuncPos: 0
 --- !u!114 &8333115238588098056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94899,6 +94915,7 @@ MonoBehaviour:
   - {fileID: 4132127738751896766}
   - {fileID: 4132127738884279532}
   LaunchSound: {fileID: 0}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -94918,7 +94935,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &8333115238754075734
@@ -96069,6 +96085,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &8333115238970575334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106042,6 +106059,7 @@ MonoBehaviour:
   HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 8333115239849592805}
   AtGScreen: {fileID: 8333115239949523039}
+  CamTurnSmoothness: 100
   CamZoomScale: 100
   CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 4170627024752863621}
@@ -106053,6 +106071,7 @@ MonoBehaviour:
     m_Bits: 133121
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AGMInheritVelocity: 1
   DoAnimBool: 0
   AnimBoolName: AGMSelected
   AnimFloatName: AGMs
@@ -106062,8 +106081,9 @@ MonoBehaviour:
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  TargetingTransform: {fileID: 0}
   WorldParent: {fileID: 0}
-  HandHeldMode: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &8333115239043645012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106149,7 +106169,9 @@ MonoBehaviour:
   SoundControl: {fileID: -333974543967690982}
   Dial_Funcon: {fileID: 5049991645689140439}
   CanopyAnimator: {fileID: 8333115239819171383}
+  CanopyOpenTime: 0
   CanopyCloseTime: 1.8
+  EffectedSeats: []
   CanopyCanBreakOff: 1
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 100
@@ -117447,7 +117469,6 @@ MonoBehaviour:
   DopplerSounds:
   - {fileID: 8333115238219477516}
   InVehicleThrustVolumeFactor: 0.09
-  AllDoorsClosed: 1
   IsHelicopter: 1
   DoEngineLerpSpeedMultiplierChanges: 1
   EngineStartingLerpSpeedMulti: 0.3

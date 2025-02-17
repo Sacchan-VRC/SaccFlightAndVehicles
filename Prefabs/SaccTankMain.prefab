@@ -16189,7 +16189,7 @@ MonoBehaviour:
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
   ToggleWhileHeldKey: 0
-  AnimBoolName: AnimBool
+  AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 1
   PilotExitTurnOn: 0
@@ -18277,7 +18277,7 @@ MonoBehaviour:
   - {fileID: 5808748684688106119}
   Dial_Functions_L:
   - {fileID: 3286946122174885724}
-  - {fileID: 6236782976509341814}
+  - {fileID: 7252762049195918127}
   - {fileID: 5423526595589576054}
   - {fileID: 5630527419273877287}
   - {fileID: 8073538954869398820}
@@ -38497,7 +38497,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 880839476569357569}
   Lfunc1: {fileID: 0}
   Lfunc1key: 0
-  Lfunc2: {fileID: 6236782976509341814}
+  Lfunc2: {fileID: 0}
   Lfunc2key: 113
   Lfunc3: {fileID: 5423526595589576054}
   Lfunc3key: 103
@@ -39097,6 +39097,7 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 4974518595390709628}
   LaunchSound: {fileID: 7124725457034235000}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 3469998454510006493}
   ReloadSound_offset: 0.5
   LaunchParticle: {fileID: 8290964709789644492}
@@ -39794,7 +39795,7 @@ MonoBehaviour:
   use_OnPickupUseDown: 0
   ToggleWhileHeld: 0
   ToggleWhileHeldKey: 0
-  AnimBoolName: AnimBool
+  AnimBoolName: 
   OnDefault: 0
   PilotExitTurnOff: 1
   PilotExitTurnOn: 0
@@ -51741,6 +51742,7 @@ MonoBehaviour:
   BombDelay: 15
   BombLaunchPoints: []
   LaunchSound: {fileID: 5777103110747467656}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 8040260994712939812}
@@ -77539,8 +77541,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9054533896143838296}
-  - component: {fileID: 6236782976509341814}
-  - component: {fileID: 1715080539516392874}
+  - component: {fileID: 7252762049195918127}
+  - component: {fileID: 3433634407371622765}
   m_Layer: 0
   m_Name: DFUNC_Zoom
   m_TagString: Untagged
@@ -77563,7 +77565,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4334748542858089058}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6236782976509341814
+--- !u!114 &7252762049195918127
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77572,7 +77574,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8454273952539236314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe33337a821edcf488ee3eb8a8dbb507, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e83b4872fc1d5641b28fb162b8c4768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -77584,37 +77586,19 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 1715080539516392874}
-  MasterToggle: {fileID: 0}
-  BoolAnimator: {fileID: 1932946362016045969}
-  Dial_Funcon:
-  - {fileID: 1826946152429739492}
-  InvertFuncon: 0
-  use_OnPickupUseDown: 0
-  ToggleWhileHeld: 0
-  ToggleWhileHeldKey: 0
-  AnimBoolName: zoomgunner
-  OnDefault: 0
-  PilotExitTurnOff: 0
-  PilotExitTurnOn: 0
-  PilotEnterTurnOff: 0
-  PilotEnterTurnOn: 0
-  ToggleMinDelay: 0
-  ToggleObjects: []
-  ToggleObjects_Off: []
-  ToggleEmission: []
-  AllowToggleFlying: 1
-  AllowToggleGrounded: 1
-  AllowToggleOnWater: 1
-  AllowAfterBurner: 1
-  AllowToggleEngineOff: 1
-  AllowToggleEngineOn: 1
-  OpensDoor: 0
-  SoundControl: {fileID: 0}
-  DoorCloseTime: 2
-  DoorOpenTime: 0
-  EffectedSeats: []
---- !u!114 &1715080539516392874
+  _udonSharpBackingUdonBehaviour: {fileID: 3433634407371622765}
+  SAVControl: {fileID: 1554233077807406780}
+  ControlsRoot: {fileID: 2566284437896167529}
+  SyncUpdateRate: 0.25
+  AnimUpKey: 113
+  AnimDownKey: 101
+  VehicleAnimator: {fileID: 1932946362016045969}
+  AnimFloatName: zoom
+  AnimDefaultValue: 0
+  AnimMoveSpeed: 2
+  ResetOnEnter: 1
+  LoopingAnimation: 0
+--- !u!114 &3433634407371622765
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77634,9 +77618,9 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 1
-  serializedProgramAsset: {fileID: 11400000, guid: 70cbd24791fbef449a544355d2df3f64,
+  serializedProgramAsset: {fileID: 11400000, guid: 3b7d67207a916674da07fb4275bb9d8a,
     type: 2}
-  programSource: {fileID: 11400000, guid: 13b3afa1cb7686c4187808dfb673655a, type: 2}
+  programSource: {fileID: 11400000, guid: c83d4ae68e97b7a4cb89d473003d6744, type: 2}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
