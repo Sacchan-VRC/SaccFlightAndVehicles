@@ -33202,7 +33202,9 @@ MonoBehaviour:
   SoundControl: {fileID: -861782148710182909}
   Dial_Funcon: {fileID: 4885824311804587859}
   CanopyAnimator: {fileID: 4371473018849597658}
+  CanopyOpenTime: 0
   CanopyCloseTime: 1.8
+  EffectedSeats: []
   CanopyCanBreakOff: 1
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 100
@@ -55323,6 +55325,7 @@ MonoBehaviour:
   HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 4371473019587610573}
   AtGScreen: {fileID: 4371473018734145325}
+  CamTurnSmoothness: 100
   CamZoomScale: 100
   CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 1025653920136716035}
@@ -55334,6 +55337,7 @@ MonoBehaviour:
     m_Bits: 133121
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AGMInheritVelocity: 1
   DoAnimBool: 0
   AnimBoolName: AGMSelected
   AnimFloatName: AGMs
@@ -55343,6 +55347,7 @@ MonoBehaviour:
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  TargetingTransform: {fileID: 0}
   WorldParent: {fileID: 0}
   use_OnPickupUseDown: 0
 --- !u!114 &4371473019125145362
@@ -66868,7 +66873,6 @@ MonoBehaviour:
   DopplerSounds:
   - {fileID: 4371473018875325949}
   InVehicleThrustVolumeFactor: 0.09
-  AllDoorsClosed: 1
   IsHelicopter: 0
   DoEngineLerpSpeedMultiplierChanges: 1
   EngineStartingLerpSpeedMulti: 0.3
@@ -72148,6 +72152,7 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 4371473018565603552}
   LaunchSound: {fileID: 0}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -72167,7 +72172,6 @@ MonoBehaviour:
   DT_UseToFire: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 4371473019587610573}
-  SetAtGCamSettings: 0
   EnableOnSelected:
   - {fileID: 4371473018734145325}
   - {fileID: 427684810952554521}
@@ -88590,6 +88594,7 @@ MonoBehaviour:
   SendLockWarning: 1
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AAMInheritVelocity: 1
   AllowNoAmmoLock: 0
   LoseLockWhenFired: 0
   PitBullIndicator: {fileID: 0}
@@ -88891,7 +88896,6 @@ MonoBehaviour:
   WheelColliders: []
   WheelVisuals: []
   GearTransitionTime: 5
-  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &4371473019976013252
 MonoBehaviour:
@@ -123060,7 +123064,7 @@ WheelCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1587614152466380027}
   serializedVersion: 2
-  m_Center: {x: 0, y: 0.236, z: 0}
+  m_Center: {x: -0.1743844, y: 0.236, z: 0}
   m_Radius: 0.317
   m_SuspensionSpring:
     spring: 40
