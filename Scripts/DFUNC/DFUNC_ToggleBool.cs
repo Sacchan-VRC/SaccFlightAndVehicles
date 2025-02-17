@@ -54,8 +54,7 @@ namespace SaccFlightAndVehicles
         [Space(10)]
         public bool OpensDoor = false;
         [Header("Door Only:")]
-        [Tooltip("If this toggle opens a door, it will change the sound to the outside sounds using the soundcontroller")]
-        public UdonSharpBehaviour SoundControl;
+        private UdonSharpBehaviour SoundControl;
         [Tooltip("How long it takes for the sound to change after toggle to closed")]
         public float DoorCloseTime = 2;
         [Tooltip("How long it takes for the sound to change after toggle to open")]
@@ -75,6 +74,14 @@ namespace SaccFlightAndVehicles
         private bool IsSecondary = false;
         public void SFEXT_L_EntityStart()
         {
+            SoundControl = EntityControl.GetExtention(GetUdonTypeName<SAV_SoundController>());
+            ParticleLength = ToggleEmission.Length;
+            ToggleEmission_em = new ParticleSystem.EmissionModule[ParticleLength];
+            for (int i = 0; i < ParticleLength; i++)
+            { ToggleEmission_em[i] = ToggleEmission[i].emission; }
+            if (AnimBoolName.Length > 0) DoAnimBool = true;
+            if (!SoundControl)
+                SoundControl = EntityControl.GetExtention(GetUdonTypeName<SGV_EffectsController>());
             if (MasterToggle)//this object is slave
             {
                 IsSecondary = true;
@@ -90,11 +97,6 @@ namespace SaccFlightAndVehicles
                 foreach (GameObject funcon in Dial_Funcon)
                 { funcon.SetActive(InvertFuncon ? !OnDefault : OnDefault); }
             }
-            ParticleLength = ToggleEmission.Length;
-            ToggleEmission_em = new ParticleSystem.EmissionModule[ParticleLength];
-            for (int i = 0; i < ParticleLength; i++)
-            { ToggleEmission_em[i] = ToggleEmission[i].emission; }
-            if (AnimBoolName.Length > 0) DoAnimBool = true;
         }
         public void SFEXT_O_OnPlayerJoined()
         {

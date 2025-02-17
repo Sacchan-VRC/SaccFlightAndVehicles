@@ -112,9 +112,9 @@ namespace SaccFlightAndVehicles
             EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
             StartEntityLayer = EntityControl.gameObject.layer;
             if (FireSyncDelegate) { FireSyncDelegate.SetProgramVariable("DelegateFireCallback", this); }
-            SoundControl = (SAV_SoundController)EntityControl.GetExtention(GetUdonTypeName<SAV_SoundController>());
+            SoundControl = EntityControl.GetExtention(GetUdonTypeName<SAV_SoundController>());
             if (!SoundControl)
-                SoundControl = (SGV_EffectsController)EntityControl.GetExtention(GetUdonTypeName<SGV_EffectsController>());
+                SoundControl = EntityControl.GetExtention(GetUdonTypeName<SGV_EffectsController>());
 
             UpdateAmmoVisuals();
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
