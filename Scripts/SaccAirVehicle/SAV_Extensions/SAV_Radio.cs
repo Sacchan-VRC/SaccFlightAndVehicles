@@ -21,8 +21,9 @@ namespace SaccFlightAndVehicles
         bool DFUNCMODE = false;
         [System.NonSerialized] public SaccRadioBase RadioBase;
         [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
+        [System.NonSerialized] public DFUNC_RadioPTT PTTControl; // set true if DFUNC_RadioPTT is in use
         // public bool RadioOn = true;
-        [UdonSynced, FieldChangeCallback(nameof(Channel))] private byte _Channel;
+        [UdonSynced, FieldChangeCallback(nameof(Channel))] public byte _Channel;
         public byte Channel
         {
             set
@@ -58,11 +59,6 @@ namespace SaccFlightAndVehicles
             }
             InVR = localPlayer.IsUserInVR();
             gameObject.SetActive(true);
-            bool RadioOn = _Channel != 0;
-            for (int i = 0; i < Dial_Funcon.Length; i++)
-            {
-                Dial_Funcon[i].SetActive(RadioOn);
-            }
             if (ForceChannel > -1)
             {
                 if (ForceChannel > 255) ForceChannel = 255;
@@ -139,7 +135,7 @@ namespace SaccFlightAndVehicles
                 // but sets your synced radio channel to +200 when you're not talking so that others see you as not on their channel and don't hear you
                 // it sets it back -200 to the 'real' value while you are holding PTT so that everyone in the channel can hear you
                 byte newChannel = (byte)RadioBase.GetProgramVariable("MyChannel");
-                if (PTT_MODE && newChannel != 0) newChannel += 200;
+                if (PTT_MODE && newChannel != 0 && !PTTControl.PTT_ACTIVE) newChannel += 200;
                 Channel = newChannel;
                 RequestSerialization();
             }
@@ -210,11 +206,10 @@ namespace SaccFlightAndVehicles
         [Header("Optional, DFUNC Mode:")]
         [SerializeField] private KeyCode ChannelUpKey = KeyCode.RightBracket;
         [SerializeField] private KeyCode ChannelDownKey = KeyCode.LeftBracket;
-        [SerializeField] private TextMeshProUGUI ChannelNumber;
+        [SerializeField] private TextMeshProUGUI ChannelNumber_UGUI;
+        [SerializeField] private TextMeshPro ChannelNumber;
         [SerializeField] private Transform ControlsRoot;
         private bool Selected;
-        [Tooltip("Objects enabled when function is active (used on MFD)")]
-        public GameObject[] Dial_Funcon;
         private bool TriggerLastFrame;
         private Quaternion VehicleRotLastFrame, JoystickZeroPoint;
         private float JoyStickValue;
@@ -297,13 +292,8 @@ namespace SaccFlightAndVehicles
         }
         private void UpdateChannelText()
         {
-            if (ChannelNumber)
-            { ChannelNumber.text = RadioBase.ChannelText.text; }
-            bool RadioOn = _Channel != 0;
-            for (int i = 0; i < Dial_Funcon.Length; i++)
-            {
-                Dial_Funcon[i].SetActive(RadioOn);
-            }
+            if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = RadioBase.ChannelText.text; }
+            if (ChannelNumber) { ChannelNumber.text = RadioBase.ChannelText.text; }
         }
         public void DFUNC_Selected()
         {

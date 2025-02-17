@@ -26,12 +26,13 @@ namespace SaccFlightAndVehicles
         {
             InVR = EntityControl.InVR;
             Radio.PTT_MODE = true;
+            Radio.PTTControl = this;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
         }
         bool Selected;
         private void Update()
         {
-            if (!Piloting) return;
+            if (!Selected && InVR) return;
             float Trigger;
             if (use_OnPickupUseDown)
                 Trigger = PickupTrigger;
@@ -76,7 +77,7 @@ namespace SaccFlightAndVehicles
             PickupTrigger = 0;
             Selected = false;
         }
-        bool PTT_ACTIVE;
+        [System.NonSerialized] public bool PTT_ACTIVE;
         void PTT_Toggle()
         {
             if (!PTT_ACTIVE)
