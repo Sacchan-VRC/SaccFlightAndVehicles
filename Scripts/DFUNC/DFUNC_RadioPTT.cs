@@ -9,7 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class DFUNC_RadioPTT : UdonSharpBehaviour
     {
-        [SerializeField] SAV_Radio Radio;
+        SAV_Radio Radio;
         [SerializeField] KeyCode PTT_Key;
         public GameObject Dial_Funcon;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
@@ -25,6 +25,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             InVR = EntityControl.InVR;
+            Radio = (SAV_Radio)EntityControl.GetExtention(GetUdonTypeName<SAV_Radio>());
             Radio.PTT_MODE = true;
             Radio.PTTControl = this;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
