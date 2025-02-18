@@ -609,7 +609,7 @@ namespace SaccFlightAndVehicles
                             int Ai = Input.GetKey(KeyCode.A) ? 1 : 0;
                             int Si = Input.GetKey(KeyCode.S) ? 1 : 0;
                             int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
-                            if (Vector3.Dot(CurrentVel, EntityControl.transform.forward) < -.01)
+                            if (Vector3.Dot(CurrentVel, EntityControl.transform.forward) < -.5f)
                             {
                                 // invert steering when going backwards
                                 Ai *= -1;
