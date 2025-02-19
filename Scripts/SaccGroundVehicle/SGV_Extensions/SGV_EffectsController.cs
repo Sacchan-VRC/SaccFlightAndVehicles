@@ -405,7 +405,7 @@ namespace SaccFlightAndVehicles
             {
                 if (DoEffects > 10)
                 {
-                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("Revs") / RevLimiter < 0.015f && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 0.1f)
+                    if (!KeepAwake && !InVehicle && (float)SGVControl.GetProgramVariable("Revs") / RevLimiter < 0.015f && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 0.1f)
                     { FallAsleep(); }
                     else
                         DoEffects = 8f;
