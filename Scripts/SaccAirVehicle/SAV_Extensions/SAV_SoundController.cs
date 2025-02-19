@@ -81,6 +81,12 @@ namespace SaccFlightAndVehicles
         public float RollingVolCurve_Water = .004f;
         [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
         public AudioSource ReSupply;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a refuel event")]
+        public AudioSource ReFuel;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a rearm event")]
+        public AudioSource ReArm;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a repair event")]
+        public AudioSource Repair;
         [Tooltip("Looping Sound that plays when vehicle is being targeted by a missile")]
         public AudioSource RadarLocked;
         [Tooltip("Sound that plays when vehicle enters water and player is inside the vehicle")]
@@ -362,6 +368,7 @@ namespace SaccFlightAndVehicles
                 _rollingVolCurve = RollingVolCurve_Water;
                 _rollingMaxVol = RollingMaxVol_Water;
             }
+
             PlaneInsidePitchLerpValueOnStart = PlaneInsidePitchLerpValueOn;
             PlaneInsidePitchLerpValueOffStart = PlaneInsidePitchLerpValueOff;
             PlaneInsideVolLerpValueOnStart = PlaneInsideVolLerpValueOn;
@@ -908,6 +915,58 @@ namespace SaccFlightAndVehicles
         {
             SendCustomEventDelayedFrames(nameof(ResupplySound), 1);
         }
+        public void ResupplySound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (ReSupply)
+                {
+                    ReSupply.Play();
+                }
+            }
+        }
+        public void SFEXT_G_ReFuel()
+        {
+            SendCustomEventDelayedFrames(nameof(ReFuelSound), 1);
+        }
+        public void ReFuelSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (ReFuel)
+                {
+                    ReFuel.Play();
+                }
+            }
+        }
+        public void SFEXT_G_ReArm()
+        {
+            SendCustomEventDelayedFrames(nameof(ReArmSound), 1);
+        }
+        public void ReArmSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (ReArm)
+                {
+                    ReArm.Play();
+                }
+            }
+        }
+        public void SFEXT_G_RePair()
+        {
+            SendCustomEventDelayedFrames(nameof(RePairSound), 1);
+        }
+        public void RePairSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (Repair)
+                {
+                    Repair.Play();
+                }
+            }
+        }
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
@@ -1127,16 +1186,6 @@ namespace SaccFlightAndVehicles
                 PlaneThrustVolume *= PlaneThrustTargetVolume * InVehicleThrustVolumeFactorReverse;
                 PlaneDistantVolume = PlaneThrustVolume;
                 if (PlaneInside) { PlaneIdlePitch = PlaneInside.pitch; }
-            }
-        }
-        public void ResupplySound()
-        {
-            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
-            {
-                if (ReSupply)
-                {
-                    ReSupply.Play();
-                }
             }
         }
         public void SFEXT_G_AfterburnerOn()

@@ -211,6 +211,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SFEXT_G_ReFuel() { SFEXT_G_ReSupply(); }
         private void Reset()
         {
             Boosting = 0;

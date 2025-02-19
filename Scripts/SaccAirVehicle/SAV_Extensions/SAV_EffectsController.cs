@@ -303,10 +303,6 @@ namespace SaccFlightAndVehicles
         {
             VehicleAnimator.SetBool("afterburneron", false);
         }
-        public void SFEXT_G_ReSupply()
-        {
-            VehicleAnimator.SetTrigger("resupply");
-        }
         public void SFEXT_G_BulletHit()
         {
             DoEffects = 0f;

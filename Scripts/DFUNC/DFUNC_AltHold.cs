@@ -19,6 +19,7 @@ namespace SaccFlightAndVehicles
         public float AltHoldPitchProportional = 1f;
         public float AltHoldPitchIntegral = 1f;
         private float AltHoldPitchIntegrator;
+        [Tooltip("Derivative has some jitter because of the inaccuracy of Vector3.SignedAngle on very low angles")]
         public float AltHoldPitchDerivative = .1f;
         private float AltHoldPitchlastframeerror;
         public float AltHoldRollProportional = .01f;
@@ -220,6 +221,7 @@ namespace SaccFlightAndVehicles
                 if (HelicopterMode)
                 {
                     float MovementErrorz = Mathf.Clamp(Mathf.Clamp(localVelocity.z * AutoHoverStrengthPitch, -AutoHoverMaxAngleSpeedPitch, AutoHoverMaxAngleSpeedPitch), -AutoHoverMaxPitch, AutoHoverMaxPitch);
+                    //Vector3.SignedAngle's minimum angle measurement seems to be 0.01978234 degrees, i believe is the source of the jitter when using derivative AltHoldPitchDerivative > 0
                     error = Vector3.SignedAngle(VehicleRigidbody.rotation * Vector3.forward, Vector3.ProjectOnPlane(VehicleRigidbody.rotation * Vector3.forward, Vector3.up), VehicleRigidbody.rotation * Vector3.right) - MovementErrorz;
                 }
                 else

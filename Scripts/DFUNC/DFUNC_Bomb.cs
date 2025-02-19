@@ -237,6 +237,7 @@ namespace SaccFlightAndVehicles
             BombPoint = 0;
             UpdateAmmoVisuals();
         }
+        public void SFEXT_G_ReArm() { SFEXT_G_ReSupply(); }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         private int PickupTrigger = 0;

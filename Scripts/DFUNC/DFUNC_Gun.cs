@@ -186,6 +186,7 @@ namespace SaccFlightAndVehicles
             if (SAVControl && GunAmmoInSeconds != FullGunAmmoInSeconds)
             { EntityControl.SetProgramVariable("ReSupplied", (int)EntityControl.GetProgramVariable("ReSupplied") + 1); }
         }
+        public void SFEXT_G_ReArm() { SFEXT_G_ReSupply(); }
         public override void OnDeserialization()
         {
             UpdateAmmoVisuals();

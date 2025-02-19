@@ -111,6 +111,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SFEXT_G_RePair() { SFEXT_G_ReSupply(); }
         public void RepairCanopy()
         {
             CanopyBroken = false;

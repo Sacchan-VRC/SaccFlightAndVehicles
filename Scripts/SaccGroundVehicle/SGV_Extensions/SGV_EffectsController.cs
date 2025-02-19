@@ -54,6 +54,12 @@ namespace SaccFlightAndVehicles
         public AudioSource[] BigCrashInside;
         [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
         public AudioSource ReSupply;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a refuel event")]
+        public AudioSource ReFuel;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a rearm event")]
+        public AudioSource ReArm;
+        [Tooltip("Oneshot sound sound played each time vehicle recieves a repair event")]
+        public AudioSource Repair;
         public AudioSource GearChange;
         public AudioSource GearUp;
         public AudioSource GearDown;
@@ -704,7 +710,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ReSupply()
         {
-            SendCustomEventDelayedFrames("ResupplySound", 1);
+            SendCustomEventDelayedFrames(nameof(ResupplySound), 1);
         }
         public void ResupplySound()
         {
@@ -713,6 +719,48 @@ namespace SaccFlightAndVehicles
                 if (ReSupply)
                 {
                     ReSupply.Play();
+                }
+            }
+        }
+        public void SFEXT_G_ReFuel()
+        {
+            SendCustomEventDelayedFrames(nameof(ReFuelSound), 1);
+        }
+        public void ReFuelSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (ReFuel)
+                {
+                    ReFuel.Play();
+                }
+            }
+        }
+        public void SFEXT_G_ReArm()
+        {
+            SendCustomEventDelayedFrames(nameof(ReArmSound), 1);
+        }
+        public void ReArmSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (ReArm)
+                {
+                    ReArm.Play();
+                }
+            }
+        }
+        public void SFEXT_G_RePair()
+        {
+            SendCustomEventDelayedFrames(nameof(RePairSound), 1);
+        }
+        public void RePairSound()
+        {
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
+            {
+                if (Repair)
+                {
+                    Repair.Play();
                 }
             }
         }

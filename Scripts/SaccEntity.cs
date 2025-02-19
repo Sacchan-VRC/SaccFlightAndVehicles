@@ -1472,7 +1472,29 @@ namespace SaccFlightAndVehicles
         }
         public void ReFuel_Event()
         {
+            ReSupplied = 0;//used to know if other scripts resupplied
             SendEventToExtensions("SFEXT_G_ReFuel");//extensions increase the ReSupplied value too
+            LastResupplyTime = Time.time;
+        }
+        public void ReArm()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReArm_Event));
+        }
+        public void ReArm_Event()
+        {
+            ReSupplied = 0;//used to know if other scripts resupplied
+            SendEventToExtensions("SFEXT_G_ReArm");//extensions increase the ReSupplied value too
+            LastResupplyTime = Time.time;
+        }
+        public void RePair()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RePair_Event));
+        }
+        public void RePair_Event()
+        {
+            ReSupplied = 0;//used to know if other scripts resupplied
+            SendEventToExtensions("SFEXT_G_RePair");//extensions increase the ReSupplied value too
+            LastResupplyTime = Time.time;
         }
     }
 }

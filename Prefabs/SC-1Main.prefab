@@ -5979,7 +5979,6 @@ MonoBehaviour:
   WheelColliders: []
   WheelVisuals: []
   GearTransitionTime: 5
-  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &914079681130734468
 MonoBehaviour:
@@ -32036,10 +32035,10 @@ MonoBehaviour:
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &914079681580794773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37292,6 +37291,7 @@ MonoBehaviour:
   DownIndicator: {fileID: 5465751469252538382}
   ElevationIndicator: {fileID: 5465751468710689617}
   HeadingIndicator: {fileID: 5465751469695308991}
+  HeadingOffset: 0
   VelocityIndicator: {fileID: 5465751469521994531}
   distance_from_head: 1.333
   updateInterval_vectors: 0
@@ -43353,6 +43353,7 @@ MonoBehaviour:
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &914079681930388931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59075,7 +59076,9 @@ MonoBehaviour:
   SoundControl: {fileID: 2486851246198071157}
   Dial_Funcon: {fileID: 2510070448969768284}
   CanopyAnimator: {fileID: 914079681580794731}
+  CanopyOpenTime: 0
   CanopyCloseTime: 2
+  EffectedSeats: []
   CanopyCanBreakOff: 1
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 20
@@ -96269,6 +96272,7 @@ MonoBehaviour:
   PlaneWindMaxVolSpeed: 1000
   SonicBoom:
   - {fileID: 914079681385738660}
+  PlayAllSonicBoomSounds: 0
   Explosion:
   - {fileID: 914079682047291515}
   Wrecked:
@@ -96291,6 +96295,9 @@ MonoBehaviour:
   RollingMaxVol_Water: 0.3
   RollingVolCurve_Water: 0.004
   ReSupply: {fileID: 914079683209889602}
+  ReFuel: {fileID: 914079683209889602}
+  ReArm: {fileID: 914079683209889602}
+  Repair: {fileID: 914079683209889602}
   RadarLocked: {fileID: 914079681904505201}
   EnterWater: {fileID: 7414449358710994856}
   EnterWaterOutside: {fileID: 5465751470705844540}
@@ -96298,7 +96305,6 @@ MonoBehaviour:
   DamageFeedBack: {fileID: 757527005923868325}
   DopplerSounds: []
   InVehicleThrustVolumeFactor: 0.09
-  AllDoorsClosed: 1
   IsHelicopter: 0
   DoEngineLerpSpeedMultiplierChanges: 1
   EngineStartingLerpSpeedMulti: 0.3
@@ -96856,8 +96862,8 @@ MonoBehaviour:
   VelLiftMax: 10
   MaxGs: 25
   GDamage: 110
-  CrashDmg_MinSpeed: 15
-  CrashDmg_MaxSpeed: 100
+  Crash_Damage_Speed: 10
+  Crash_Death_Speed: 50
   GroundEffectMaxDistance: 9
   GroundEffectStrength: 6
   GroundEffectLiftMax: 12
@@ -96911,6 +96917,8 @@ MonoBehaviour:
   Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
+  NumFUinAvgTime: 1
+  Gs_all: {x: 0, y: 0, z: 0}
 --- !u!114 &1251122204420011798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107580,7 +107588,9 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 8672312210088702308}
   InvertFuncon: 0
-  DoAnimBool: 1
+  use_OnPickupUseDown: 0
+  ToggleWhileHeld: 0
+  ToggleWhileHeldKey: 0
   AnimBoolName: movecabin
   OnDefault: 0
   PilotExitTurnOff: 0
@@ -107598,8 +107608,9 @@ MonoBehaviour:
   AllowToggleEngineOff: 1
   AllowToggleEngineOn: 1
   OpensDoor: 0
-  SoundControl: {fileID: 0}
   DoorCloseTime: 2
+  DoorOpenTime: 0
+  EffectedSeats: []
 --- !u!114 &4944223921576435397
 MonoBehaviour:
   m_ObjectHideFlags: 0

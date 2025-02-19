@@ -101,6 +101,7 @@ namespace SaccFlightAndVehicles
             NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         }
+        public void SFEXT_G_ReArm() { SFEXT_G_ReSupply(); }
         private void Update()
         {
             if (!Piloting) return;

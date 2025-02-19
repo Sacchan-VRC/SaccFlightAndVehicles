@@ -1925,7 +1925,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ReSupply()
         {
-            if ((Fuel < FullFuel - 10 || Health != FullHealth))
+            if ((Fuel < FullFuel - 10) || (Health != FullHealth))
             {
                 EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
@@ -1945,6 +1945,34 @@ namespace SaccFlightAndVehicles
                 if (EntityControl.wrecked && Health > 0)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairWrecked));
+                }
+            }
+        }
+        public void SFEXT_G_RePair()
+        {
+            if (Health != FullHealth) { EntityControl.ReSupplied++; }
+            if (IsOwner)
+            {
+                Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+                if (EntityControl.wrecked && Health > 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairWrecked));
+                }
+            }
+        }
+        public void SFEXT_G_ReFuel()
+        {
+            if (Fuel < FullFuel - 10) { EntityControl.ReSupplied++; }
+            if (IsOwner)
+            {
+                Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
+                if (LowFuelLastFrame && Fuel > LowFuel)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
+                }
+                if (NoFuelLastFrame && Fuel > 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
                 }
             }
         }

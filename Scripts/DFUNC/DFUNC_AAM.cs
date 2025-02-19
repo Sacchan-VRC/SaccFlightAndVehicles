@@ -241,6 +241,7 @@ namespace SaccFlightAndVehicles
             NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
             UpdateAmmoVisuals();
         }
+        public void SFEXT_G_ReArm() { SFEXT_G_ReSupply(); }
         public void UpdateAmmoVisuals()
         {
             if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
