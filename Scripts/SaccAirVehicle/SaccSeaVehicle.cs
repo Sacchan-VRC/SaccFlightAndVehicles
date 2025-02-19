@@ -1439,10 +1439,6 @@ namespace SaccFlightAndVehicles
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
         }
-        public void SendBulletHit()
-        {
-            EntityControl.SendEventToExtensions("SFEXT_G_BulletHit");
-        }
         public void SFEXT_L_BulletHit()
         {
             if (PredictDamage)
