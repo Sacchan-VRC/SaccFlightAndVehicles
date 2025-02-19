@@ -106,7 +106,7 @@ namespace SaccFlightAndVehicles
                 WheelStartPos = new Vector3[WheelColliders.Length];
                 for (int i = 0; i < WheelColliders.Length; i++)
                 {
-                    WheelRadii[i] = WheelColliders[i].radius * WheelColliders[i].transform.lossyScale.magnitude;
+                    WheelRadii[i] = WheelColliders[i].radius * WheelColliders[i].transform.lossyScale.x;
                     WheelStartPos[i] = WheelVisuals[i].localPosition;
                 }
             }
