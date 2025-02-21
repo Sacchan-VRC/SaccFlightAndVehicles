@@ -859,20 +859,12 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             VehicleAnimator.SetBool("owner", true);
-            WakeUp();
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
             VehicleAnimator.SetBool("owner", false);
             EnableWings(false);
-        }
-        public void SFEXT_L_OwnershipTransfer()
-        {
-            if (DespawnIfUnused)
-            {
-                WakeUp();//ensure no desync
-            }
         }
         public void SFEXT_G_BulletHit()
         {
