@@ -46,7 +46,8 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
         [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
-        private float brake;
+        float VehicleSpeed;
+        bool taxiing;
         private float FullHealthDivider;
         private float FullFuelDivider;
         private Vector3 OwnerRotationInputs;
@@ -153,13 +154,18 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(VTOLANGLE_STRING, (float)SAVControl.GetProgramVariable("VTOLAngle"));
             VehicleAnimator.SetFloat(HEALTH_STRING, (float)SAVControl.GetProgramVariable("Health") * FullHealthDivider);
 
-            vapor = !(bool)SAVControl.GetProgramVariable("Taxiing") && ((float)SAVControl.GetProgramVariable("Speed") > 20);// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
+            vapor = !taxiing && ((float)SAVControl.GetProgramVariable("Speed") > 20);// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
             VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack") * 0.00555555556f /* Divide by 180 */ ) : 0);
 
             if (DoWheelPose)
             {
                 if (GearDown)
                 {
+                    if (taxiing)
+                    { VehicleSpeed = (float)SAVControl.GetProgramVariable("Speed"); }
+                    else
+                    { VehicleSpeed = Mathf.Lerp(VehicleSpeed, 0, 1 - Mathf.Pow(0.5f, Time.deltaTime)); }
+
                     if (IsOwner)
                     {
                         for (int i = 0; i < WheelVisuals.Length; i++)
@@ -168,12 +174,20 @@ namespace SaccFlightAndVehicles
                             Quaternion rot;
                             WheelColliders[i].GetWorldPose(out pos, out rot);
                             WheelVisuals[i].position = pos;
-                            WheelVisuals[i].rotation = rot;
+                            if (taxiing)
+                            { WheelVisuals[i].rotation = rot; }
+                            else
+                            {
+                                // rot isn't correct because rigidbody properties are different when nonowner
+                                WheelRotations[i] += (VehicleSpeed * Time.deltaTime) / WheelRadii[i];
+                                float degrees = Mathf.Rad2Deg * WheelRotations[i];
+                                Quaternion newrot = Quaternion.AngleAxis(degrees, Vector3.right);
+                                WheelVisuals[i].localRotation = newrot;
+                            }
                         }
                     }
                     else
                     {
-                        float VehSpeed = (float)SAVControl.GetProgramVariable("Speed");
                         for (int i = 0; i < WheelVisuals.Length; i++)
                         {
                             Vector3 pos;
@@ -182,7 +196,7 @@ namespace SaccFlightAndVehicles
                             WheelVisuals[i].position = pos;
 
                             // rot isn't correct because rigidbody properties are different when nonowner
-                            WheelRotations[i] += (VehSpeed * Time.deltaTime) / WheelRadii[i];
+                            WheelRotations[i] += (VehicleSpeed * Time.deltaTime) / WheelRadii[i];
                             float degrees = Mathf.Rad2Deg * WheelRotations[i];
                             Quaternion newrot = Quaternion.AngleAxis(degrees, Vector3.right);
                             WheelVisuals[i].localRotation = newrot;
@@ -251,6 +265,12 @@ namespace SaccFlightAndVehicles
         {
             GearDown_raw = false;
             GearDown = false;
+            if (DoWheelPose)
+            {
+                VehicleSpeed = 0;
+                for (int i = 0; i < WheelColliders.Length; i++)
+                { WheelVisuals[i].localPosition = WheelStartPos[i]; }
+            }
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -323,11 +343,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_TakeOff()
         {
+            taxiing = false;
             VehicleAnimator.SetBool("onground", false);
             VehicleAnimator.SetBool("onwater", false);
         }
         public void SFEXT_G_TouchDown()
         {
+            taxiing = true;
             VehicleAnimator.SetBool("onground", true);
         }
         public void SFEXT_G_TouchDownWater()
