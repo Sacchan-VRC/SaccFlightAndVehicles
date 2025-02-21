@@ -10,7 +10,7 @@ namespace SaccFlightAndVehicles
     // [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SaccWheel : UdonSharpBehaviour
     {
-        [Header("Sync is only used for skid effects,\nset Synchronization Method:\nNone to save bandwidth\nManual to sync skid sounds/effects")]
+        [Header("Sync is only used for skid effects,\nset Synchronization Method:\nNone to save bandwidth (Use for tanks)\nManual to sync skid sounds/effects")]
         [Space(10)]
         public Rigidbody CarRigid;
         public SaccGroundVehicle SGVControl;
@@ -878,6 +878,21 @@ namespace SaccFlightAndVehicles
             {
                 Gizmos.DrawLine(ContactPoint, ContactPoint + ForceVector);
             }
+            Matrix4x4 newmatrix = transform.localToWorldMatrix;
+            Gizmos.matrix = Matrix4x4.TRS(newmatrix.GetPosition(), newmatrix.rotation, Vector3.one);// saccwheel does not respect scale
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(Vector3.up * ExtraRayCastDistance * .5f, new Vector3(.01f, ExtraRayCastDistance, .01f));
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(-Vector3.up * SuspensionDistance * .5f, new Vector3(.01f, SuspensionDistance, .01f));
+            Gizmos.color = Color.white;
+            //flatten matrix and draw a sphere to draw a circle for the wheel
+            newmatrix = transform.localToWorldMatrix;
+            Vector3 scale = newmatrix.lossyScale;
+            scale.x = 0; // Flatten the x scale
+            scale.y = scale.z = 1; // saccwheel does not respect scale
+            Gizmos.matrix = Matrix4x4.TRS(newmatrix.GetPosition(), newmatrix.rotation, scale);
+            // UnityEditor.Handles.DrawWireDisc(transform.position + transform.up * WheelRadius, transform.right, WheelRadius); not exposed
+            Gizmos.DrawWireSphere(Vector3.up * WheelRadius, WheelRadius);
         }
 #endif
     }
