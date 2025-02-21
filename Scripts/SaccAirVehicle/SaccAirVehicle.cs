@@ -276,6 +276,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Set Engine Off when entering the vehicle?")]
         public bool EngineOffOnExit = true;
         public bool DroneMode = false;
+        [Header("Debug:")]
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
         public bool EngineOn
         {
@@ -643,7 +644,6 @@ namespace SaccFlightAndVehicles
             get => DisablePhysicsApplication;
         }
 #if UNITY_EDITOR
-        [Header("Debug:")]
         public bool SetVel;
         public Vector3 VelToSet;
 #endif
