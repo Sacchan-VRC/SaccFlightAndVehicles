@@ -153,7 +153,7 @@ namespace SaccFlightAndVehicles
             StartAngDrag = VehicleRigid.angularDrag;
             if (!InEditor)
             {
-                if (EntityControl.IsOwner)
+                if (ObjectMode?Networking.IsOwner(SyncRigid.gameObject):EntityControl.IsOwner)
                 {
                     IsOwner = true;
                     if (ObjectMode)
