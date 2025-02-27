@@ -179,7 +179,6 @@ namespace SaccFlightAndVehicles
                 {
                     EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") + 1);
                 }
-                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
             }
             else
             {
@@ -187,8 +186,8 @@ namespace SaccFlightAndVehicles
                 {
                     EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") + 1);
                 }
-                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
             }
+            SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
         }
         public void CanopyClosing()
         {
@@ -215,7 +214,6 @@ namespace SaccFlightAndVehicles
                 {
                     EntityControl.VehicleSeats[i].SetProgramVariable("numOpenDoors", (int)EntityControl.VehicleSeats[i].GetProgramVariable("numOpenDoors") - 1);
                 }
-                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
             }
             else
             {
@@ -223,8 +221,8 @@ namespace SaccFlightAndVehicles
                 {
                     EffectedSeats[i].SetProgramVariable("numOpenDoors", (int)EffectedSeats[i].GetProgramVariable("numOpenDoors") - 1);
                 }
-                SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
             }
+            SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
         }
         //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
         public void SendCanopyClosed()

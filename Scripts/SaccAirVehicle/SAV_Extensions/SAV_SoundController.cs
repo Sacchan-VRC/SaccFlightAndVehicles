@@ -734,7 +734,7 @@ namespace SaccFlightAndVehicles
             InVehicle = true;
             if (EntityControl.MySeat != -1)
             {
-                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+                InVehicle_Sounds = EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors == 0;
             }
             UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
@@ -757,7 +757,7 @@ namespace SaccFlightAndVehicles
             InVehicle = true;
             if (EntityControl.MySeat != -1)
             {
-                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+                InVehicle_Sounds = EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors == 0;
             }
             UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
@@ -1106,26 +1106,21 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateDoorsOpen()
         {
-            int mySeatDoorsOpen = 0;
             if (EntityControl.MySeat != -1)
             {
-                mySeatDoorsOpen += EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors;
+                InVehicle_Sounds = EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors == 0;
             }
-            if (mySeatDoorsOpen != 0)
+            if (!InVehicle_Sounds)
             {
                 if (AllDoorsClosed)
                 {
                     SetSoundsOutside();
                 }
             }
-            else if (mySeatDoorsOpen == 0)
+            else
             {
-                if (InVehicle_Sounds && !AllDoorsClosed)
-                {
-                    SetSoundsInside();
-                }
+                if (!AllDoorsClosed) { SetSoundsInside(); }
             }
-            else if (mySeatDoorsOpen < 0) Debug.LogWarning("localDoorsOpen is negative");
         }
         private void SetSoundsInside()
         {

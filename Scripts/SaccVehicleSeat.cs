@@ -22,7 +22,7 @@ namespace SaccFlightAndVehicles
         // public bool AdjustSeatRotation = true; //YAWCALIBRATION
         public Transform TargetEyePosition;
         [Tooltip("Let other scripts know that this seat is on the outside of the vehicle (stop sound changing when closing canopy)")]
-        public bool SeatOutSideVehicle;
+        [SerializeField] private bool SeatOutSideVehicle;
         [Tooltip("How far to move the seat to the side when looking backwards in desktop")]
         [SerializeField] float HeadXOffset = 0.25f;
         [Tooltip("Disable the ability for desktop users to turn 180 degrees")]
@@ -98,6 +98,7 @@ namespace SaccFlightAndVehicles
                 { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
             }
             if (PassengerFunctions) { PassengerFunctions.Station = Station; }
+            if (SeatOutSideVehicle) { numOpenDoors++; }
         }
         public override void Interact()//entering the vehicle
         {

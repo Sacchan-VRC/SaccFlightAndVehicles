@@ -38,7 +38,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Max revs of the engine")]
         public float RevLimiter = 8000;
         [Tooltip("How many revs are taken away all the time")]
-        public float EngineSlowDown = .75f;
+        public float EngineSlowDown = 1f;
         [Tooltip("Throttle that is applied when not touching the controls")]
         public float MinThrottle = .08f;
         [Tooltip("How agressively to reach minthrottle value when not touching the controls")]
@@ -958,7 +958,6 @@ namespace SaccFlightAndVehicles
                         for (int i = 0; i < DriveWheels.Length; i++)
                         {
                             DriveWheels[i].SetProgramVariable("Clutch", Clutch);
-                            DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio);
                         }
                         FinalThrottle = ThrottleInput;
                     }
@@ -993,6 +992,11 @@ namespace SaccFlightAndVehicles
                 VehiclePosLastFrame = VehicleTransform.position;
                 MovingForward = Vector3.Dot(VehicleTransform.forward, VehicleVel) < 0f;
             }
+        }
+        public void UpdateGearRatio()
+        {
+            for (int i = 0; i < DriveWheels.Length; i++)
+            { DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio); }
         }
         float Steps_Error;
         bool frame_even = true;
@@ -1039,23 +1043,16 @@ namespace SaccFlightAndVehicles
             {
                 Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, DeltaTime * EngineSlowDown)), 0f);
             }
-            // Alternate order of processing of wheels to make the car drive straight.
-            // I don't think there's another way of fixing that without completely changing how wheel works.
-            // would require communication between wheels and removal of substep?
-            if (frame_even)
-            {
-                for (int i = 0; i < AllWheels.Length; i++)
-                { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
-            }
-            else
-            {
-                for (int i = AllWheels.Length - 1; i > -1; i--)
-                { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
-            }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
+            Revs -= EngineForceUsed;
+            EngineForceUsed = 0;
+
             frame_even = !frame_even;
 
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * DeltaTime));
         }
+        [System.NonSerialized] public float EngineForceUsed;
         private void RevUp(int NumSteps)
         {
             float PhysicsDelta = Time.fixedDeltaTime / NumSteps;

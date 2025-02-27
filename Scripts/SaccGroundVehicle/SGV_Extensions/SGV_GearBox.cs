@@ -53,6 +53,7 @@ namespace SaccFlightAndVehicles
             {
                 SGVControl.SetProgramVariable("CurrentGear", value);
                 SGVControl.SetProgramVariable("GearRatio", GearRatios[value] * FinalDrive);
+                SGVControl.SendCustomEvent("UpdateGearRatio");
                 if (value == NeutralGear)
                 { InNeutralGear = true; }
                 else { InNeutralGear = false; }
