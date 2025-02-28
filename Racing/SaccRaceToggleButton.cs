@@ -85,11 +85,12 @@ namespace SaccFlightAndVehicles
                     { RaceTrig.gameObject.SetActive(true); }
                 }
             }
+            int course = CurrentCourseSelection;
             AutomaticRaceSelection = _AutomaticRaceSelection;
             if (AutomaticRaceSelection)
             { RaceSelectionLoop(); }
             else
-            { SetRace(CurrentCourseSelection); }
+            { SetRace(course); }
         }
         public override void Interact()
         {
