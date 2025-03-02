@@ -1193,7 +1193,7 @@ MonoBehaviour:
   - {fileID: 9045122725599844176}
   Brake_FrontStrengthMulti: 1
   BrakeWheels_Back: []
-  Brake_BackStrengthMulti: 0.6
+  Brake_BackStrengthMulti: 0.8
   KeyboardControl: 115
   UpperDeadZone: 0.9
   LowerDeadZone: 0.1
@@ -27371,8 +27371,8 @@ MonoBehaviour:
   - 0.24
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
-  AutoClutch_StayPressed: 0
-  AutoClutch_Length: 0.5
+  AutoClutch_StayPressed: 0.1
+  AutoClutch_Length: 0.1
   _CurrentGear: 1
 --- !u!114 &6493495902232363454
 MonoBehaviour:
@@ -28625,7 +28625,7 @@ Transform:
   m_GameObject: {fileID: 2935594653319740706}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.32, z: -0}
+  m_LocalPosition: {x: 0, y: 0.32, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -28701,7 +28701,7 @@ MonoBehaviour:
   - {fileID: 9045122725599844206}
   - {fileID: 9045122725599844176}
   OtherWheels: []
-  DriveSpeed: 9000
+  DriveSpeed: 21000
   RevLimiter: 8000
   EngineSlowDown: 1
   MinThrottle: 0.08
@@ -100535,12 +100535,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -100788,7 +100788,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 1
-  Grip: 1.8
+  Grip: 1.95
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -100899,12 +100899,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -101025,7 +101025,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 1
-  Grip: 1.8
+  Grip: 1.95
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -101136,12 +101136,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -101443,12 +101443,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1

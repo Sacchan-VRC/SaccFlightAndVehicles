@@ -1105,7 +1105,7 @@ Transform:
   m_GameObject: {fileID: 1519741741398964860}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.896, z: -0.136}
+  m_LocalPosition: {x: 0, y: 0.36, z: 0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6747,7 +6747,7 @@ Transform:
   m_GameObject: {fileID: 1803049916630535089}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2.355}
+  m_LocalPosition: {x: 0, y: 0, z: -2.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -57794,8 +57794,8 @@ MonoBehaviour:
   - 0.24
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
-  AutoClutch_StayPressed: 0
-  AutoClutch_Length: 0.5
+  AutoClutch_StayPressed: 0.1
+  AutoClutch_Length: 0.1
   _CurrentGear: 1
 --- !u!114 &6891223997364332433
 MonoBehaviour:
@@ -64159,7 +64159,7 @@ MonoBehaviour:
   - {fileID: 1803049917166894445}
   - {fileID: 1803049917166894452}
   OtherWheels: []
-  DriveSpeed: 12000
+  DriveSpeed: 24000
   RevLimiter: 8000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
@@ -64167,10 +64167,10 @@ MonoBehaviour:
   DriveSpeedKeyboardMax: 1
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
-  SteeringKeyboardSecsToMax: 0.7
-  SteeringMaxSpeedDT: 30
+  SteeringKeyboardSecsToMax: 0.5
+  SteeringMaxSpeedDT: 50
   SteeringMaxSpeedDTDisabled: 0
-  DesktopMinSteering: 0.2
+  DesktopMinSteering: 0.1
   ThrottleReturnTimeDT: 0.0001
   Drag: 0.02
   ControlsRoot: {fileID: 0}
@@ -88837,7 +88837,7 @@ PrefabInstance:
     - target: {fileID: -6911025712357619089, guid: ee62f4172236b7a41879a1026e9e2474,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.097
+      value: 0.082
       objectReference: {fileID: 0}
     - target: {fileID: -6635887507701925860, guid: ee62f4172236b7a41879a1026e9e2474,
         type: 3}
@@ -88857,7 +88857,7 @@ PrefabInstance:
     - target: {fileID: -6112444127010675173, guid: ee62f4172236b7a41879a1026e9e2474,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.097
+      value: 0.082
       objectReference: {fileID: 0}
     - target: {fileID: -6112444127010675173, guid: ee62f4172236b7a41879a1026e9e2474,
         type: 3}
@@ -89352,14 +89352,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 2861363327480148299}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.2
+  SuspensionDistance: 0.1
   WheelRadius: 0.60272
   SpringForceMulti: 6
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 2.1
+  Grip: 3.2
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -89411,7 +89411,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  LateralGrip: 0.85
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
@@ -89470,12 +89470,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -89647,14 +89647,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 1600372230470421315}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.15
+  SuspensionDistance: 0.1
   WheelRadius: 0.491575
   SpringForceMulti: 8
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 1.75
+  Grip: 2.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -89706,7 +89706,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  LateralGrip: 0.85
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
@@ -89765,12 +89765,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -89980,14 +89980,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 888232133081724446}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.15
+  SuspensionDistance: 0.1
   WheelRadius: 0.491575
   SpringForceMulti: 8
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 1.75
+  Grip: 2.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -90039,7 +90039,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  LateralGrip: 0.85
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
@@ -90098,12 +90098,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -90243,14 +90243,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 7900695418297590805}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.2
+  SuspensionDistance: 0.1
   WheelRadius: 0.60272
   SpringForceMulti: 6
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 2.1
+  Grip: 3.2
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -90302,7 +90302,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  LateralGrip: 0.85
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
@@ -90361,12 +90361,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1

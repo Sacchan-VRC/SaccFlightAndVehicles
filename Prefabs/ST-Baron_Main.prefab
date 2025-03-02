@@ -58100,7 +58100,7 @@ MonoBehaviour:
   - {fileID: 648356966}
   - {fileID: 927353063}
   OtherWheels: []
-  DriveSpeed: 12000
+  DriveSpeed: 30000
   RevLimiter: 6000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
@@ -58108,10 +58108,10 @@ MonoBehaviour:
   DriveSpeedKeyboardMax: 1
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
-  SteeringKeyboardSecsToMax: 0.7
+  SteeringKeyboardSecsToMax: 0.5
   SteeringMaxSpeedDT: 60
   SteeringMaxSpeedDTDisabled: 0
-  DesktopMinSteering: 0.1
+  DesktopMinSteering: 0.15
   ThrottleReturnTimeDT: 0.0001
   Drag: 0.02
   ControlsRoot: {fileID: 0}
@@ -59036,7 +59036,7 @@ Transform:
   m_GameObject: {fileID: 6141758680536392897}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.88, z: 0.12}
+  m_LocalPosition: {x: 0, y: 0.58, z: 0.055}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65152,11 +65152,11 @@ MonoBehaviour:
   GearRatios:
   - -0.04
   - 0
-  - 0.03
   - 0.06
-  - 0.09
   - 0.12
-  - 0.15
+  - 0.18
+  - 0.24
+  - 0.3
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
   AutoClutch_StayPressed: 0
@@ -77742,22 +77742,22 @@ PrefabInstance:
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.59842956
+      value: 0.59843165
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.00000015002291
+      value: 0.0000021003168
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.00000011205803
+      value: 0.0000015688179
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.8011755
+      value: 0.8011739
       objectReference: {fileID: 0}
     - target: {fileID: -5491882240545318371, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77837,22 +77837,22 @@ PrefabInstance:
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.59842956
+      value: 0.59843177
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00000007501146
+      value: -0.0000021003168
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000000056029016
+      value: 0.0000015688182
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.8011755
+      value: -0.80117387
       objectReference: {fileID: 0}
     - target: {fileID: -1551168584785544901, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78062,22 +78062,22 @@ PrefabInstance:
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6543481
+      value: 0.6543489
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.0000025487952
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.000002205524
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.7561935
+      value: -0.7561928
       objectReference: {fileID: 0}
     - target: {fileID: 3783353238668546013, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78087,22 +78087,22 @@ PrefabInstance:
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.65434825
+      value: 0.6543475
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: -0.00000028319997
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -0.00000024505772
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.75619334
+      value: 0.756194
       objectReference: {fileID: 0}
     - target: {fileID: 5419709599708206005, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78404,7 +78404,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.23
-  Grip: 2.1
+  Grip: 3
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -78515,12 +78515,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -78755,7 +78755,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.23
-  Grip: 2.1
+  Grip: 3
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -78866,12 +78866,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -79018,7 +79018,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.23
-  Grip: 2.4
+  Grip: 3.5
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -79129,12 +79129,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1
@@ -79299,7 +79299,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.23
-  Grip: 2.4
+  Grip: 3.5
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -79410,12 +79410,12 @@ MonoBehaviour:
   BrakeStrength: 0.8
   HandBrakeStrength: 1.4
   WheelGroundInfluence: 1000
-  EngineInfluence: 80000
+  EngineInfluence: 30000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
-  ClutchStrength: 6
+  ClutchStrength: 1
   DisableEffects: 0
   SurfaceType_Grips:
   - 1

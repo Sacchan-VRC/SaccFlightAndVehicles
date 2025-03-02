@@ -466,7 +466,7 @@ namespace SaccFlightAndVehicles
                     Vector3 newgrip = Vector3.Slerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
                     GripForce3 = Vector3.Lerp(newgrip, GripForce3, LongLatSeparation);
                     gripPc = Mathf.Lerp(gripPc * ForwardSideRatio, gripPc, LongLatSeparation);
-                    ForceUsed = gripPc * DeltaTime;
+                    ForceUsed = ForwardSkid.magnitude * DeltaTime;
                 }
                 else
                 {
@@ -478,7 +478,7 @@ namespace SaccFlightAndVehicles
                     float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
                     GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat * WheelRollGrip;
                     GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
-                    ForceUsed = gripPc * ForwardSideRatio * DeltaTime;
+                    ForceUsed = (GripForceForward * ForwardSideRatio).magnitude * DeltaTime;
                 }
                 CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
 
@@ -493,7 +493,7 @@ namespace SaccFlightAndVehicles
                 WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, DeltaTime * Brake * BrakeStrength * WheelGroundInfluence);
                 WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, DeltaTime * HandBrake * HandBrakeStrength * WheelGroundInfluence);
                 //wheels slow down due to ?friction
-                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, 1 - Mathf.Pow(0.5f, Time.fixedDeltaTime * CurrentWheelSlowDown));
+                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, 1 - Mathf.Pow(0.5f, DeltaTime * CurrentWheelSlowDown));
                 WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
                 WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
