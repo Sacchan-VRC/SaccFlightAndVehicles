@@ -252,7 +252,7 @@ namespace SaccFlightAndVehicles
         }
         void ResetToDefault()
         {
-            AnimMover = AnimLastValue = AnimValue = NewAnimValue = AnimDefaultValue;
+            AnimValueInput = AnimValueLocal = AnimMover = AnimLastValue = AnimValue = NewAnimValue = AnimDefaultValue;
             AnimValue = AnimDefaultValue;
         }
         public void SFEXT_O_TakeOwnership()
