@@ -21,6 +21,8 @@ namespace SaccFlightAndVehicles
         [SerializeField] private AudioSource[] ExplosionSounds;
         [Tooltip("Play a random one of these explosion sounds when hitting water")]
         [SerializeField] private AudioSource[] WaterExplosionSounds;
+        [SerializeField] private Transform PassBySound;
+        [SerializeField] private float PassBySound_distance = 40f;
         [Tooltip("Bomb flies forward with this much extra speed, can be used to make guns/shells")]
         [SerializeField] private float LaunchSpeed = 0;
         [Tooltip("Spawn bomb at a random angle up to this number")]
@@ -93,6 +95,7 @@ namespace SaccFlightAndVehicles
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
+            Exploding = false;
             if (ColliderAlwaysActive) { BombCollider.enabled = true; ColliderActive = true; }
             else { BombCollider.enabled = false; ColliderActive = false; }
             BombRigid.velocity += transform.forward * LaunchSpeed;
@@ -102,6 +105,8 @@ namespace SaccFlightAndVehicles
             { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime + Random.Range(-MaxLifetimeRadnomization, MaxLifetimeRadnomization));
             LifeTimeExplodesSent++;
+            float forwardDist = Vector3.Dot(transform.forward, Networking.LocalPlayer.GetPosition() - transform.position);
+            if (!PassBySound || forwardDist < 0) { flewPast = true; } else { flewPast = false; }
             if (ColliderAlwaysActive && !EntityControl.IsOwner && BombRigid && !BombRigid.isKinematic && SAVControl)
             {
                 // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
@@ -119,9 +124,25 @@ namespace SaccFlightAndVehicles
             BombRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
+        bool flewPast = true;
         void LateUpdate()
         {
             if (Exploding) return;
+            if (!flewPast)
+            {
+                float forwardDist = Vector3.Dot(transform.forward, Networking.LocalPlayer.GetPosition() - transform.position);
+                if (forwardDist < 0)
+                {
+                    Vector3 flypastPos = transform.position + transform.forward * forwardDist;
+                    if (Vector3.Distance(Networking.LocalPlayer.GetPosition(), flypastPos) < PassBySound_distance)
+                    {
+                        PassBySound.position = flypastPos;
+                        PassBySound.SetParent(null);
+                        PassBySound.gameObject.SetActive(true);
+                    }
+                    flewPast = true;
+                }
+            }
             if (!ColliderActive)
             {
                 Vector3 LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
@@ -160,9 +181,14 @@ namespace SaccFlightAndVehicles
             Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
             transform.position = LaunchPoint;
             BombRigid.position = LaunchPoint;
-            Exploding = false;
             UnderWater = false;
             BombRigid.drag = DragStart;
+            if (PassBySound)
+            {
+                PassBySound.SetParent(transform);
+                PassBySound.gameObject.SetActive(false);
+                PassBySound.localPosition = Vector3.zero;
+            }
             for (int i = 0; i < DisableInWater.Length; i++) { DisableInWater[i].SetActive(true); }
             for (int i = 0; i < DisableInWater_ParticleEmission_EM.Length; i++) { DisableInWater_ParticleEmission_EM[i].enabled = true; }
             for (int i = 0; i < DisableInWater_TrailEmission.Length; i++) { DisableInWater_TrailEmission[i].emitting = true; }
@@ -298,6 +324,7 @@ namespace SaccFlightAndVehicles
             { BombAnimator.SetTrigger("explodeowner"); }
             else { BombAnimator.SetTrigger("explode"); }
             BombAnimator.SetBool("hitwater", hitwater || UnderWater);
+            flewPast = true;
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
 
 
