@@ -271,18 +271,6 @@ namespace SaccFlightAndVehicles
             }
             get => DisableInput;
         }
-        public void setStepsSec()
-        {
-            if (NumStepsSec < 1f / Time.fixedDeltaTime)
-            {
-                _numStepsSec = (int)Mathf.Round(1f / Time.fixedDeltaTime);
-            }
-            else { _numStepsSec = NumStepsSec; }
-            for (int i = 0; i < AllWheels.Length; i++)
-            {
-                AllWheels[i].SendCustomEvent("updateStepsSec");
-            }
-        }
         public void SFEXT_L_EntityStart()
         {
             if (!Initialized) { Init(); }
@@ -367,9 +355,9 @@ namespace SaccFlightAndVehicles
 
             CurrentlyDistant = true;
             SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
+            revUpDT = 1f / NumStepsSec;
 
             SetupGCalcValues();
-            setStepsSec();
         }
         public void SetupGCalcValues()
         {
@@ -999,7 +987,6 @@ namespace SaccFlightAndVehicles
             { DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio); }
         }
         float Steps_Error;
-        bool frame_even = true;
         float GsAveragingTime = .1f;
         private int NumFUinAvgTime = 1;
         private Vector3 Gs_all;
@@ -1026,40 +1013,53 @@ namespace SaccFlightAndVehicles
 
             if (Piloting)
             {
-                float StepsFloat = ((DeltaTime) * _numStepsSec);
-                int steps = (int)((DeltaTime) * _numStepsSec);
-                Steps_Error += StepsFloat - steps;
-                if (Steps_Error > 1)
+#if UNITY_EDITOR
+                revUpDT = 1f / NumStepsSec; // so adjusting in play mode works
+#endif
+                float engineTimeDif = Time.fixedTime - engineTime;
+                // works out the number of steps, 
+                int numupdates = (int)(engineTimeDif / revUpDT);
+                // make sure its even (if doing too many, less will be done next frame so it's okay)
+                if (numupdates % 2 != 0)
+                { numupdates++; }
+                // because the for loop starts at 0, the middle update is one less
+                int middleUpdate = (int)(numupdates / 2) - 1;
+                bool WheelUpdateDone = false;
+                for (int i = 0; i < numupdates; i++)
                 {
-                    int AddSteps = (int)Mathf.Floor(Steps_Error);//pretty sure this can never be anything but 1 unless refresh rate is changed during play maybe
-                    steps += AddSteps;
-                    Steps_Error = (Steps_Error - AddSteps);
+                    RevUp(); // increases revs based on EngineResponseCurve
+                    if (!WheelUpdateDone)
+                    {
+                        if (i == middleUpdate)
+                        {
+                            // Apply EngineForceUsed at the middle step (that's why we needed an even number)
+                            // This is required when applying delta time when iterating over a curve (integrals with deltatime)
+                            WheelUpdateDone = true;
+                            Revs = Mathf.Max(Revs - EngineForceUsed, 0);
+                            EngineForceUsed = 0;
+                        }
+                    }
                 }
-                if (steps < 1) { steps = 1; }//if refresh rate is above NumItsSec just run once per frame, nothing else we can do
-                for (int i = 0; i < steps; i++)
-                { RevUp(steps); }
             }
             else
             {
                 Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, DeltaTime * EngineSlowDown)), 0f);
             }
             for (int i = 0; i < AllWheels.Length; i++)
-            { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
-            Revs -= EngineForceUsed;
-            EngineForceUsed = 0;
-
-            frame_even = !frame_even;
+            { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }//EngineForceUsed is updated in this function
 
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * DeltaTime));
         }
         [System.NonSerialized] public float EngineForceUsed;
-        private void RevUp(int NumSteps)
+        float revUpDT;
+        float engineTime;
+        private void RevUp()
         {
-            float PhysicsDelta = Time.fixedDeltaTime / NumSteps;
-            Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, PhysicsDelta * EngineSlowDown)), 0f);
+            engineTime += revUpDT;
+            Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, revUpDT * EngineSlowDown)), 0f);
             if (!LimitingRev)
             {
-                Revs += FinalThrottle * DriveSpeed * PhysicsDelta * EngineResponseCurve.Evaluate(Revs / RevLimiter);
+                Revs += FinalThrottle * DriveSpeed * revUpDT * EngineResponseCurve.Evaluate(Revs / RevLimiter);
                 if (Revs > RevLimiter)
                 {
                     Revs = RevLimiter;
@@ -1254,13 +1254,13 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            engineTime = Time.fixedTime;
             TANK_Cruising = false;
             System.Array.Clear(TankThrottles, 0, 2);
             AllGs = 0f;
             InVR = EntityControl.InVR;
             SetCollidersLayer(EntityControl.OnboardVehicleLayer);
             SetWheelDriver();
-            setStepsSec();
         }
         public void SFEXT_O_PilotExit()
         {
