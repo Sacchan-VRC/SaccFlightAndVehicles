@@ -55,8 +55,8 @@ namespace SaccFlightAndVehicles
             TriggerLastFrame = false;
             InVR = EntityControl.InVR;
             gameObject.SetActive(true);
-            AnimMover = AnimLastValue = NewAnimValue = AnimValueLocal = AnimValue;
             if (ResetOnEnter) { ResetToDefault(); }
+            else { AnimValueInput = AnimValueLocal = AnimMover = AnimLastValue = NewAnimValue = AnimValue; }
             RequestSerialization();
         }
         public void SFEXT_O_PilotExit()
@@ -253,7 +253,6 @@ namespace SaccFlightAndVehicles
         void ResetToDefault()
         {
             AnimValueInput = AnimValueLocal = AnimMover = AnimLastValue = AnimValue = NewAnimValue = AnimDefaultValue;
-            AnimValue = AnimDefaultValue;
         }
         public void SFEXT_O_TakeOwnership()
         {
