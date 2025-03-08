@@ -202,7 +202,7 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)
             {
-                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+                GunAmmoInSeconds = FullGunAmmoInSeconds;
                 RequestSerialization();
                 UpdateAmmoVisuals();
             }
