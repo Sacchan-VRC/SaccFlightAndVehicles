@@ -44,10 +44,6 @@ namespace SaccFlightAndVehicles
         public float WheelRollGrip_Power = 1;
         [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
         public int SkidRatioMode = 0;
-        public float BrakeStrength = .8f;
-        public float HandBrakeStrength = 1.4f;
-        [Tooltip("How quickly the wheel matches the speed of the ground when in contact with it, low values will make the car skid more")]
-        public float WheelGroundInfluence = 1000f;
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
         public float EngineInfluence = 80000f;
         [Tooltip("Max angle of ground at which vehicle can park on without sliding down")]
@@ -93,6 +89,7 @@ namespace SaccFlightAndVehicles
         private bool SkidLength_SkiddingLast;
         private float lastSync;
         public float Clutch = 1f;
+        public float BrakeStrength;
         public float WheelRotation;
         public float WheelRotationSpeedRPS;
         public float WheelRotationSpeedRPM;
@@ -253,7 +250,7 @@ namespace SaccFlightAndVehicles
         {
             if (SurfaceType < 0) { return; }
             CurrentGrip = Grip * SurfaceType_Grips[SurfaceType];
-            CurrentWheelSlowDown = SurfaceType_Slowdown[SurfaceType];
+            CurrentWheelSlowDown = SurfaceType_Slowdown[SurfaceType] * .01f;//*.01 to offset removed *deltatime 
             CurrentNumParticles = SurfaceType_SkidParticles_Amount[SurfaceType];
             StopSkidSound();
             if (SurfaceType < SurfaceType_SkidSounds.Length)
@@ -378,6 +375,7 @@ namespace SaccFlightAndVehicles
             float ForceUsed = 0f;
             float ForwardSlip = 0f;
             Vector3 SkidVectorFX = Vector3.zero;
+            bool slowing = false;
 
             if (IsDriveWheel && !GearNeutral)
             {
@@ -466,7 +464,7 @@ namespace SaccFlightAndVehicles
                     Vector3 newgrip = Vector3.Slerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
                     GripForce3 = Vector3.Lerp(newgrip, GripForce3, LongLatSeparation);
                     gripPc = Mathf.Lerp(gripPc * ForwardSideRatio, gripPc, LongLatSeparation);
-                    ForceUsed = ForwardSkid.magnitude * DeltaTime;
+                    SkidVectorFX = SideSkid + ForwardSkid - ForwardSkid * gripPc;
                 }
                 else
                 {
@@ -478,40 +476,40 @@ namespace SaccFlightAndVehicles
                     float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
                     GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat * WheelRollGrip;
                     GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
-                    ForceUsed = (GripForceForward * ForwardSideRatio).magnitude * DeltaTime;
+                    SkidVectorFX = SideSkid + ForwardSkid - ForwardSkid * gripPc;
                 }
                 CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
-
+                ForceUsed = Vector3.Dot(WheelForwardSpeed.normalized, GripForce3);
 #if UNITY_EDITOR
                 ForceVector = GripForce3;
                 ForceUsedDBG = ForceUsed;
 #endif
-                //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward 'skid' that it gripped
-                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, Mathf.Abs(ForceUsed) * WheelGroundInfluence);
-                //brake
-                //WheelGroundInfluence is multiplied in so that changing WheelGroundInfluence doesn't change brake's effect
-                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, DeltaTime * Brake * BrakeStrength * WheelGroundInfluence);
-                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, DeltaTime * HandBrake * HandBrakeStrength * WheelGroundInfluence);
+                if (IsDriveWheel)
+                    WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, ForwardSpeed, Clutch);
+                else
+                    WheelRotationSpeedSurf = ForwardSpeed;
+                // I don't know why these changes to WheelRotationSpeedSurf don't need delta time multiplied in. Doing so makes lower dt = slower car & worse brakes
                 //wheels slow down due to ?friction
-                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, 1 - Mathf.Pow(0.5f, DeltaTime * CurrentWheelSlowDown));
-                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
-                SkidVectorFX = FullSkid;
+                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, 1 - Mathf.Pow(0.5f, CurrentWheelSlowDown));
             }
+            //brake
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, BrakeStrength * Brake);
+            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, HandBrake);
+            WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+            WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
+
             // adjust engine speed
             if (IsDriveWheel && !GearNeutral)
             {
-                bool slowing = (ForwardSlip < 0 && (_GearRatio > 0)) || ((ForwardSlip > 0) && (_GearRatio < 0));
+                slowing = (ForwardSlip < 0 && (_GearRatio > 0)) || ((ForwardSlip > 0) && (_GearRatio < 0));
                 // (slowing ? 1 : -(1f - Clutch)) means use clutch if speeding up the engine, but don't use clutch if slowing down the engine.
                 // because clutch was already used in the input in the slowing down case.
                 // if removed, using the clutch can give a speed boost since the engine doesn't slow down by the correct amount relative to force produced.
-                float ThisEngineForceUsed = ForceUsed * Mathf.Abs(_GearRatio) * EngineInfluence * (slowing ? 1 : -(1f - Clutch));
+                float ThisEngineForceUsed = Mathf.Abs(ForceUsed) * Mathf.Abs(_GearRatio) * EngineInfluence * (slowing ? 1 : -(1f - Clutch));
                 SGVControl.SetProgramVariable("EngineForceUsed", (float)SGVControl.GetProgramVariable("EngineForceUsed") + ThisEngineForceUsed);
             }
             SkidLength = SkidVectorFX.magnitude;
         }
-        // [SerializeField] AnimationCurve GripOverRoll;
         private void LateUpdate()
         {
             if (Sleeping) return;

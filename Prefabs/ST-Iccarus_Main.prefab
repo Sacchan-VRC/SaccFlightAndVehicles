@@ -538,12 +538,12 @@ MonoBehaviour:
   BrakeWheels_Front:
   - {fileID: 1803049917166894445}
   - {fileID: 1803049917166894452}
-  Brake_FrontStrengthMulti: 0.5
   BrakeWheels_Back: []
-  Brake_BackStrengthMulti: 0.6
+  BrakeStrength: 10.5644
+  Brake_FrontStrengthMulti: 1
+  Brake_BackStrengthMulti: 1
+  KeyboardBrakeMulti: 1
   KeyboardControl: 115
-  UpperDeadZone: 0.9
-  LowerDeadZone: 0.1
   _AnimFloatName: brake
   IsHandBrake: 0
   EnableBrakeOnExit: 0
@@ -1105,7 +1105,7 @@ Transform:
   m_GameObject: {fileID: 1519741741398964860}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.36, z: 0.13}
+  m_LocalPosition: {x: 0, y: 0.46, z: 0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -64151,7 +64151,7 @@ MonoBehaviour:
   OnlyChangeColliders: 0
   Health: 260
   VehicleAnimator: {fileID: 3243243057054021814}
-  NumStepsSec: 300
+  NumStepsSec: 1000
   DriveWheels:
   - {fileID: 1803049917166894443}
   - {fileID: 1803049917166894442}
@@ -64172,7 +64172,7 @@ MonoBehaviour:
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.1
   ThrottleReturnTimeDT: 0.0001
-  Drag: 0.02
+  Drag: 0.04
   ControlsRoot: {fileID: 0}
   EngineResponseCurve:
     serializedVersion: 2
@@ -64187,17 +64187,17 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.56
     - serializedVersion: 3
-      time: 0.30379406
-      value: 0.5381355
-      inSlope: 1.4529436
-      outSlope: 1.4529436
+      time: 0.25806236
+      value: 0.51701313
+      inSlope: 1.8376257
+      outSlope: 1.8376257
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.12464586
-      outWeight: 0.16164629
+      outWeight: 0.22375092
     - serializedVersion: 3
-      time: 0.5053951
-      value: 0.80895156
+      time: 0.39462277
+      value: 0.8239133
       inSlope: 1.1858695
       outSlope: 1.1858695
       tangentMode: 0
@@ -64205,13 +64205,13 @@ MonoBehaviour:
       inWeight: 0.19144788
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.6643753
-      value: 0.9285862
-      inSlope: 1.0780283
-      outSlope: 1.0780283
+      time: 0.65116394
+      value: 0.9329867
+      inSlope: 0.7788174
+      outSlope: 0.7788174
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.4102298
+      inWeight: 0.15348533
       outWeight: 0.34515968
     - serializedVersion: 3
       time: 0.839495
@@ -64854,7 +64854,19 @@ MonoBehaviour:
   OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets:
-  - {fileID: 3243243055673315756}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!95 &3243243057054021814
 Animator:
   serializedVersion: 5
@@ -65739,7 +65751,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   VehicleRigidbody: {fileID: 3243243057054021818}
-  WingSize: 1
+  WingSize: 1.37
   LiftStrength: 0.0009
   DoGroundEffect: 0
   GroundEffectRange: 0
@@ -87338,14 +87350,14 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   BrakeAnimator: {fileID: 3243243057054021814}
   BrakeWheels_Front: []
-  Brake_FrontStrengthMulti: 1
   BrakeWheels_Back:
   - {fileID: 1803049917166894443}
   - {fileID: 1803049917166894442}
+  BrakeStrength: 1
+  Brake_FrontStrengthMulti: 1
   Brake_BackStrengthMulti: 1
+  KeyboardBrakeMulti: 1
   KeyboardControl: 32
-  UpperDeadZone: 0.9
-  LowerDeadZone: 0.1
   _AnimFloatName: handbrake
   IsHandBrake: 1
   EnableBrakeOnExit: 1
@@ -89359,7 +89371,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 3.2
+  Grip: 2.56
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -89467,9 +89479,6 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
   EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
@@ -89489,16 +89498,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 2
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.04
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 1803049917081001696}
   - {fileID: 1803049917847603202}
@@ -89516,8 +89525,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
@@ -89530,6 +89539,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -89654,7 +89664,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 2.8
+  Grip: 2.24
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -89762,9 +89772,6 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
   EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
@@ -89784,16 +89791,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 2
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.04
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 1803049917644784665}
   - {fileID: 1803049916859567716}
@@ -89811,8 +89818,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
@@ -89825,6 +89832,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -89987,7 +89995,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 2.8
+  Grip: 2.24
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -90095,9 +90103,6 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
   EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
@@ -90117,16 +90122,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 2
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.04
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 1803049916790333525}
   - {fileID: 1803049917859943891}
@@ -90144,8 +90149,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
@@ -90158,6 +90163,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -90250,7 +90256,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.8
-  Grip: 3.2
+  Grip: 2.56
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -90358,9 +90364,6 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
   EngineInfluence: 20000
   MaxParkingIncline: 30
   WheelLayers:
@@ -90380,16 +90383,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 2
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.04
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 1803049917727938571}
   - {fileID: 1803049917905062155}
@@ -90407,8 +90410,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
@@ -90421,6 +90424,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0

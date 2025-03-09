@@ -20,8 +20,8 @@ namespace SaccFlightAndVehicles
         public Animator VehicleAnimator;
         [System.NonSerialized] public Transform VehicleTransform;
         [System.NonSerialized] public Rigidbody VehicleRigidbody;
-        [Tooltip("Number of steps per second engine+wheel physics should run, if refresh rate is higher than this number, it will do nothing. Higher number = more fair physics over different refreshrates at cost of performance.")]
-        public int NumStepsSec = 300;
+        [Tooltip("Number of steps per second engine speedup code should run, higher number = smoother engine, effects performance of vehicle somewhat")]
+        public int NumStepsSec = 1000;
         int _numStepsSec = 1;
         [Tooltip("List of wheels to send Engine values to and from")]
         public UdonSharpBehaviour[] DriveWheels;
@@ -639,7 +639,7 @@ namespace SaccFlightAndVehicles
                         // float RGearRatio = RightNeg ? -GearRatio : GearRatio;
                         // float LGearRatio = LeftNeg ? -GearRatio : GearRatio;
                         float reverseSpeedL = LeftThrottle < 0 ? TANK_ReverseSpeed : 1;
-                        float reverseSpeedR = LeftThrottle < 0 ? TANK_ReverseSpeed : 1;
+                        float reverseSpeedR = RightThrottle < 0 ? TANK_ReverseSpeed : 1;
                         float LGearRatio = Mathf.LerpUnclamped(0, GearRatio, LeftThrottle * reverseSpeedL);
                         float RGearRatio = Mathf.LerpUnclamped(0, GearRatio, RightThrottle * reverseSpeedR);
 

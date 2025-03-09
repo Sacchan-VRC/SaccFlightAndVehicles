@@ -74,7 +74,7 @@ namespace SaccFlightAndVehicles
         {
             if (DrawDebugGizmos)
             {
-                Gizmos.DrawRay(transform.position, VehicleRigidbody.velocity * DebugLineSizeVEL);
+                Gizmos.DrawRay(transform.position, -VehicleRigidbody.velocity * DebugLineSizeVEL);
 
                 Gizmos.DrawRay(transform.position, GEDEBUGVEC * DebugLineSizeGE);
                 Gizmos.matrix = transform.localToWorldMatrix;

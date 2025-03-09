@@ -71,6 +71,7 @@ namespace SaccFlightAndVehicles
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
                 EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
                 AutoClutch = 1 + ClucthDecaySpeed * AutoClutch_StayPressed;
+                SGVControl.SetProgramVariable("Clutch", Mathf.Max(_ClutchOverride, Mathf.Min(1, AutoClutch)));
                 if (!ClutchTransitioning)
                 {
                     ClutchTransitioning = true;

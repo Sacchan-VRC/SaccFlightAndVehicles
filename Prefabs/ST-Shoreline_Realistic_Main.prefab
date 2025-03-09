@@ -314,6 +314,36 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
+      propertyPath: GearBox
+      value: 
+      objectReference: {fileID: 9043661907126510229}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: AutoClutch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: BrakeStrength
+      value: 14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: KeyboardBrakeMulti
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: Brake_BackStrengthMulti
+      value: 0.6666666
+      objectReference: {fileID: 0}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: Brake_FrontStrengthMulti
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
       propertyPath: serializationData.Prefab
       value: 
       objectReference: {fileID: 465045989419287067, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
@@ -473,6 +503,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1931339256508014819, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
+    - target: {fileID: 1964195338337086324, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1194c11bea4044c4dbbb392e7e5e1e22, type: 2}
     - target: {fileID: 2515495976410963957, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: serializationData.Prefab
@@ -506,7 +541,12 @@ PrefabInstance:
     - target: {fileID: 4193423723041413652, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: Grip
-      value: 1.5865
+      value: 1.5365
+      objectReference: {fileID: 0}
+    - target: {fileID: 4193423723041413652, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: EngineInfluence
+      value: 30000
       objectReference: {fileID: 0}
     - target: {fileID: 4193423723041413652, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
@@ -615,7 +655,12 @@ PrefabInstance:
     - target: {fileID: 6392917590679912788, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: Grip
-      value: 1.162087
+      value: 1.194
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392917590679912788, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: EngineInfluence
+      value: 30000
       objectReference: {fileID: 0}
     - target: {fileID: 6392917590679912788, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
@@ -637,7 +682,12 @@ PrefabInstance:
     - target: {fileID: 7211299479356292543, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: Grip
-      value: 1.5865
+      value: 1.5365
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211299479356292543, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: EngineInfluence
+      value: 30000
       objectReference: {fileID: 0}
     - target: {fileID: 7211299479356292543, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
@@ -654,7 +704,12 @@ PrefabInstance:
     - target: {fileID: 8204297190439482269, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: Grip
-      value: 1.162087
+      value: 1.194
+      objectReference: {fileID: 0}
+    - target: {fileID: 8204297190439482269, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: EngineInfluence
+      value: 30000
       objectReference: {fileID: 0}
     - target: {fileID: 8204297190439482269, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
@@ -662,6 +717,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8204297190439482269, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
+    - target: {fileID: 8724087983031032889, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+        type: 3}
+      propertyPath: BoostAmount
+      value: 4000
+      objectReference: {fileID: 0}
     - target: {fileID: 8724087983031032889, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
         type: 3}
       propertyPath: serializationData.Prefab
@@ -717,3 +777,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3855904360921838816}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9043661907126510229 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5189103349800228469, guid: 9ccc71bbbb8a6af43b09e04d4f3276a4,
+    type: 3}
+  m_PrefabInstance: {fileID: 3855904360921838816}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd7d767f0ae0008489951011d46f90f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -21089,14 +21089,14 @@ MonoBehaviour:
   SGVControl: {fileID: 6141758679994110546}
   BrakeAnimator: {fileID: 6141758680382097274}
   BrakeWheels_Front: []
-  Brake_FrontStrengthMulti: 1
   BrakeWheels_Back:
   - {fileID: 1823797713}
   - {fileID: 895312535}
+  BrakeStrength: 1
+  Brake_FrontStrengthMulti: 1
   Brake_BackStrengthMulti: 1
+  KeyboardBrakeMulti: 1
   KeyboardControl: 32
-  UpperDeadZone: 0.9
-  LowerDeadZone: 0.1
   _AnimFloatName: handbrake
   IsHandBrake: 1
   EnableBrakeOnExit: 1
@@ -58092,7 +58092,7 @@ MonoBehaviour:
   OnlyChangeColliders: 0
   Health: 250
   VehicleAnimator: {fileID: 6141758680382097274}
-  NumStepsSec: 300
+  NumStepsSec: 1000
   DriveWheels:
   - {fileID: 1823797713}
   - {fileID: 895312535}
@@ -58109,11 +58109,11 @@ MonoBehaviour:
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.5
-  SteeringMaxSpeedDT: 60
+  SteeringMaxSpeedDT: 55
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.15
   ThrottleReturnTimeDT: 0.0001
-  Drag: 0.02
+  Drag: 0.04
   ControlsRoot: {fileID: 0}
   EngineResponseCurve:
     serializedVersion: 2
@@ -58128,17 +58128,17 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.56
     - serializedVersion: 3
-      time: 0.30379406
-      value: 0.5381355
-      inSlope: 1.4529436
-      outSlope: 1.4529436
+      time: 0.25806236
+      value: 0.51701313
+      inSlope: 1.8376257
+      outSlope: 1.8376257
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.12464586
-      outWeight: 0.16164629
+      outWeight: 0.22375092
     - serializedVersion: 3
-      time: 0.5053951
-      value: 0.80895156
+      time: 0.39462277
+      value: 0.8239133
       inSlope: 1.1858695
       outSlope: 1.1858695
       tangentMode: 0
@@ -58146,13 +58146,13 @@ MonoBehaviour:
       inWeight: 0.19144788
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.6643753
-      value: 0.9285862
-      inSlope: 1.0780283
-      outSlope: 1.0780283
+      time: 0.65116394
+      value: 0.9329867
+      inSlope: 0.7788174
+      outSlope: 0.7788174
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.4102298
+      inWeight: 0.15348533
       outWeight: 0.34515968
     - serializedVersion: 3
       time: 0.839495
@@ -58826,7 +58826,19 @@ MonoBehaviour:
   OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets:
-  - {fileID: 6141758681215479392}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!95 &6141758680382097274
 Animator:
   serializedVersion: 5
@@ -59036,7 +59048,7 @@ Transform:
   m_GameObject: {fileID: 6141758680536392897}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.58, z: 0.055}
+  m_LocalPosition: {x: 0, y: 0.648, z: 0.055}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65157,6 +65169,7 @@ MonoBehaviour:
   - 0.18
   - 0.24
   - 0.3
+  - 0.36
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
   AutoClutch_StayPressed: 0
@@ -76383,12 +76396,12 @@ MonoBehaviour:
   BrakeWheels_Front:
   - {fileID: 648356966}
   - {fileID: 927353063}
-  Brake_FrontStrengthMulti: 0.8
   BrakeWheels_Back: []
-  Brake_BackStrengthMulti: 0.65
+  BrakeStrength: 10.5644
+  Brake_FrontStrengthMulti: 1
+  Brake_BackStrengthMulti: 1
+  KeyboardBrakeMulti: 1
   KeyboardControl: 115
-  UpperDeadZone: 0.9
-  LowerDeadZone: 0.1
   _AnimFloatName: brake
   IsHandBrake: 0
   EnableBrakeOnExit: 0
@@ -77742,22 +77755,22 @@ PrefabInstance:
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.59843165
+      value: 0.5984294
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000021003168
+      value: 0.00000015002293
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000015688179
+      value: 0.000000112058
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.8011739
+      value: 0.80117553
       objectReference: {fileID: 0}
     - target: {fileID: -5491882240545318371, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77837,22 +77850,22 @@ PrefabInstance:
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.59843177
+      value: 0.5984293
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000021003168
+      value: -0.00000015002296
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000015688182
+      value: 0.00000011205798
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.80117387
+      value: -0.80117565
       objectReference: {fileID: 0}
     - target: {fileID: -1551168584785544901, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78062,22 +78075,22 @@ PrefabInstance:
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6543489
+      value: 0.654348
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000025487952
+      value: -0.00000007079995
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.000002205524
+      value: 0.00000006126448
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.7561928
+      value: -0.7561936
       objectReference: {fileID: 0}
     - target: {fileID: 3783353238668546013, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78087,22 +78100,22 @@ PrefabInstance:
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6543475
+      value: 0.65434813
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00000028319997
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.00000024505772
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.756194
+      value: 0.75619346
       objectReference: {fileID: 0}
     - target: {fileID: 5419709599708206005, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78397,14 +78410,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 5910489168914116605}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.25
+  SuspensionDistance: 0.35
   WheelRadius: 0.385672
   SpringForceMulti: 7
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
-  MaxSusForce: 60
+  MaxSusForce: 50
   ExtraRayCastDistance: 0.23
-  Grip: 3
+  Grip: 2.54
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -78512,10 +78525,7 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
-  EngineInfluence: 30000
+  EngineInfluence: 24000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -78534,16 +78544,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 0.6
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.03
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 8894572861119677086}
   - {fileID: 557774370111641267}
@@ -78561,8 +78571,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
@@ -78575,6 +78585,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -78748,14 +78759,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 4575407254928553814}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.25
+  SuspensionDistance: 0.35
   WheelRadius: 0.385672
   SpringForceMulti: 7
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
-  MaxSusForce: 60
+  MaxSusForce: 50
   ExtraRayCastDistance: 0.23
-  Grip: 3
+  Grip: 2.54
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -78863,10 +78874,7 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
-  EngineInfluence: 30000
+  EngineInfluence: 24000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -78885,16 +78893,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 0.6
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.03
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 1262685652512150063}
   - {fileID: 5233924591700483975}
@@ -78912,8 +78920,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
@@ -78926,6 +78934,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -79011,14 +79020,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 6005323304930896397}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.35
+  SuspensionDistance: 0.45
   WheelRadius: 0.48209
   SpringForceMulti: 9
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
-  MaxSusForce: 60
+  MaxSusForce: 50
   ExtraRayCastDistance: 0.23
-  Grip: 3.5
+  Grip: 2.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -79126,10 +79135,7 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
-  EngineInfluence: 30000
+  EngineInfluence: 24000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -79148,16 +79154,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 0.6
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.03
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 4031639203262013529}
   - {fileID: 7652792915499050624}
@@ -79175,8 +79181,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
@@ -79189,6 +79195,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
@@ -79292,14 +79299,14 @@ MonoBehaviour:
   WheelVisual: {fileID: 1953323024443111551}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
-  SuspensionDistance: 0.35
+  SuspensionDistance: 0.45
   WheelRadius: 0.48209
   SpringForceMulti: 9
   Damping_Bump: 0.75
   Damping_Rebound: 0.7
-  MaxSusForce: 60
+  MaxSusForce: 50
   ExtraRayCastDistance: 0.23
-  Grip: 3.5
+  Grip: 2.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -79407,10 +79414,7 @@ MonoBehaviour:
   LongLatSeparation: 1
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
-  BrakeStrength: 0.8
-  HandBrakeStrength: 1.4
-  WheelGroundInfluence: 1000
-  EngineInfluence: 30000
+  EngineInfluence: 24000
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -79429,16 +79433,16 @@ MonoBehaviour:
   - 1
   - 1
   SurfaceType_Slowdown:
-  - 0.1
-  - 0.6
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
+  - 0
+  - 0.03
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   SurfaceType_SkidSounds:
   - {fileID: 8202946498933891094}
   - {fileID: 6987903778535580342}
@@ -79456,8 +79460,8 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  SkidSound_Min: 6
-  SkidSound_VolumeIncrease: 0.2
+  SkidSound_Min: 4
+  SkidSound_VolumeIncrease: 0.25
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
@@ -79470,6 +79474,7 @@ MonoBehaviour:
   CurrentWheelSlowDown: 0
   SkidLength_SmoothStep: 0.11
   Clutch: 1
+  BrakeStrength: 1.4
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
