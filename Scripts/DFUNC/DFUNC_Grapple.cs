@@ -288,7 +288,6 @@ namespace SaccFlightAndVehicles
                 {
                     KeepingECAwake = true;
                     EntityControl.KeepAwake_++;
-                    EntityControl.SendEventToExtensions("SFEXT_L_GrappleAttach");
                 }
                 EntityControl.SendEventToExtensions("SFEXT_G_GrappleActive");
                 DoEventCallbacks("DFUNC_Grapple_Attached");
@@ -514,25 +513,24 @@ namespace SaccFlightAndVehicles
             NonLocalAttached = false;
             Hook.localPosition = HookStartPos;
             Hook.localRotation = HookStartRot;
+            if (KeepingECAwake)
+            {
+                KeepingECAwake = false;
+                EntityControl.KeepAwake_--;
+            }
             if (HookedEntity)
             {
-                if (KeepingECAwake)
-                {
-                    KeepingECAwake = false;
-                    EntityControl.KeepAwake_--;
-                    EntityControl.SendEventToExtensions("SFEXT_L_GrappleDetach");
-                }
                 if (KeepingHEAwake)
                 {
                     KeepingHEAwake = false;
                     HookedEntity.KeepAwake_--;
                 }
-                UndoHookOverrides();
                 if (HookedEntity.Using)
                 {
                     Networking.SetOwner(Networking.LocalPlayer, HookedEntity.gameObject);
-                    HookedEntity.SendEventToExtensions("SFEXT_L_SetEngineOn");
                 }
+                HookedEntity.SendEventToExtensions("SFEXT_L_GrappleDetach");
+                UndoHookOverrides();
                 HookedEntity = null;
             }
             if (PlayReelIn && HookReelIn) { HookReelIn.Play(); }

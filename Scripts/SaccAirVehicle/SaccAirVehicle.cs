@@ -2252,7 +2252,7 @@ namespace SaccFlightAndVehicles
                 {
                     PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput;
                 }
-                else// user was in the vehicle when they left
+                else// user was in the vehicle when they left or you took ownership with a grapple
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
                     PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
@@ -2366,6 +2366,11 @@ namespace SaccFlightAndVehicles
             foreach (WheelCollider wheel in VehicleWheelColliders)
             {
                 wheel.motorTorque = 0f;
+            }
+            if (Piloting)
+            {
+                if (EngineOnOnEnter)
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
             }
         }
         public void SetCollidersLayer(int NewLayer)

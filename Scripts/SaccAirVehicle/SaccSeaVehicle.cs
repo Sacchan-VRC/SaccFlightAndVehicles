@@ -1662,6 +1662,23 @@ namespace SaccFlightAndVehicles
             //set vehicle's collider's layers back
             SetCollidersLayer(EntityControl.OutsideVehicleLayer);
         }
+        int numGrapplesAttached;
+        public void SFEXT_L_GrappleAttach()
+        {
+            numGrapplesAttached++;
+        }
+        public void SFEXT_L_GrappleDetach()
+        {
+            numGrapplesAttached--;
+            if (numGrapplesAttached < 0) { numGrapplesAttached = 0; }
+            if (EngineOn) return;
+            if (numGrapplesAttached != 0) return;
+            if (Piloting)
+            {
+                if (EngineOnOnEnter)
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
+            }
+        }
         public void SetCollidersLayer(int NewLayer)
         {
             if (VehicleMesh)
