@@ -102,6 +102,7 @@ namespace SaccFlightAndVehicles
         private float SkidVolumeMulti = 1;
         private bool SkidSoundPlayingLast;
         private bool SkidParticlePlayingLast;
+        bool TankMode;
         private Vector3 SusDirection;
         private Renderer WheelRenderer;
         [FieldChangeCallback(nameof(GearRatio))] public float _GearRatio = 0f;
@@ -109,7 +110,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (value == 0f && !(bool)SGVControl.GetProgramVariable("TankMode"))
+                if (value == 0f && !TankMode)
                 {
                     GearNeutral = true;
                 }
@@ -209,6 +210,7 @@ namespace SaccFlightAndVehicles
 #endif
         void Start()
         {
+            TankMode = (bool)SGVControl.GetProgramVariable("TankMode");
             SkidSound_Min_THREEQUARTER = SkidSound_Min * .75f;
             SkidSound_Min_TWOTHRID = SkidSound_Min * .66f;
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
@@ -484,7 +486,7 @@ namespace SaccFlightAndVehicles
                 ForceVector = GripForce3;
                 ForceUsedDBG = ForceUsed;
 #endif
-                if (IsDriveWheel)
+                if (IsDriveWheel && !TankMode)
                     WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, ForwardSpeed, Clutch);
                 else
                     WheelRotationSpeedSurf = ForwardSpeed;

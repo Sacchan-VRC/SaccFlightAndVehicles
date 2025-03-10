@@ -152,7 +152,7 @@ namespace SaccFlightAndVehicles
         public float Bike_AutoSteer_CounterStrength = .01f;
         public float Bike_AutoSteer_Strength = .01f;
         [Space(10)]
-        [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks")]
+        [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks\nCannot be changed during play")]
         public bool TankMode;
         [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
