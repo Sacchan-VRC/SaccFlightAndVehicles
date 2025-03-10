@@ -23,9 +23,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("How often the automatic mode can change gear")]
         public float AutomaticGearChangeDelay = .25f;
         [Tooltip("In automatic mode, when revs are above this percentage, the gear will increase")]
-        public float GearChangeRevsUpper = .8f;
+        public float GearChangeRevsUpper = .9f;
         [Tooltip("In automatic mode, when revs are below this percentage, the gear will decrease")]
-        public float GearChangeRevsLower = .3f;
+        public float GearChangeRevsLower = .4f;
         [Tooltip("Use left controller stick to change gear instead?")]
         public bool GearsLeftController = false;
         [Tooltip("Use the left controller grip for clutch? Disable for right")]
