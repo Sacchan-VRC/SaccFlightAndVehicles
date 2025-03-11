@@ -20,19 +20,15 @@ namespace SaccFlightAndVehicles
         public TextMeshProUGUI RadioEnabledTxt;
         private byte CurrentChannel = 1;
         public byte MyChannel = 1;
-        [Header("All Planes and RadioZones are filled automatically on build.")]
-        [Tooltip("All SaccEntities found")]
-        public Transform[] AllEntities_TF;
-        [Tooltip("All SaccEntities with a radio")]
-        [SerializeField] private SAV_Radio[] AllEntities_RD;
-        public SaccRadioZone[] RadioZones;
+        [Tooltip("All SAV_Radio scripts")]
         public TextMeshProUGUI ChannelText;
-        [Header("Debug, leave empty:")]
-        public SaccEntity MyEntity;
-        SaccEntity[] AllEntities;
-        [System.NonSerialized] public int MyVehicleSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
+        [Header("Debug, leave empty (auto filled):")]
+        public SAV_Radio[] AllRadios_RD;
+        public SaccRadioZone[] RadioZones;
+        public SAV_Radio MyRadio;
+        private int NextRadio;
+        [System.NonSerialized] public int MyRadioSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
         [System.NonSerialized] public SaccRadioZone MyZone;
-        private int NextEntity;
         private int NextZone;
         private int NumZones;
         private bool DoZones = false;
@@ -42,31 +38,24 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel = 1;
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
-            AllEntities = new SaccEntity[AllEntities_TF.Length];
-            AllEntities_RD = new SAV_Radio[AllEntities_TF.Length];
             string radioname = GetUdonTypeName<SAV_Radio>();
-            for (int i = 0; i < AllEntities_TF.Length; i++)
-            {
-                AllEntities[i] = (SaccEntity)AllEntities_TF[i].GetComponent<SaccEntity>();
-                if (AllEntities[i]) { AllEntities_RD[i] = (SAV_Radio)AllEntities[i].GetExtention(radioname); }
-            }
             PruneRadiosArray();
-            for (int i = 0; i < AllEntities_RD.Length; i++)
+            for (int i = 0; i < AllRadios_RD.Length; i++)
             {
-                AllEntities_RD[i].RadioBase = this;
-                AllEntities_RD[i].Init();
+                AllRadios_RD[i].RadioBase = this;
+                AllRadios_RD[i].Init();
             }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
         }
         private void PruneRadiosArray()
         {
-            int len = AllEntities_RD.Length;
+            int len = AllRadios_RD.Length;
             bool[] valid = new bool[len];
             int numvalid = 0;
             for (int i = 0; i < len; i++)
             {
-                if (AllEntities_RD[i])
+                if (AllRadios_RD[i])
                 {
                     valid[i] = true;
                     numvalid++;
@@ -82,11 +71,11 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    RD_New[i - offset] = AllEntities_RD[i];
+                    RD_New[i - offset] = AllRadios_RD[i];
                 }
             }
-            AllEntities_RD = RD_New;
-            if (AllEntities_RD.Length == 0)
+            AllRadios_RD = RD_New;
+            if (AllRadios_RD.Length == 0)
             {
                 Debug.LogWarning("RadioBase: No Entities with SAV_Radio found");
                 DoEntities = false;
@@ -95,20 +84,20 @@ namespace SaccFlightAndVehicles
         public void SetRadioVoiceVolumes()
         {
             SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes), 5);
-            if (!MyEntity && !MyZone) { return; }
+            if (!MyRadio && !MyZone) { return; }
             if (DoZones)
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             if (!DoEntities) return;
-            NextEntity++;
-            if (NextEntity == AllEntities_RD.Length) { NextEntity = 0; }
-            SaccEntity NextEntity_SE = AllEntities_RD[NextEntity].EntityControl;
-            if (MyEntity == NextEntity_SE
-                || (byte)AllEntities_RD[NextEntity].Channel != CurrentChannel
+            NextRadio++;
+            if (NextRadio == AllRadios_RD.Length) { NextRadio = 0; }
+            SAV_Radio NextRadio_R = AllRadios_RD[NextRadio];
+            if (MyRadio == NextRadio_R
+                || (byte)AllRadios_RD[NextRadio].Channel != CurrentChannel
                 || CurrentChannel == 0) { return; }
-            for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
+            for (int o = 0; o < NextRadio_R.RadioSeats.Length; o++)
             {
-                if (!NextEntity_SE.VehicleSeats[o]) continue;
-                VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
+                if (!NextRadio_R.RadioSeats[o]) continue;
+                VRCPlayerApi thisplayer = NextRadio_R.RadioSeats[o].SeatedPlayer;
                 if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
@@ -116,9 +105,9 @@ namespace SaccFlightAndVehicles
                     thisplayer.SetVoiceGain(VoiceGain);
                 }
             }
-            if ((NextEntity_SE.EntityPickup && NextEntity_SE.EntityPickup.IsHeld) || NextEntity_SE.CustomPickup_Synced_isHeld)
+            if ((NextRadio_R.EntityControl.EntityPickup && NextRadio_R.EntityControl.EntityPickup.IsHeld) || NextRadio_R.EntityControl.CustomPickup_Synced_isHeld)
             {
-                VRCPlayerApi thisplayer = Networking.GetOwner(NextEntity_SE.gameObject);
+                VRCPlayerApi thisplayer = Networking.GetOwner(NextRadio_R.gameObject);
                 if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
@@ -127,19 +116,17 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void UpdateVehicle(SaccEntity Vehicle)
+        public void UpdateVehicle(SAV_Radio VehicleRadio)
         {
-            if (!MyEntity && !MyZone) { return; }
-            SaccEntity NextEntity_SE = Vehicle;
-            SAV_Radio NextEntity_R = (SAV_Radio)NextEntity_SE.GetExtention(GetUdonTypeName<SAV_Radio>());
-            if (MyEntity == NextEntity_SE
-                || !NextEntity_R
-                || (byte)NextEntity_R.Channel != CurrentChannel
+            if (!MyRadio && !MyZone) { return; }
+            if (MyRadio == VehicleRadio
+                || !VehicleRadio
+                || (byte)VehicleRadio.Channel != CurrentChannel
                 || CurrentChannel == 0) { return; }
-            for (int o = 0; o < NextEntity_SE.VehicleSeats.Length; o++)
+            for (int o = 0; o < VehicleRadio.RadioSeats.Length; o++)
             {
-                if (!NextEntity_SE.VehicleSeats[o]) continue;
-                VRCPlayerApi thisplayer = NextEntity_SE.VehicleSeats[o].SeatedPlayer;
+                if (!VehicleRadio.RadioSeats[o]) continue;
+                VRCPlayerApi thisplayer = VehicleRadio.RadioSeats[o].SeatedPlayer;
                 if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
@@ -147,9 +134,9 @@ namespace SaccFlightAndVehicles
                     thisplayer.SetVoiceGain(VoiceGain);
                 }
             }
-            if ((NextEntity_SE.EntityPickup && NextEntity_SE.EntityPickup.IsHeld) || NextEntity_SE.CustomPickup_Synced_isHeld)
+            if ((VehicleRadio.EntityControl.EntityPickup && VehicleRadio.EntityControl.EntityPickup.IsHeld) || VehicleRadio.EntityControl.CustomPickup_Synced_isHeld)
             {
-                VRCPlayerApi thisplayer = Networking.GetOwner(NextEntity_SE.gameObject);
+                VRCPlayerApi thisplayer = Networking.GetOwner(VehicleRadio.gameObject);
                 if (Utilities.IsValid(thisplayer))
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
@@ -160,7 +147,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetRadioVoiceVolumes_Zones()
         {
-            if (!MyEntity && !MyZone) { return; }
+            if (!MyRadio && !MyZone) { return; }
             NextZone++;
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
@@ -187,13 +174,13 @@ namespace SaccFlightAndVehicles
         }
         public void SetAllVoiceVolumesDefault()
         {
-            for (int i = 0; i < AllEntities.Length; i++)
+            for (int i = 0; i < AllRadios_RD.Length; i++)
             {
-                if (!AllEntities[i].Initialized) continue;
-                for (int o = 0; o < AllEntities[i].VehicleSeats.Length; o++)
+                if (!AllRadios_RD[i].EntityControl.Initialized) continue;
+                for (int o = 0; o < AllRadios_RD[i].RadioSeats.Length; o++)
                 {
-                    if (!AllEntities[i].VehicleSeats[o]) continue;
-                    VRCPlayerApi thisplayer = AllEntities[i].VehicleSeats[o].SeatedPlayer;
+                    if (!AllRadios_RD[i].RadioSeats[o]) continue;
+                    VRCPlayerApi thisplayer = AllRadios_RD[i].RadioSeats[o].SeatedPlayer;
                     if (Utilities.IsValid(thisplayer))
                     {
                         thisplayer.SetVoiceDistanceNear(0);
@@ -201,9 +188,9 @@ namespace SaccFlightAndVehicles
                         thisplayer.SetVoiceGain(15);
                     }
                 }
-                if ((AllEntities[i].EntityPickup && AllEntities[i].EntityPickup.IsHeld) || AllEntities[i].CustomPickup_Synced_isHeld)
+                if ((AllRadios_RD[i].EntityControl.EntityPickup && AllRadios_RD[i].EntityControl.EntityPickup.IsHeld) || AllRadios_RD[i].EntityControl.CustomPickup_Synced_isHeld)
                 {
-                    VRCPlayerApi thisplayer = Networking.GetOwner(AllEntities[i].gameObject);
+                    VRCPlayerApi thisplayer = Networking.GetOwner(AllRadios_RD[i].gameObject);
                     if (Utilities.IsValid(thisplayer))
                     {
                         thisplayer.SetVoiceDistanceNear(0);
@@ -222,12 +209,12 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SetVehicleVolumeDefault(SaccEntity Vehicle)
+        public void SetVehicleVolumeDefault(SAV_Radio Vehicle)
         {
-            for (int i = 0; i < Vehicle.VehicleSeats.Length; i++)
+            for (int i = 0; i < Vehicle.RadioSeats.Length; i++)
             {
-                if (!Vehicle.VehicleSeats[i]) continue;
-                SetSingleVoiceVolumeDefault(Vehicle.VehicleSeats[i].SeatedPlayer);
+                if (!Vehicle.RadioSeats[i]) continue;
+                SetSingleVoiceVolumeDefault(Vehicle.RadioSeats[i].SeatedPlayer);
             }
         }
         public void SetSingleVoiceVolumeDefault(VRCPlayerApi player)
@@ -272,9 +259,9 @@ namespace SaccFlightAndVehicles
         }
         void UpdateRadioScripts()
         {
-            for (int i = 0; i < AllEntities_RD.Length; i++)
+            for (int i = 0; i < AllRadios_RD.Length; i++)
             {
-                AllEntities_RD[i].NewChannel();
+                AllRadios_RD[i].NewChannel();
             }
         }
     }

@@ -110,17 +110,12 @@ namespace SaccFlightAndVehicles
         }
         public static void SetPlaneList_RadioBase()
         {
-            var SEs = GetAllSaccEntitys().ToArray();
             var RBs = GetAllSaccRadioBases().ToArray();
-            var SETransforms = new Transform[SEs.Length];
-            for (int i = 0; i < SEs.Length; i++)
-            {
-                SETransforms[i] = SEs[i].transform;
-            }
+            var Radios = GetAllSAVRadios().ToArray();
             var RZs = GetAllSaccRadioZones().ToArray();
             for (int i = 0; i < RBs.Length; i++)
             {
-                RBs[i].AllEntities_TF = SETransforms;
+                RBs[i].AllRadios_RD = Radios;
                 RBs[i].RadioZones = RZs;
                 PrefabUtility.RecordPrefabInstancePropertyModifications(RBs[i]);
                 EditorUtility.SetDirty(RBs[i]);
@@ -281,6 +276,16 @@ namespace SaccFlightAndVehicles
             foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
             {
                 var objs = g.GetComponentsInChildren<SaccVehicleEnterer>(true);
+                ls.AddRange(objs);
+            }
+            return ls;
+        }
+        static List<SAV_Radio> GetAllSAVRadios()
+        {
+            var ls = new List<SAV_Radio>();
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                var objs = g.GetComponentsInChildren<SAV_Radio>(true);
                 ls.AddRange(objs);
             }
             return ls;

@@ -15,6 +15,8 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [Tooltip("Force this radio to always be on this channel (-1 to disable)")]
         [SerializeField] int ForceChannel = -1;
+        [Tooltip("Leave empty to use all seats")]
+        public SaccVehicleSeat[] RadioSeats;
         bool ForceChannel_b = false;
         byte myPrevChannel;
         bool ForceChannel_swapped = false;
@@ -23,6 +25,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
         [System.NonSerialized] public DFUNC_RadioPTT PTTControl; // set true if DFUNC_RadioPTT is in use
         // public bool RadioOn = true;
+        [Header("Debug")]
         [UdonSynced, FieldChangeCallback(nameof(Channel))] public byte _Channel;
         public byte Channel
         {
@@ -34,8 +37,8 @@ namespace SaccFlightAndVehicles
                     UpdateChannel();
                     RadioBase.SetAllVoiceVolumesDefault();
                 }
-                RadioBase.SetVehicleVolumeDefault(EntityControl);
-                RadioBase.UpdateVehicle(EntityControl);
+                RadioBase.SetVehicleVolumeDefault(this);
+                RadioBase.UpdateVehicle(this);
             }
             get => _Channel;
         }
@@ -64,6 +67,10 @@ namespace SaccFlightAndVehicles
                 if (ForceChannel > 255) ForceChannel = 255;
                 ForceChannel_b = true;
             }
+            if (RadioSeats.Length == 0)
+            {
+                RadioSeats = EntityControl.VehicleSeats;
+            }
             if (DialPosition != -999) { DFUNCMODE = true; }
         }
         public void SFEXT_L_EntityStart()
@@ -79,11 +86,11 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotEnter()
         {
-            if (EntityControl.Passenger) { SendCustomEventDelayedSeconds(nameof(UpdateChannel), 2); }
+            if (ImOnRadio) { SendCustomEventDelayedSeconds(nameof(UpdateChannel), 2); }
         }
         public void UpdateChannel()
         {
-            if (!EntityControl.Using)
+            if (!(PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using))
             {
                 ChannelSwapped = true;
                 RadioBase.SetProgramVariable("CurrentChannel", Channel);
@@ -103,14 +110,24 @@ namespace SaccFlightAndVehicles
         {
             ExitVehicle();
         }
+        bool ImOnRadio = false;
         public void EnterVehicle()
         {
+            for (int i = 0; i < RadioSeats.Length; i++)
+            {
+                if (RadioSeats[i].SeatedPlayer == localPlayer)
+                {
+                    ImOnRadio = true;
+                    break;
+                }
+            }
+            if (!ImOnRadio) { return; }
             if (RadioBase)
             {
-                RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
-                RadioBase.SetProgramVariable("MyEntity", EntityControl);
+                RadioBase.SetProgramVariable("MyRadioSetTimes", (int)RadioBase.GetProgramVariable("MyRadioSetTimes") + 1);
+                RadioBase.SetProgramVariable("MyRadio", this);
                 //if not pilot, set my channel on radiobase to vehicle's and set back on exit
-                if (ForceChannel_b && EntityControl.Using)
+                if (ForceChannel_b && (PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using))
                 {
                     myPrevChannel = RadioBase.MyChannel;
                     ForceChannel_swapped = true;
@@ -128,7 +145,7 @@ namespace SaccFlightAndVehicles
         }
         public void NewChannel()
         {
-            if (EntityControl.Using)
+            if (PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using)
             {
                 // PTT_MODE requires DFUNC_RadioPTT
                 // PTT_MODE has your radiobase channel set to what is selected as normal so that you hear that channel
@@ -142,7 +159,8 @@ namespace SaccFlightAndVehicles
         }
         public void ExitVehicle()
         {
-            controlsRunning = false;
+            if (!ImOnRadio) return;
+            ImOnRadio = controlsRunning = false;
             if (RadioBase)
             {
                 if (ChannelSwapped)
@@ -155,11 +173,11 @@ namespace SaccFlightAndVehicles
                     ForceChannel_swapped = false;
                     RadioBase.SetChannel(myPrevChannel);
                 }
-                int mvst = (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") - 1;
-                RadioBase.SetProgramVariable("MyVehicleSetTimes", mvst);
-                if (mvst == 0)
+                int mrst = (int)RadioBase.GetProgramVariable("MyRadioSetTimes") - 1;
+                RadioBase.SetProgramVariable("MyRadioSetTimes", mrst);
+                if (mrst == 0)
                 {
-                    RadioBase.SetProgramVariable("MyEntity", null);
+                    RadioBase.SetProgramVariable("MyRadio", null);
                     RadioBase.SetAllVoiceVolumesDefault();
                 }
             }

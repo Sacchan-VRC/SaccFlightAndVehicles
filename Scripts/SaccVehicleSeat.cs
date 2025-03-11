@@ -133,7 +133,7 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         if (PassengerFunctions)
-                        { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                        { PassengerFunctions.passengerFuncIgnorePassengerFlag = true; }
                         EntityControl.PassengerEnterVehicleLocal();
                     }
                     for (int i = 0; i < EnableInSeat.Length; i++)
@@ -180,7 +180,7 @@ namespace SaccFlightAndVehicles
                 else
                 {
                     if (PassengerFunctions)
-                    { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                    { PassengerFunctions.passengerFuncIgnorePassengerFlag = true; }
                     EntityControl.PassengerEnterVehicleGlobal(player);
                 }
                 if (AnimBoolAnimator) { AnimBoolAnimator.SetBool(AnimBoolOnEnter, true); }
@@ -241,7 +241,7 @@ namespace SaccFlightAndVehicles
                     if (!IsPilotSeat)
                     {
                         if (PassengerFunctions)
-                        { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                        { PassengerFunctions.passengerFuncIgnorePassengerFlag = true; }
                         EntityControl.PassengerExitVehicleLocal();
                     }
                     if (DoVoiceVolumeChange)
@@ -265,7 +265,7 @@ namespace SaccFlightAndVehicles
                 else
                 {
                     if (PassengerFunctions)
-                    { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                    { PassengerFunctions.passengerFuncIgnorePassengerFlag = true; }
                     EntityControl.PassengerExitVehicleGlobal(player);
                 }
                 if (PassengerFunctions)

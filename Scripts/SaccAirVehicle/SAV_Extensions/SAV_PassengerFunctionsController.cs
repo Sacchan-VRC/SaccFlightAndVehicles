@@ -31,6 +31,7 @@ namespace SaccFlightAndVehicles
         public bool PlaySelectSoundLeft = true;
         public bool PlaySelectSoundRight = true;
         public float DialSensitivity = 0.7f;
+        [NonSerialized] public bool passengerFuncIgnorePassengerFlag;
         private int LStickNumFuncs;
         private int RStickNumFuncs;
         private float LStickFuncDegrees;
@@ -49,7 +50,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
         [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
         public bool IsOwner = false;
-        public bool FunctionsActive = false;
+        public bool Using = false;
         public bool Occupied = false;
         VRCPlayerApi currentUser;
         [NonSerialized] public VRCStation Station;
@@ -168,7 +169,7 @@ namespace SaccFlightAndVehicles
         }
         public void InVehicleControls()
         {
-            if (!FunctionsActive) { return; }
+            if (!Using) { return; }
             SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Vector2 LStickPos = Vector2.zero;
             Vector2 RStickPos = Vector2.zero;
@@ -334,7 +335,7 @@ namespace SaccFlightAndVehicles
             if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             TakeOwnerShipOfExtensions();
-            FunctionsActive = true;
+            Using = true;
             if (!IsOwner)
             { IsOwner = true; SendEventToExtensions_Gunner("SFEXT_O_TakeOwnership"); }
             SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
@@ -354,7 +355,7 @@ namespace SaccFlightAndVehicles
         }
         public void UserExitVehicleLocal()
         {
-            FunctionsActive = false;
+            Using = false;
             LStickSelection = -1;
             RStickSelection = -1;
             SendEventToExtensions_Gunner("SFEXT_O_PilotExit");

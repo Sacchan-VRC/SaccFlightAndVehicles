@@ -768,7 +768,6 @@ namespace SaccFlightAndVehicles
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (RStickDisplayHighlighter)
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-            if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
             EnableInVehicle_Enable();
             DisableInVehicle_Disable();
             SendEventToExtensions("SFEXT_P_PassengerEnter");
@@ -1069,10 +1068,17 @@ namespace SaccFlightAndVehicles
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             }
         }
-        [System.NonSerialized] public bool passengerFuncIgnorePassengerFlag;
         [RecursiveMethod]
         public void SendEventToExtensions(string eventname)
         {
+            //prevent recursive calls from activating the flag
+            bool[] PFIPF_local = new bool[PassengerFunctionControllers.Length];
+            for (int i = 0; i < PassengerFunctionControllers.Length; i++)
+            {
+                PFIPF_local[i] = PassengerFunctionControllers[i].passengerFuncIgnorePassengerFlag;
+                PassengerFunctionControllers[i].passengerFuncIgnorePassengerFlag = false;
+            }
+
             if (!Initialized) { return; }
             foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
             {
@@ -1091,25 +1097,24 @@ namespace SaccFlightAndVehicles
             }
             if (hasPassengerFunctions)
             {
-                if (passengerFuncIgnorePassengerFlag)
+                for (int i = 0; i < PassengerFunctionControllers.Length; i++)
                 {
-                    passengerFuncIgnorePassengerFlag = false;
-                    if (eventname.Contains("_Passenger"))
+                    if (PassengerFunctionControllers[i])
                     {
-                        // Don't send PassengerEnter etc to PassengerFunctionsController when the passenger controlling the functions enters
-                        // For those functions to work this passenger is sent as 'pilot' from SaccVehicleSeat.PassengerFunctions
-                        // SFEXT_P_PassengerEnter
-                        // SFEXT_P_PassengerExit
-                        // SFEXT_G_PassengerEnter
-                        // SFEXT_G_PassengerExit
-                        return;
-                    }
-                }
-                foreach (SAV_PassengerFunctionsController EXT in PassengerFunctionControllers)
-                {
-                    if (EXT)
-                    {
-                        EXT.SendCustomEvent(eventname);
+                        if (PFIPF_local[i])
+                        {
+                            if (eventname.Contains("_Passenger"))
+                            {
+                                // Don't send PassengerEnter etc to PassengerFunctionsController when the passenger controlling the functions enters
+                                // For those functions to work this passenger is sent as 'pilot' from SaccVehicleSeat.PassengerFunctions
+                                // SFEXT_P_PassengerEnter
+                                // SFEXT_P_PassengerExit
+                                // SFEXT_G_PassengerEnter
+                                // SFEXT_G_PassengerExit
+                                continue;
+                            }
+                        }
+                        PassengerFunctionControllers[i].SendCustomEvent(eventname);
                         if (
                             eventname == "SFEXT_L_EntityStart" ||
                             eventname == "SFEXT_O_LoseOwnership" ||
@@ -1124,7 +1129,7 @@ namespace SaccFlightAndVehicles
                         .Replace("O_PilotEnter", "P_PassengerEnter")
                         .Replace("O_PilotExit", "P_PassengerExit");
 
-                        EXT.SendEventToExtensions_Gunner(passengerEventName);
+                        PassengerFunctionControllers[i].SendEventToExtensions_Gunner(passengerEventName);
                     }
                 }
             }
