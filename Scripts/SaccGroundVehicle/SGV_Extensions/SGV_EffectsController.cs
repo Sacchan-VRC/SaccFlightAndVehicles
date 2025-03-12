@@ -236,7 +236,7 @@ namespace SaccFlightAndVehicles
             EngineSounds_Interior_playing = EngineSounds_playing = TrackSound_playing = TrackSound_Interior_playing = false;
 
             FallAsleep();// sleep until sync script wakes up
-            SendCustomEventDelayedSeconds(nameof(WakeUp), Random.Range(5, 15));// same activation delay as sync script
+            SendCustomEventDelayedSeconds(nameof(WakeUp_Initial), Random.Range(5f, 7f));// same activation delay as sync script
         }
         private bool KeepAwake = false;
         public void SFEXT_L_KeepAwake() { KeepAwake = true; WakeUp(); }
@@ -504,6 +504,13 @@ namespace SaccFlightAndVehicles
             { SteerWheels[i].SendCustomEvent("WakeUp"); }
             for (int i = 0; i < OtherWheels.Length; i++)
             { OtherWheels[i].SendCustomEvent("WakeUp"); }
+        }
+        public void WakeUp_Initial()
+        {
+            if (Time.deltaTime > 0.06666f)
+                SendCustomEventDelayedSeconds(nameof(WakeUp_Initial), Random.Range(.25f, 1f));
+            else
+                WakeUp();
         }
         public void WakeUp()
         {
