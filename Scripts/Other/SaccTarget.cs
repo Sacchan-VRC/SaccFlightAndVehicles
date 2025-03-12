@@ -9,6 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SaccTarget : UdonSharpBehaviour
     {
+        [Header("Do not put colliders on child objects, it wont work properly (unless rigidbody?)")]
         [UdonSynced] public float HitPoints = 30f;
         [Tooltip("Particle collisions will do this much damage")]
         public float DamageFromBullet = 10f;

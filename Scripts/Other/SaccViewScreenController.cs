@@ -152,7 +152,7 @@ namespace SaccFlightAndVehicles
             if (CamTargets[nextcam])
             { nextTargEntity = CamTargets[nextcam].GetComponent<SaccEntity>(); }
             else { nextTargEntity = null; }
-            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy || (DisableSwitchToDead && (!nextTargEntity || nextTargEntity.dead == true)))
+            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy || (DisableSwitchToDead && (!nextTargEntity || nextTargEntity.dead)))
             {
                 if (numchecks >= NumCameras)
                 {
