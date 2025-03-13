@@ -287,6 +287,7 @@ namespace SaccFlightAndVehicles
             Suspension();
             WheelPhysics();
         }
+        float gripLast;
         private void Suspension()
         {
             float compression = 0f;
@@ -311,6 +312,14 @@ namespace SaccFlightAndVehicles
                 else
                 { SusDirection = SusOut.normal; }
 
+#if UNITY_EDITOR
+                // make changing 'grip' value work instantly in editor play mode
+                if (gripLast != Grip)
+                {
+                    SurfaceType = -1;
+                    gripLast = Grip;
+                }
+#endif
                 CheckSurface();
                 //SUSPENSION//
                 compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
