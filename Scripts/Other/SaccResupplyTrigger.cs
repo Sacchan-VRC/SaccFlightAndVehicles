@@ -59,13 +59,16 @@ namespace SaccFlightAndVehicles
             if (other && other.gameObject.layer == ResupplyLayer)
             {
                 supplyType = -1;
-                for (int i = 0; i < supplyNames.Length; i++)
+                if (other.transform.childCount > 0)
                 {
-                    Transform child = other.transform.Find(supplyNames[i]);
-                    if (child != null)
+                    for (int i = 0; i < supplyNames.Length; i++)
                     {
-                        supplyType = i; // Set supplyType to the index of the matching child
-                        break;          // Exit the loop once a match is found
+                        Transform child = other.transform.Find(supplyNames[i]);
+                        if (child != null)
+                        {
+                            supplyType = i; // Set supplyType to the index of the matching child
+                            break;          // Exit the loop once a match is found
+                        }
                     }
                 }
                 if (NumTriggers == 0) { LastResupplyTime = Time.time - ResupplyDelay + ResupplyInitialDelay; }
