@@ -300,6 +300,9 @@ namespace SaccFlightAndVehicles
                 {
                     bombrigid.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                 }
+                UdonSharpBehaviour USB = NewBomb.GetComponent<UdonSharpBehaviour>();
+                if (USB)
+                { USB.SendCustomEvent("EnableWeapon"); }
             }
         }
         public void SetBoolOn()
