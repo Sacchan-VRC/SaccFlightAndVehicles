@@ -404,7 +404,13 @@ namespace SaccFlightAndVehicles
                 string pname = other.transform.GetChild(0).name;
                 getDamageValue(pname, ref dmg);
             }
-            if (dmg < BulletArmorLevel) return;
+            if (dmg <= BulletArmorLevel) return;
+            // probably not a good idea
+            // if (dmg > BulletArmorLevel)
+            // {
+            //     dmg -= BulletArmorLevel;
+            //     dmg = Mathf.Min(dmg, 14);
+            // }
             WeaponDamageVehicle(dmg, other);
         }
         void getDamageValue(string name, ref int dmg)
