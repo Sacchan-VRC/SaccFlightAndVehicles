@@ -177,7 +177,7 @@ namespace SaccFlightAndVehicles
                         string pname = other.collider.transform.GetChild(0).name;
                         getArmorValue(pname, ref Armor);
                     }
-                    bool DoDamage = true;
+                    bool DoDamage = false;
                     dmgLvl = dmgLvl - Armor;
                     if (dmgLvl > 0) DoDamage = true;
                     if (DoDamage) HitVehicle.WeaponDamageVehicle(dmgLvl, gameObject);
