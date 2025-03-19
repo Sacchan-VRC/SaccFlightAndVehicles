@@ -68,11 +68,13 @@ namespace SaccFlightAndVehicles
         public GameObject[] Wings;
         [Header("Tank Stuff:")]
         public bool DoCaterpillarTracks;
+        [Tooltip("Object with the track materials on it")]
+        public Renderer TracksRenderer;
+        [Tooltip("material index of the tracks")]
+        public int[] TrackMaterialSlots;
         public UdonSharpBehaviour[] TrackSourceWheels;
         [System.NonSerialized] public float[] TrackRotations;
-        public Renderer TracksRenderer;
         public Vector2[] TrackSpeedMulti = new Vector2[2];
-        public int[] TrackMaterialSlots;
         [Header("Corresponding arrays must be of equal length")]
         [Tooltip("Extra objects that rotate with the tracks, each with their own speed multiplier\nTrack0/1/2/3 use TrackSourceWheels0/1/2/3")]
         [SerializeField] Transform[] CogWheelsTrack0;
