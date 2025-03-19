@@ -23,7 +23,9 @@ namespace SaccFlightAndVehicles
         public float SuspensionDistance;
         public float WheelRadius;
         public float SpringForceMulti = 8f;
+        [Tooltip("Multiplier for suspension strength when suspension is compressing")]
         public float Damping_Bump = 0.75f;
+        [Tooltip("Multiplier for suspension strength(reduction) when suspension is decompressing")]
         public float Damping_Rebound = 0.7f;
         [Tooltip("Limit suspension force so that the car doesn't jump up when going over a step")]
         public float MaxSusForce = 60f;
