@@ -246,6 +246,10 @@ namespace SaccFlightAndVehicles
             if (Selected_HUD)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }
         }
+        public void SFEXT_O_LoseOwnership()
+        {
+            IsOwner = false;
+        }
         public void SFEXT_G_Explode()
         {
             GunAmmoInSeconds = FullGunAmmoInSeconds;
@@ -305,17 +309,6 @@ namespace SaccFlightAndVehicles
                     // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                 }
             }
-            if (_firing && IsOwner)
-            {
-                if (!GunRecoilEmpty)
-                {
-                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * RecoilForce, ForceMode.Acceleration);
-                }
-                else
-                {
-                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * RecoilForce, GunRecoilEmpty.position, ForceMode.Acceleration);
-                }
-            }
         }
         private GameObject[] AAMTargets;
         private Transform VehicleTransform;
@@ -334,6 +327,18 @@ namespace SaccFlightAndVehicles
         private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                                   //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
         {
+            if (_firing && EntityControl.IsOwner)
+            {
+                if (!GunRecoilEmpty)
+                {
+                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * RecoilForce, ForceMode.Acceleration);
+                }
+                else
+                {
+                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * RecoilForce, GunRecoilEmpty.position, ForceMode.Acceleration);
+                }
+            }
+            if (!IsOwner) return;
             if (Selected && HUDControl)
             {
                 float DeltaTime = Time.fixedDeltaTime;
