@@ -5079,8 +5079,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 200
-      minScalar: 180
+      scalar: 400
+      minScalar: 360
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -7005,12 +7005,12 @@ ParticleSystem:
         m_RotationOrder: 4
     inWorldSpace: 0
   InheritVelocityModule:
-    enabled: 0
+    enabled: 1
     m_Mode: 0
     m_Curve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -7558,7 +7558,7 @@ ParticleSystem:
     inWorldSpace: 0
     multiplyDragByParticleSize: 0
     multiplyDragByParticleVelocity: 0
-    dampen: 0.05
+    dampen: 0.08
     drag:
       serializedVersion: 2
       minMaxState: 0
@@ -25008,6 +25008,7 @@ MonoBehaviour:
   FlareEffect: 10
   RequireParentLock: 0
   PitBullDistance: 0
+  MaxTrackingAngle: 90
   HighAspectTrackAngle: 60
   HighAspectRotSpeedMulti: 0.5
   SendMissileIncoming: 1
