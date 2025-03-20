@@ -10,7 +10,7 @@ namespace SaccFlightAndVehicles
     public class SAV_KillTracker : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
-        private SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         [Tooltip("Leave empty if you just want to use the SFEXT_O_GotKilled and SFEXT_O_GotAKill events for something else")]
         public SaccScoreboard_Kills KillsBoard;
         private bool InEditor;
@@ -18,7 +18,6 @@ namespace SaccFlightAndVehicles
         [SerializeField] private UdonSharpBehaviour KillFeed;
         public void SFEXT_L_EntityStart()
         {
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             gameObject.SetActive(false);//this object never needs to be active
             localPlayer = Networking.LocalPlayer;
             if (localPlayer == null)
@@ -40,12 +39,20 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            resetMyKills();
+        }
+        public void SFEXT_O_OnDrop()
+        {
+            resetMyKills();
+        }
+        void resetMyKills()
+        {
             if (KillsBoard) { KillsBoard.MyKills = 0; }
         }
         public void SFEXT_O_GotAKill()
         {
             //Debug.Log("SFEXT_O_GotAKill");
-            if (!(KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))) { return; }
+            if (!(KillsBoard && EntityControl.Using)) { return; }
             KillsBoard.MyKills++;
             if (KillsBoard.MyKills > KillsBoard.MyBestKills)
             {
