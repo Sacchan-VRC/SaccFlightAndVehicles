@@ -70,12 +70,15 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
                 EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
-                AutoClutch = 1 + ClucthDecaySpeed * AutoClutch_StayPressed;
-                SGVControl.SetProgramVariable("Clutch", Mathf.Max(_ClutchOverride, Mathf.Min(1, AutoClutch)));
-                if (!ClutchTransitioning)
+                if (EntityControl.IsOwner)
                 {
-                    ClutchTransitioning = true;
-                    ClutchTransition();
+                    AutoClutch = 1 + ClutchDecaySpeed * AutoClutch_StayPressed;
+                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(_ClutchOverride, Mathf.Min(1, AutoClutch)));
+                    if (!ClutchTransitioning)
+                    {
+                        ClutchTransitioning = true;
+                        ClutchTransition();
+                    }
                 }
                 _CurrentGear = value;
             }
@@ -83,10 +86,10 @@ namespace SaccFlightAndVehicles
         }
         private float AutoClutch;
         private bool ClutchTransitioning = false;
-        private float ClucthDecaySpeed;
+        private float ClutchDecaySpeed;
         public void ClutchTransition()
         {
-            AutoClutch -= ClucthDecaySpeed * Time.deltaTime;
+            AutoClutch -= ClutchDecaySpeed * Time.deltaTime;
             if (AutoClutch < 0)
             {
                 AutoClutch = 0;
@@ -151,8 +154,8 @@ namespace SaccFlightAndVehicles
                     break;
                 }
             }
-            if (AutoClutch_Length <= 0) { ClucthDecaySpeed = Mathf.Infinity; }
-            else { ClucthDecaySpeed = 1 / AutoClutch_Length; }
+            if (AutoClutch_Length <= 0) { ClutchDecaySpeed = Mathf.Infinity; }
+            else { ClutchDecaySpeed = 1 / AutoClutch_Length; }
             CurrentGear = NeutralGear;
             SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
             gameObject.SetActive(true);
