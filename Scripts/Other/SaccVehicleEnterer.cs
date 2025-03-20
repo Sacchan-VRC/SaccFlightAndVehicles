@@ -10,8 +10,10 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SaccVehicleEnterer : UdonSharpBehaviour
     {
+        public TextMeshProUGUI PilotName;
+        public TextMeshProUGUI MessageText;
+        [Header("For Debug (autofilled):")]
         public Transform[] AllPlanes;
-        private VRCPlayerApi localPlayer;
         void Start()
         {
             players_choosepilot = new VRCPlayerApi[100];
@@ -22,8 +24,7 @@ namespace SaccFlightAndVehicles
         private int MyPilotID;
         private int MyPilotCheck;
         private VRCPlayerApi[] players_choosepilot;
-        public TextMeshProUGUI PilotName;
-        public TextMeshProUGUI MessageText;
+        private VRCPlayerApi localPlayer;
         public void NextPilot()
         {
             int numPlayers = 0;
