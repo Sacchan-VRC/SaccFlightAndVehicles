@@ -19,6 +19,7 @@ namespace SaccFlightAndVehicles
         public float TriggerFireDelay = 0;
         [Tooltip("Camera that renders onto the AtGScreen")]
         public Camera AtGCam;
+        [Tooltip("Gun object whos rotation is synced for shooting in the right direction")]
         public Transform LaserBarrel;
         [Tooltip("Screen that displays target, that is enabled when selected")]
         public GameObject AtGScreen;
@@ -257,14 +258,6 @@ namespace SaccFlightAndVehicles
         private void PullTrigger()
         {
             FiredTime = Time.time;
-            for (int i = 0; i < ToggleBoolDisabler.Length; i++)
-            {
-                bool animon = (bool)ToggleBoolDisabler[i].GetProgramVariable("AnimOn");
-                if (animon)
-                {
-                    ToggleBoolDisabler[i].SendCustomEvent("SetBoolOff");
-                }
-            }
             if (LaserFireSound) { LaserFireSound.PlayOneShot(LaserFireSound.clip); }
             if (TriggerFireDelay == 0)
             {
@@ -303,6 +296,14 @@ namespace SaccFlightAndVehicles
                 UdonSharpBehaviour USB = NewBomb.GetComponent<UdonSharpBehaviour>();
                 if (USB)
                 { USB.SendCustomEvent("EnableWeapon"); }
+            }
+            for (int i = 0; i < ToggleBoolDisabler.Length; i++)
+            {
+                bool animon = (bool)ToggleBoolDisabler[i].GetProgramVariable("AnimOn");
+                if (animon)
+                {
+                    ToggleBoolDisabler[i].SendCustomEvent("SetBoolOff");
+                }
             }
         }
         public void SetBoolOn()
