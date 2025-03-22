@@ -501,6 +501,7 @@ namespace SaccFlightAndVehicles
         {
             NumFUinAvgTime = (int)(GsAveragingTime / Time.fixedDeltaTime);
             FrameGs = new Vector3[NumFUinAvgTime];
+            Gs_all = Vector3.zero;
         }
         private void LateUpdate()
         {
@@ -1594,6 +1595,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigidbody.drag = 0;
                 VehicleRigidbody.angularDrag = 0;
             }
+            SetupGCalcValues();
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -1626,6 +1628,7 @@ namespace SaccFlightAndVehicles
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
             }
+            SetupGCalcValues();
             SetCollidersLayer(EntityControl.OnboardVehicleLayer);
         }
         public void SFEXT_G_PilotEnter()
