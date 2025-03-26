@@ -39,6 +39,8 @@ namespace SaccFlightAndVehicles
                 }
                 RadioBase.SetVehicleVolumeDefault(this);
                 RadioBase.UpdateVehicle(this);
+                if (inVehicle)
+                    UpdateChannelText();
             }
             get => _Channel;
         }
@@ -113,6 +115,7 @@ namespace SaccFlightAndVehicles
         bool ImOnRadio = false;
         public void EnterVehicle()
         {
+            inVehicle = true;
             for (int i = 0; i < RadioSeats.Length; i++)
             {
                 if (RadioSeats[i].SeatedPlayer == localPlayer)
@@ -121,6 +124,7 @@ namespace SaccFlightAndVehicles
                     break;
                 }
             }
+            UpdateChannelText();
             if (!ImOnRadio) { return; }
             if (RadioBase)
             {
@@ -136,7 +140,6 @@ namespace SaccFlightAndVehicles
                 else { NewChannel(); }
                 UpdateChannel();
             }
-            UpdateChannelText();
             if (DFUNCMODE && !controlsRunning && Piloting)
             {
                 controlsRunning = true;
@@ -159,6 +162,7 @@ namespace SaccFlightAndVehicles
         }
         public void ExitVehicle()
         {
+            inVehicle = false;
             if (!ImOnRadio) return;
             ImOnRadio = controlsRunning = false;
             if (RadioBase)
@@ -247,12 +251,10 @@ namespace SaccFlightAndVehicles
                 if (Input.GetKeyDown(ChannelUpKey))
                 {
                     RadioBase.IncreaseChannel();
-                    UpdateChannelText();
                 }
                 if (Input.GetKeyDown(ChannelDownKey))
                 {
                     RadioBase.DecreaseChannel();
-                    UpdateChannelText();
                 }
             }
             else if (Selected)
@@ -301,7 +303,6 @@ namespace SaccFlightAndVehicles
                         else
                         { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                         RadioBase.SetChannel(NewChannel);
-                        UpdateChannelText();
                         CurChannel = NewChannel;
                     }
                 }
@@ -310,8 +311,12 @@ namespace SaccFlightAndVehicles
         }
         private void UpdateChannelText()
         {
-            if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = RadioBase.ChannelText.text; }
-            if (ChannelNumber) { ChannelNumber.text = RadioBase.ChannelText.text; }
+            string channeltxt;
+            if (Channel == 0) channeltxt = "OFF";
+            else channeltxt = Channel.ToString();
+
+            if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = channeltxt; }
+            if (ChannelNumber) { ChannelNumber.text = channeltxt; }
         }
         public void DFUNC_Selected()
         {
