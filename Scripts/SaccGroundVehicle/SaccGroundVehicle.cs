@@ -363,6 +363,7 @@ namespace SaccFlightAndVehicles
         {
             NumFUinAvgTime = (int)(GsAveragingTime / Time.fixedDeltaTime);
             FrameGs = new Vector3[NumFUinAvgTime];
+            Gs_all = Vector3.zero;
         }
         private void Init()
         {
@@ -1185,6 +1186,7 @@ namespace SaccFlightAndVehicles
             AllGs = 0;
             UpdateWheelIsOwner();
             for (int i = 0; i < NumFUinAvgTime; i++) { FrameGs[i] = Vector3.zero; }
+            SetupGCalcValues();
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -1261,6 +1263,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             SetCollidersLayer(EntityControl.OnboardVehicleLayer);
             SetWheelDriver();
+            SetupGCalcValues();
         }
         public void SFEXT_O_PilotExit()
         {
