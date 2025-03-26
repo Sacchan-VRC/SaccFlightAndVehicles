@@ -12,7 +12,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SAV_Radio : UdonSharpBehaviour
     {
-        public SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         [Tooltip("Force this radio to always be on this channel (-1 to disable)")]
         [SerializeField] int ForceChannel = -1;
         [Tooltip("Leave empty to use all seats")]
@@ -32,7 +32,7 @@ namespace SaccFlightAndVehicles
             set
             {
                 _Channel = value;
-                if (EntityControl.InVehicle)
+                if (ImOnRadio)
                 {
                     UpdateChannel();
                     RadioBase.SetAllVoiceVolumesDefault();
@@ -181,8 +181,8 @@ namespace SaccFlightAndVehicles
                 RadioBase.SetProgramVariable("MyRadioSetTimes", mrst);
                 if (mrst == 0)
                 {
-                    RadioBase.SetProgramVariable("MyRadio", null);
                     RadioBase.SetAllVoiceVolumesDefault();
+                    RadioBase.SetProgramVariable("MyRadio", null);
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace SaccFlightAndVehicles
             {
                 RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
             }
-            CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
+            CurrentOwnerID = Networking.GetOwner(gameObject).playerId;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -206,7 +206,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnDrop()
         {
-            VRCPlayerApi ownerAPI = Networking.GetOwner(EntityControl.gameObject);
+            VRCPlayerApi ownerAPI = Networking.GetOwner(gameObject);
             if (ownerAPI == null) { return; }
             if (CurrentOwnerID == ownerAPI.playerId)
             {
@@ -312,8 +312,11 @@ namespace SaccFlightAndVehicles
         private void UpdateChannelText()
         {
             string channeltxt;
-            if (Channel == 0) channeltxt = "OFF";
-            else channeltxt = Channel.ToString();
+            int unPTT_Channel = Channel;
+            if (unPTT_Channel >= 200)
+                unPTT_Channel -= 200;
+            if (unPTT_Channel == 0) channeltxt = "OFF";
+            else channeltxt = unPTT_Channel.ToString();
 
             if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = channeltxt; }
             if (ChannelNumber) { ChannelNumber.text = channeltxt; }

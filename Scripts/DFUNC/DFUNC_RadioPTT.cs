@@ -9,7 +9,8 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class DFUNC_RadioPTT : UdonSharpBehaviour
     {
-        SAV_Radio Radio;
+        [Header("PTT Can only be used by the owner of the SAV_Radio\nIf you want more than one person to be able to use PTT\n you must have another SAV_Radio in their PassengerFunctions")]
+        [SerializeField] SAV_Radio Radio;
         [SerializeField] KeyCode PTT_Key;
         public GameObject Dial_Funcon;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
@@ -19,13 +20,13 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool InVR;
         private bool Piloting;
         public void SFEXT_L_EntityStart()
         {
             InVR = EntityControl.InVR;
-            Radio = (SAV_Radio)EntityControl.GetExtention(GetUdonTypeName<SAV_Radio>());
             Radio.PTT_MODE = true;
             Radio.PTTControl = this;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -33,7 +34,7 @@ namespace SaccFlightAndVehicles
         bool Selected;
         private void Update()
         {
-            if (!Selected && InVR) return;
+            if (!Piloting || !Selected && InVR) return;
             float Trigger;
             if (use_OnPickupUseDown)
                 Trigger = PickupTrigger;

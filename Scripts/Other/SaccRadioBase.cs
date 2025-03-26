@@ -7,6 +7,7 @@ using TMPro;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(100000)]// initialize after everything
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SaccRadioBase : UdonSharpBehaviour
     {
@@ -179,6 +180,10 @@ namespace SaccFlightAndVehicles
                 if (!AllRadios_RD[i].EntityControl.Initialized) continue;
                 for (int o = 0; o < AllRadios_RD[i].RadioSeats.Length; o++)
                 {
+                    if (MyRadio)
+                    {
+                        if (MyRadio.EntityControl.DoVoiceVolumeChange && AllRadios_RD[i].EntityControl == MyRadio.EntityControl) continue;
+                    }
                     if (!AllRadios_RD[i].RadioSeats[o]) continue;
                     VRCPlayerApi thisplayer = AllRadios_RD[i].RadioSeats[o].SeatedPlayer;
                     if (Utilities.IsValid(thisplayer))
