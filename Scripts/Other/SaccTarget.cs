@@ -378,6 +378,8 @@ namespace SaccFlightAndVehicles
         }
         public void RespawnTarget()
         {
+            if (!localPlayer.IsOwner(gameObject))
+            { Networking.SetOwner(localPlayer, gameObject); }
             respawning = false;
             HitPoints = FullHealth;
             SendNetworkUpdate();
@@ -399,6 +401,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
+            if (!player.isLocal) return;
             if (dead)
             {
                 SendNetworkUpdate();
