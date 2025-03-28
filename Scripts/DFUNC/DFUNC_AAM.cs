@@ -350,7 +350,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (!TriggerLastFrame)
                         {
-                            if (DisallowFireIfWind)
+                            if (DisallowFireIfWind && SAVControl)
                             {
                                 if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).sqrMagnitude > 0f)
                                 { return; }
@@ -613,7 +613,7 @@ namespace SaccFlightAndVehicles
                 else { NewAAM.transform.SetParent(null); }
                 NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
                 Rigidbody AAMRB = NewAAM.GetComponent<Rigidbody>();
-                if (AAMRB)
+                if (AAMRB && SAVControl)
                 {
                     if (EntityControl.IsOwner && IsOwner)// these can be different for passenger functions      
                     {
