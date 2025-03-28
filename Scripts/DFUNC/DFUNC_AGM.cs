@@ -37,7 +37,7 @@ namespace SaccFlightAndVehicles
         public AudioSource AGMLock;
         [Tooltip("Sound that plays when the AGM unlocks")]
         public AudioSource AGMUnlock;
-        public LayerMask LockableLayers = 133121;
+        public LayerMask LockableLayermask = -2147350527; // Default, Environment, Walkthrough, OnBoardVehicleLayer
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
         [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
@@ -80,12 +80,14 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int FullAGMs;
         private float FullAGMsDivider;
         private int NumChildrenStart;
+        // public Transform Debug_LockPointRaw, Debug_TransformLock;
         [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
         public Vector3 AGMTarget
         {
             set
             {
-                RaycastHit[] hits = Physics.SphereCastAll(value, 150, Vector3.up, 0, LockableLayers, QueryTriggerInteraction.Ignore);
+                // if (Debug_LockPointRaw) Debug_LockPointRaw.position = value;
+                RaycastHit[] hits = Physics.SphereCastAll(value, 150, Vector3.up, 0, LockableLayermask, QueryTriggerInteraction.Ignore);
                 float NearestDist = float.MaxValue;
                 if (hits.Length > 0)
                 {
@@ -263,7 +265,9 @@ namespace SaccFlightAndVehicles
         private void RaycastLock()
         {
             RaycastHit lockpoint;
-            if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, LockableLayers, QueryTriggerInteraction.Ignore))
+            int layerm = LockableLayermask;
+            layerm &= ~(1 << EntityControl.OnboardVehicleLayer);// remove your own vehicle from the raycast layers
+            if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, layerm, QueryTriggerInteraction.Ignore))
             {
                 AGMTarget = lockpoint.point;
                 AGMLocked = true;
@@ -274,6 +278,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            // if (Debug_TransformLock) Debug_TransformLock.position = TrackedTransform.TransformPoint(TrackedObjectOffset);
             if (func_active)
             {
                 float DeltaTime = Time.deltaTime;
