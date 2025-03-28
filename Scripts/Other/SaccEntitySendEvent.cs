@@ -9,14 +9,18 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class SaccEntitySendEvent : UdonSharpBehaviour
     {
+        [Header("OtherScripts is for sending regular udon events to specific scripts\nRespawning is a regular event for SaccEntity. (it will tell extensions automatically)")]
+        public UdonSharpBehaviour[] OtherScripts;
+        [Tooltip("Name of event to send to OtherScripts (normal udon events)")]
+        public string OtherScripts_Event_Name = string.Empty;
+        public bool OtherScript_EventGlobal = false;
+        [Space(20)]
+        [Header("EntityControl reference is for sending entity events to extensions (but not to SaccEntity itself)")]
         public SaccEntity EntityControl;
         [Tooltip("Name of entity event to send to the SaccEntity (send to all extensions)")]
         public string EntityEventName = string.Empty;
-        [Tooltip("Name of event to send to the SaccEntity (just sent to entity)")]
         public bool EntityEventGlobal = false;
-        public UdonSharpBehaviour[] OtherScripts;
-        public string OtherScripts_Event_Name = string.Empty;
-        public bool OtherScript_EventGlobal = false;
+        [Space(20)]
         [Tooltip("(Optional) Animator to send Trigger to")]
         [SerializeField] Animator AnimTriggerAnimator;
         [SerializeField] string AnimTriggerName;
