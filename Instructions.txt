@@ -4,9 +4,7 @@ Changelog is at the bottom
 
 Contact:
 https://discord.gg/Z7bUDc8
-https://twitter.com/Sacchan_VRC
-Please support me if you like this project:
-https://ko-fi.com/sacchanvrc
+https://x.com/Sacchan_VRC
 
 To install: Extract the SaccFlightAndVehicles folder into your Assets folder
 To update: Use your folder browser to delete your old SaccFlightAndVehicles folder, and replace it with the new one. Don't do it inside Unity.
@@ -24,11 +22,10 @@ Crash_Damage_Speed is the speed at which vehicle will begin to take damage when 
 Vehicles with no canopy should now just tick [x] Seat Out Side Vehicle on the seats.
 The racing system has been updating, Scoreboards and racing triggers will need to be updated.
 	There is now a prefab for RacingTrigger you can use in Prefabs/Accessories
-readme: how to update vehicles with passenger functions (just set the passengerfunctionscontroller in the seat and remove from extension behaviours)
 The passenger functions system has has an overhaul.
 	Each seat's PassengerFunctionsController must now be referenced by the seat, and the reference should be removed from SaccEntity's UdonExtensionBehaviours.
 	all DFUNCP and EXTP scripts have been removed. The PassengerFunctionsController now uses regular DFUNCs.
-		For example, a turret can EXT_Turret to turn, and DFUNC_GUN/AAM/AGM/Bomb to fire a weapon.
+		For example, a turret can use EXT_Turret to turn, and DFUNC_GUN/AAM/AGM/Bomb to fire a weapon.
 		Not all DFUNCs support use with PassengerFunctionsController.
 Planes:
 Set 'Vel Lift' to same as your 'Lift' value to match the old behaviour (Or the same percentage difference
@@ -36,6 +33,7 @@ Air Friction calculation has changed, multiply your existing value by 1.6 and th
 The DFUNC_Flares script can no longer use the KeyboardInputs script, set up the controls from within the DFUNC_Flares object.
 There is a new system for vehicles being 'wrecked', this means their health is below 0 and their engines no longer work so they'll fall out of the sky.
 	The HealthSmoke animation layer's transition now uses the condition 'dead=false' instead of 'health>0' and vice versa in order to do its transitions.
+	Aircraft being on fire is done by the HealthSmoke animation, check the SF-1's HealthSmoke animation to see the difference. The particle system is called 'WreckedFire'
 	There's a new prefab in Prefabs/Effects/ called WreckedPuff that you can add to your vehicle (it's a small explosion that happens the moment the vehicle is 'wrecked').
 		Add it under EffectsController and add it to the EffectsController's WreckedParticles[] array.
 Due to underlying code changes (code being moved from Update() to FixedUpdate() and no longer using the ConstantForce script, vehicles may behave a bit differently and need some tweaking.
@@ -43,6 +41,8 @@ Wing tip trails have been changed (now using particles instead of trail renderer
 The 'beeps' object (the cockpit warning sounds etc) is now disabled by default so that A: the objects are disabled when you're not in the vehicle, and B: They can be enabled per-seat in vehicles
 	Put the SoundController/AttachedSounds/beeps object into either the 'EnableInVehicle[]' array in SaccEntity OR the 'EnableInSeat[]' array on the desired seats.
 The 'Auto Adjust Values To Mass' option has been removed, I'm pretty sure no one was using it anyway
+SF-1's DFUNC_Bomb now has a CCIP system (TrajectoryPredictor), you may want to copy it in to your vehicles. It's a child of the DFUNC_Bomb object.
+	A bomb using this system should have its AirPhysicsStrength set to 0 or it'll calculate incorrectly. Rigidbody drag must not be 0, and is taken into account. SF-1's bomb is using 0.015
 Cars:
 SACCWHEEL SCRIPT NOW USES MANUAL SYNC, YOU MUST CHANGE IT MANUALLY (Synchronization Method), IF YOU DO NOT, WORLD MAY GET VERY LAGGY.
 	If you want a lot more cars(or tanks), you can set Sync Method to None, but other players will not see your skid effects.
@@ -359,7 +359,8 @@ The trigger must be on the correct layer, the one selected in the ResupplyTrigge
 There are 4 kinda of resupply. The default is to resupply all. To use other resupply modes, create a child gameobject of the trigger itself, and name it one of these 3 names: xSUPPLY_FUEL, xSUPPLY_AMMO, xSUPPLY_REPAIR
 
 Target
-A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly.
+A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc.
+You can set it to never respawn by setting respawn delay to 0. You can use a script to respawn it manually if you desire, just called the RespawnTarget event to do so. The script on the vehicle respawn button can do this (SaccEntitySendEvent)
 
 Killsboard
 The board that tells you who has the biggest kill streak and number of vehicles destroyed, requires setup, see above
@@ -396,6 +397,12 @@ A pickup with sliders on it that allow you to control the strength and direction
 
 
 Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix update 1.71
+Fix a bug that caused ownership transfer to cause G calculation to break
+Fix multiple issues with Radio / PTT mode / Passenger mode
+Fix DFUNC_AAM crashing in handheld mode (stinger)
+Fix AGM target point desyncing if locked on to your vehicle by somebody else
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Large update 1.7
 Planes can be shot down instead of instantly exploding
