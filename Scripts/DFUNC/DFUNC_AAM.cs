@@ -613,7 +613,7 @@ namespace SaccFlightAndVehicles
                 else { NewAAM.transform.SetParent(null); }
                 NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
                 Rigidbody AAMRB = NewAAM.GetComponent<Rigidbody>();
-                if (AAMRB && SAVControl)
+                if (AAMRB)
                 {
                     if (EntityControl.IsOwner && IsOwner)// these can be different for passenger functions      
                     {
@@ -625,7 +625,9 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        AAMRB.position = NewAAM.transform.position + (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+                        Vector3 aamrbpos = NewAAM.transform.position;
+                        if (SAVControl) { aamrbpos += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime; }
+                        AAMRB.position = aamrbpos;
                         AAMRB.rotation = NewAAM.transform.rotation;
                     }
                 }
