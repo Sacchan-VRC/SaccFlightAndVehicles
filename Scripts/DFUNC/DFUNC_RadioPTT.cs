@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
         [SerializeField] bool ToggleMode = false;
+        [SerializeField] bool Toggle_DefaultOn = true;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
@@ -119,6 +120,8 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(true);
             InVR = EntityControl.InVR;
             Piloting = true;
+            if (ToggleMode && Toggle_DefaultOn)
+            { PTT_ON(); }
         }
         public void SFEXT_O_PilotExit()
         {
