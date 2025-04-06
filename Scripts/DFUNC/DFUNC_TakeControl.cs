@@ -23,6 +23,12 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
+        [SerializeField] private SAV_Radio PilotRadio;
+        int PilotRadio_SeatIndex = -1;
+        bool PilotRadio_DoSwap;
+        [SerializeField] private SAV_Radio ThisSeatRadio;
+        int ThisSeatRadio_SeatIndex = -1;
+        bool ThisSeatRadio_DoSwap = false;
         private SaccVehicleSeat PilotSVSeat;
         private bool TriggerLastFrame;
         private bool IsUser;
@@ -57,6 +63,41 @@ namespace SaccFlightAndVehicles
                     MoveTransformsPos_Orig[i] = MoveTransforms[i].localPosition;
                     MoveTransformsRot_Orig[i] = MoveTransforms[i].localRotation;
                 }
+            }
+            bool thisSVSeatFound = false;
+            bool PilotSVSeatFound = false;
+            if (PilotRadio && PilotRadio.RadioSeats.Length > 0)
+            {
+                for (int i = 0; i < PilotRadio.RadioSeats.Length; i++)
+                {
+                    if (PilotRadio.RadioSeats[i] == PilotSVSeat)
+                    {
+                        PilotRadio_SeatIndex = i;
+                        PilotSVSeatFound = true;
+                    }
+                    if (PilotRadio.RadioSeats[i] == ThisSVSeat)
+                    { thisSVSeatFound = true; }
+                    if (thisSVSeatFound && PilotSVSeatFound) { break; }
+                }
+                if (!thisSVSeatFound) PilotRadio_DoSwap = true;
+            }
+
+            thisSVSeatFound = false;
+            PilotSVSeatFound = false;
+            if (ThisSeatRadio && ThisSeatRadio.RadioSeats.Length > 0)
+            {
+                for (int i = 0; i < ThisSeatRadio.RadioSeats.Length; i++)
+                {
+                    if (ThisSeatRadio.RadioSeats[i] == ThisSVSeat)
+                    {
+                        ThisSeatRadio_SeatIndex = i;
+                        thisSVSeatFound = true;
+                    }
+                    if (ThisSeatRadio.RadioSeats[i] == PilotSVSeat)
+                    { PilotSVSeatFound = true; }
+                    if (thisSVSeatFound && PilotSVSeatFound) { break; }
+                }
+                if (!PilotSVSeatFound) ThisSeatRadio_DoSwap = true;
             }
         }
         public void TakeControl()
@@ -95,6 +136,11 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.PassengerFunctions = PilotPassengerFunctions;
             PilotSVSeat.IsPilotSeat = false;
             ThisSVSeat.IsPilotSeat = true;
+
+            if (PilotRadio_DoSwap)
+            { PilotRadio.RadioSeats[PilotRadio_SeatIndex] = ThisSVSeat; }
+            if (ThisSeatRadio_DoSwap)
+            { ThisSeatRadio.RadioSeats[ThisSeatRadio_SeatIndex] = PilotSVSeat; }
 
             ThisSVSeat.OnStationEntered(SeatAPI);
             PilotSVSeat.OnStationEntered(PilotSeatAPI);
@@ -141,6 +187,11 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.PassengerFunctions = ThisPassengerFunctions;
             PilotSVSeat.IsPilotSeat = true;
             ThisSVSeat.IsPilotSeat = false;
+
+            if (PilotRadio_DoSwap)
+            { PilotRadio.RadioSeats[PilotRadio_SeatIndex] = PilotSVSeat; }
+            if (ThisSeatRadio_DoSwap)
+            { ThisSeatRadio.RadioSeats[ThisSeatRadio_SeatIndex] = ThisSVSeat; }
 
             ThisSVSeat.OnStationEntered(SeatAPI);
             PilotSVSeat.OnStationEntered(PilotSeatAPI);
