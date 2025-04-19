@@ -497,7 +497,7 @@ namespace SaccFlightAndVehicles
                 ForceVector = GripForce3;
                 ForceUsedDBG = ForceUsed;
 #endif
-                if (IsDriveWheel && !TankMode)
+                if (IsDriveWheel && !TankMode && !GearNeutral)
                     WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, ForwardSpeed, Clutch);
                 else
                     WheelRotationSpeedSurf = ForwardSpeed;
