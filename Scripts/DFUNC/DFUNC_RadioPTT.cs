@@ -92,15 +92,14 @@ namespace SaccFlightAndVehicles
                 PTT_OFF();
             }
         }
-        void PTT_ON()
+        public void PTT_ON()
         {
-            if (Radio.Channel == 0) return; // 0 means Radio off
             if (!PTT_ACTIVE)
             {
-                if (Radio.Channel < 200) return; // should never be true but will prevent crash if it is (byte)
                 PTT_ACTIVE = true;
-                Radio.Channel -= 200;
-                Radio.RequestSerialization();
+                if (Radio.Channel >= 200)
+                { Radio.Channel -= 200; }
+                Radio.NewChannel();
                 if (Dial_Funcon) Dial_Funcon.SetActive(true);
             }
         }
@@ -108,10 +107,10 @@ namespace SaccFlightAndVehicles
         {
             if (PTT_ACTIVE)
             {
-                if (Radio.Channel > 55) return;
                 PTT_ACTIVE = false;
-                Radio.Channel += 200;
-                Radio.RequestSerialization();
+                if (Radio.Channel <= 55)
+                { Radio.Channel += 200; }
+                Radio.NewChannel();
                 if (Dial_Funcon) Dial_Funcon.SetActive(false);
             }
         }
@@ -121,7 +120,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             Piloting = true;
             if (ToggleMode && Toggle_DefaultOn)
-            { PTT_ON(); }
+            { SendCustomEventDelayedFrames(nameof(PTT_ON), 15); }//ensure SAV_Radio's SFEXT_O_PilotEnter() has run first
         }
         public void SFEXT_O_PilotExit()
         {
