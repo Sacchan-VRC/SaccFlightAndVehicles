@@ -1017,7 +1017,7 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
                 revUpDT = 1f / NumStepsSec; // so adjusting in play mode works
 #endif
-                float engineTimeDif = Time.fixedTime - engineTime;
+                double engineTimeDif = Time.fixedTimeAsDouble - engineTime;
                 // works out the number of steps, 
                 int numupdates = (int)(engineTimeDif / revUpDT);
                 // make sure its even (if doing too many, less will be done next frame so it's okay)
@@ -1053,7 +1053,7 @@ namespace SaccFlightAndVehicles
         }
         [System.NonSerialized] public float EngineForceUsed;
         float revUpDT;
-        float engineTime;
+        double engineTime;
         private void RevUp()
         {
             engineTime += revUpDT;
@@ -1256,7 +1256,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            engineTime = Time.fixedTime;
+            engineTime = Time.fixedTimeAsDouble;
             TANK_Cruising = false;
             System.Array.Clear(TankThrottles, 0, 2);
             AllGs = 0f;
