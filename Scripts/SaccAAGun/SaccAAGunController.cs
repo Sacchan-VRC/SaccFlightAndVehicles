@@ -18,6 +18,10 @@ namespace SaccFlightAndVehicles
         [Range(0, 2)]
         [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
         public int MissileType = 1;
+        [Tooltip("Animator float that represents how many missiles are left")]
+        public string AnimFloatName = "AAMs";
+        [Tooltip("Animator trigger that is set when a missile is launched")]
+        public string AnimFiredTriggerName = "aamlaunched";
         [Tooltip("Audio source that plays when rotating")]
         public AudioSource RotatingSound;
         public float RotatingSoundMulti = .02f;
@@ -27,6 +31,8 @@ namespace SaccFlightAndVehicles
         public AudioSource AAMTargetLock;
         [Tooltip("Sound that plays when a target is hit")]
         public AudioSource DamageFeedBack;
+        [Tooltip("Sound that plays when missile is fired")]
+        public AudioSource AAMLaunchSound;
         [Tooltip("Joystick object that moves around in to show rotation inputs")]
         public Transform JoyStick;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
@@ -73,7 +79,7 @@ namespace SaccFlightAndVehicles
         public float LockTimeMinDivide = .2f;
         [Tooltip("Minimum time between missile launches")]
         public float AAMLaunchDelay = 0f;
-        [Tooltip("Point missile is launched from, flips on local X each time fired")]
+        [Tooltip("Point missile is launched from, usually animated")]
         public Transform AAMLaunchPoint;
         [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
         public bool AllowNoAmmoLock = false;
@@ -91,7 +97,10 @@ namespace SaccFlightAndVehicles
         public bool OnlyTargetVehicles;
         [Tooltip("Multiplies how much damage is taken from bullets")]
         public float BulletDamageTaken = 10f;
+        [Tooltip("Fired AAMs will be parented to this object, use if you happen to have some kind of moving origin system")]
+        public Transform WorldParent;
         private float HighAspectPreventLockAngleDot;
+        private bool DoAnimFiredTrigger;
         private bool TriggerLastFrame;
         [Tooltip("Layers to check raycast hits for (in place of OnboardVehicleLayer and OutsideVehicleLayer) (OnboardVehicleLayer is required for an AAGun you own to target yourself)")]
         [SerializeField] private int[] TargetLayers = { 17, 31 };
@@ -111,6 +120,7 @@ namespace SaccFlightAndVehicles
         private float MGAmmoRecharge = 0;
         [System.NonSerializedAttribute] public float MGAmmoFull = 4;
         private float FullMGDivider;
+        [System.NonSerializedAttribute] public UdonSharpBehaviour SAVControl = null; // prevent warning
         [System.NonSerializedAttribute] public Animator AAGunAnimator;
         [System.NonSerializedAttribute] public float FullHealth;
         [System.NonSerializedAttribute] public bool Manning = false;//like Piloting in the plane
@@ -211,6 +221,7 @@ namespace SaccFlightAndVehicles
             HUDControl.RemoteInit();
             if (MGAmmoFull <= 0) AI_GUN_NOGUN = true;
             if (IsOwner && AI_GUN) { AI_GUN_Enter(); }
+            if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
 
             NumChildrenStart = transform.childCount;
             int NumToInstantiate = Mathf.Min(FullAAMs, 10);
@@ -859,43 +870,41 @@ namespace SaccFlightAndVehicles
             if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
             {
                 FireNextSerialization = true;
-                RequestSerialization();
                 LaunchAAM();
                 if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; }
+                RequestSerialization();
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }
         public void LaunchAAM()
         {
+            if (AAMLaunchSound) { AAMLaunchSound.PlayOneShot(AAMLaunchSound.clip); }
             AAMLastFiredTime = Time.time;
             if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-            AAGunAnimator.SetTrigger("aamlaunched");
-            GameObject NewAAM;
-            if (transform.childCount - NumChildrenStart > 0)
-            { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
-            else
-            { NewAAM = InstantiateWeapon(); }
-            NewAAM.transform.SetParent(null);
-            if (!(NumAAM % 2 == 0))
+            if (AAGunAnimator && DoAnimFiredTrigger) { AAGunAnimator.SetTrigger(AnimFiredTriggerName); }
+            if (AAM)
             {
-                //invert local x coordinates of launch point, launch, then revert, for odd numbered shots
-                Vector3 temp = AAMLaunchPoint.localPosition;
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-                NewAAM.transform.position = AAMLaunchPoint.transform.position;
-                NewAAM.transform.rotation = AAMLaunchPoint.transform.rotation;
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-            }
-            else
-            {
-                NewAAM.transform.position = AAMLaunchPoint.transform.position;
-                NewAAM.transform.rotation = AAMLaunchPoint.transform.rotation;
-            }
-            NewAAM.SetActive(true);
-            NewAAM.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GameObject NewAAM;
+                if (transform.childCount - NumChildrenStart > 0)
+                { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
+                else
+                { NewAAM = InstantiateWeapon(); }
+                if (WorldParent) { NewAAM.transform.SetParent(WorldParent); }
+                else { NewAAM.transform.SetParent(null); }
+                NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
 
-            AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+                NewAAM.SetActive(true);
+                UdonSharpBehaviour USB = NewAAM.GetComponent<UdonSharpBehaviour>();
+                if (USB)
+                { USB.SendCustomEvent("EnableWeapon"); }
+            }
+            UpdateAmmoVisuals();
+        }
+        public void UpdateAmmoVisuals()
+        {
+            if (AAGunAnimator) { AAGunAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
+            // done in SAAG_HUDController.cs
+            // if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
         }
         public void ReloadAAM()
         {
