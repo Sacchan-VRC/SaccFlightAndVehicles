@@ -1076,10 +1076,12 @@ namespace SaccFlightAndVehicles
         public void Explode()
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
-            EntityControl.wrecked = true;//compatability
-            EntityControl.dead = true;
             Health = FullHealth;
             HasFuel_ = true;
+            if (!EntityControl.wrecked) { EntityControl.SetWrecked(); }
+            EntityControl.dead = true;
+            EntityControl.SendEventToExtensions("SFEXT_G_Explode");
+
             if (IsOwner)
             {
                 YawInput = 0;
@@ -1088,7 +1090,6 @@ namespace SaccFlightAndVehicles
                 EntityControl.SendEventToExtensions("SFEXT_O_Explode");
                 SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
             }
-            EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
             SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay + Time.fixedDeltaTime * 2);
             SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
@@ -1101,7 +1102,7 @@ namespace SaccFlightAndVehicles
         public void ReAppear()
         {
             EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
-            EntityControl.wrecked = false;//compatability
+            EntityControl.SetWreckedFalse();//compatability
             if (IsOwner)
             {
                 if (!UsingManualSync)
@@ -1391,8 +1392,11 @@ namespace SaccFlightAndVehicles
                 float thisGDMG = (colmag_dmg / Crash_Death_Speed) * FullHealth;
                 Health -= thisGDMG;
 
-                if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
-                { NetworkExplode(); }
+                if (Health <= 0 /* && thisGDMG > FullHealth * 0.5f (This is for if wrecked is implemented) */)
+                {
+                    if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_Suicide"); }
+                    NetworkExplode();
+                }
             }
             if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
             {

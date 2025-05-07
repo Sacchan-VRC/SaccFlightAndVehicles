@@ -1032,7 +1032,6 @@ namespace SaccFlightAndVehicles
         public void Explode()
         {
             if (EntityControl._dead) { return; }
-            EntityControl.dead = true;
             SetEngineOff();
             PlayerThrottle = 0;
             ThrottleInput = 0;
@@ -1041,6 +1040,8 @@ namespace SaccFlightAndVehicles
             Fuel = FullFuel;
             Yawing = Vector3.zero;
 
+            if (!EntityControl.wrecked) { EntityControl.SetWrecked(); }
+            EntityControl.dead = true;
             EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
             SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay + Time.fixedDeltaTime * 2);
@@ -1094,6 +1095,7 @@ namespace SaccFlightAndVehicles
         public void ReAppear()
         {
             EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
+            EntityControl.SetWreckedFalse();//compatability
             if (IsOwner)
             {
                 if (!UsingManualSync)
@@ -1515,8 +1517,11 @@ namespace SaccFlightAndVehicles
                 float thisGDMG = (colmag_dmg / CrashDmg_MaxSpeed) * FullHealth;
                 Health -= thisGDMG;
 
-                if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
-                { NetworkExplode(); }
+                if (Health <= 0 /* && thisGDMG > FullHealth * 0.5f (This is for if wrecked is implemented) */)
+                {
+                    if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_Suicide"); }
+                    NetworkExplode();
+                }
             }
             if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
             {

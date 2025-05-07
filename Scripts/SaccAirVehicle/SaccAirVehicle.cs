@@ -789,7 +789,7 @@ namespace SaccFlightAndVehicles
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
 
-            if (ExplodeHealth >= 0) { ExplodeHealth = -0.0001f; }// /0
+            if (ExplodeHealth > 0) { ExplodeHealth = 0f; }
 
             SetupGCalcValues();
         }
@@ -828,7 +828,7 @@ namespace SaccFlightAndVehicles
                         Health -= GDamageToTake * .01f * GDamage;//take damage of GDamage per second per G above MaxGs
                         GDamageToTake = 0;
                     }
-                    if (Health < ExplodeHealth)
+                    if (Health <= ExplodeHealth)
                     {
                         NetworkExplode();
                     }
@@ -1499,7 +1499,7 @@ namespace SaccFlightAndVehicles
                     VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
                     if (wrecked)
                     {
-                        float negHealthPc = -Health / -ExplodeHealth;
+                        float negHealthPc = Mathf.Clamp01(-Health / ExplodeHealth);
                         VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
                         VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc) * RBMass, ForceMode.Force);
                     }
@@ -1560,7 +1560,6 @@ namespace SaccFlightAndVehicles
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             FallAsleep();
-            EntityControl.dead = true;
             SetEngineOff();
             PlayerThrottle = 0;
             ThrottleInput = 0;
@@ -1577,6 +1576,8 @@ namespace SaccFlightAndVehicles
             Yawing = Vector3.zero;
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
 
+            if (!EntityControl.wrecked) { EntityControl.SetWrecked(); }
+            EntityControl.dead = true;
             EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
             SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay + Time.fixedDeltaTime * 2);//the deltatime*2 makes sure it happens after the animation is over, probably (fix for it retaining some angular momentum on spawn)
@@ -2078,8 +2079,14 @@ namespace SaccFlightAndVehicles
                 float thisGDMG = (colmag_dmg / Crash_Death_Speed) * FullHealth;
                 Health -= thisGDMG;
 
-                if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
-                { NetworkExplode(); }
+                if (Health <= 0)
+                {
+                    if (thisGDMG > FullHealth * 0.5f || Health <= ExplodeHealth)
+                    {
+                        if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_Suicide"); }
+                        NetworkExplode();
+                    }
+                }
             }
             if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
             {
