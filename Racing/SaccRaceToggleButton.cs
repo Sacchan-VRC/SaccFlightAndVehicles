@@ -70,20 +70,9 @@ namespace SaccFlightAndVehicles
         }
         private void Start()
         {
-            if (CurrentCourseSelection == -1) //-1 = all races disabled
+            foreach (SaccRaceCourseAndScoreboard race in Races)
             {
-                foreach (SaccRaceCourseAndScoreboard race in Races)
-                {
-                    race.RaceObjects.SetActive(false);
-                }
-            }
-            else
-            {
-                if (CurrentCourseSelection != -1)
-                {
-                    foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
-                    { RaceTrig.gameObject.SetActive(true); }
-                }
+                race.RaceObjects.SetActive(false);
             }
             int course = CurrentCourseSelection;
             AutomaticRaceSelection = _AutomaticRaceSelection;
