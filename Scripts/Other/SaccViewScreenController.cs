@@ -16,6 +16,8 @@ namespace SaccFlightAndVehicles
         public Camera Cam;
         [Tooltip("Screen that is enabled when turned on")]
         public GameObject ViewScreen;
+        public GameObject OnButton;
+        public GameObject SyncToggle;
         public bool DisableSwitchToDead;
         [Header("Campositions are filled on build, check it's tooltip")]
         [Tooltip("Disable the auto fill?")]
@@ -27,11 +29,15 @@ namespace SaccFlightAndVehicles
         public bool ShowChannelNumber = true;
         private float StartFov;
         [System.NonSerializedAttribute] public GameObject[] CamTargets = new GameObject[0];
+        public int CurrentTarget_Local;
+        bool syncedChannel = true;
         [UdonSynced, FieldChangeCallback(nameof(CurrentTarget)), System.NonSerializedAttribute] public int _CurrentTarget;
         public int CurrentTarget
         {
             set
             {
+                if (syncedChannel)
+                { CurrentTarget_Local = value; }
                 _CurrentTarget = value;
                 if (!Disabled)
                 {
@@ -108,17 +114,19 @@ namespace SaccFlightAndVehicles
         {
             if (TargetEntity)
             {
-                ChannelNumberText.text = (ShowChannelNumber ? (CurrentTarget + 1).ToString() + "\n" : "") + TargetEntity.UsersName;
+                ChannelNumberText.text = (ShowChannelNumber ? (CurrentTarget_Local + 1).ToString() + "\n" : "") + TargetEntity.UsersName;
             }
             else
             {
                 if (ShowChannelNumber)
-                { ChannelNumberText.text = string.Concat((CurrentTarget + 1).ToString()); }
+                { ChannelNumberText.text = string.Concat((CurrentTarget_Local + 1).ToString()); }
             }
         }
         public void TurnOff()
         {
             if (Disabled) { return; }
+            if (OnButton) OnButton.SetActive(true);
+            if (SyncToggle) SyncToggle.SetActive(false);
             Disabled = true;
             ViewScreen.SetActive(false);
             Cam.gameObject.SetActive(false);
@@ -127,10 +135,12 @@ namespace SaccFlightAndVehicles
         public void TurnOn()
         {
             if (!Disabled) { return; }
+            if (OnButton) OnButton.SetActive(false);
+            if (SyncToggle) SyncToggle.SetActive(true);
             Disabled = false;
             Cam.gameObject.SetActive(true);
             ViewScreen.SetActive(true);
-            CameraTransform.parent = CamPositions[CurrentTarget];
+            CameraTransform.parent = CamPositions[CurrentTarget_Local];
             CameraTransform.localPosition = Vector3.zero;
             CameraTransform.localRotation = Quaternion.identity;
             UpdateCamera();
@@ -138,13 +148,8 @@ namespace SaccFlightAndVehicles
         }
         public void ChannelUp()
         {
-            if (!Networking.LocalPlayer.IsOwner(gameObject))
-            {
-                Networking.SetOwner(localPlayer, gameObject);
-            }
-
             int NumCameras = CamPositions.Length;
-            int nextcam = CurrentTarget + 1;
+            int nextcam = CurrentTarget_Local + 1;
             if (nextcam >= NumCameras) { nextcam = 0; }
             int numchecks = 0;
 
@@ -167,17 +172,23 @@ namespace SaccFlightAndVehicles
                 if (nextcam >= NumCameras) { nextcam = 0; }
                 numchecks++;
             }
-            CurrentTarget = nextcam;
-            RequestSerialization();
+            if (syncedChannel)
+            {
+                if (!Networking.LocalPlayer.IsOwner(gameObject))
+                { Networking.SetOwner(localPlayer, gameObject); }
+                CurrentTarget = nextcam;
+                RequestSerialization();
+            }
+            else
+            {
+                CurrentTarget_Local = nextcam;
+                UpdateCamera();
+            }
         }
         public void ChannelDown()
         {
-            if (!Networking.LocalPlayer.IsOwner(gameObject))
-            {
-                Networking.SetOwner(localPlayer, gameObject);
-            }
             int NumCameras = CamPositions.Length;
-            int nextcam = CurrentTarget - 1;
+            int nextcam = CurrentTarget_Local - 1;
             if (nextcam < 0) { nextcam = NumCameras - 1; }
             int numchecks = 0;
 
@@ -200,15 +211,34 @@ namespace SaccFlightAndVehicles
                 if (nextcam < 0) { nextcam = NumCameras - 1; }
                 numchecks++;
             }
-            CurrentTarget = nextcam;
-            RequestSerialization();
+            if (syncedChannel)
+            {
+                if (!Networking.LocalPlayer.IsOwner(gameObject))
+                { Networking.SetOwner(localPlayer, gameObject); }
+                CurrentTarget = nextcam;
+                RequestSerialization();
+            }
+            else
+            {
+                CurrentTarget_Local = nextcam;
+                UpdateCamera();
+            }
+        }
+        public void ToggleSyncedChannel()
+        {
+            syncedChannel = !syncedChannel;
+            if (syncedChannel)
+            {
+                CurrentTarget_Local = _CurrentTarget;
+            }
+            UpdateCamera();
         }
         public void UpdateCamera()
         {
-            if (CamPositions[CurrentTarget])
+            if (CamPositions[CurrentTarget_Local])
             {
-                CameraTransform.parent = CamPositions[CurrentTarget];
-                string camname = CamPositions[CurrentTarget].name;
+                CameraTransform.parent = CamPositions[CurrentTarget_Local];
+                string camname = CamPositions[CurrentTarget_Local].name;
                 if (camname.Contains("FOV:"))
                 {
                     string[] FovSplit = camname.Split(':');
@@ -229,9 +259,9 @@ namespace SaccFlightAndVehicles
             }
             CameraTransform.localPosition = Vector3.zero;
             CameraTransform.localRotation = Quaternion.identity;
-            if (CamTargets[CurrentTarget])
+            if (CamTargets[CurrentTarget_Local])
             {
-                TargetEntity = CamTargets[CurrentTarget].GetComponent<SaccEntity>();
+                TargetEntity = CamTargets[CurrentTarget_Local].GetComponent<SaccEntity>();
             }
             else
             {
