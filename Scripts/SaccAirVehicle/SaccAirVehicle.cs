@@ -1499,7 +1499,7 @@ namespace SaccFlightAndVehicles
                     VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
                     if (wrecked)
                     {
-                        float negHealthPc = Mathf.Clamp01(-Health / ExplodeHealth);
+                        float negHealthPc = Mathf.Clamp01(Health / ExplodeHealth);
                         VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
                         VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc) * RBMass, ForceMode.Force);
                     }
