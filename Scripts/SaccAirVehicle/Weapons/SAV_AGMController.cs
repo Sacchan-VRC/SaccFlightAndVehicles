@@ -41,9 +41,14 @@ namespace SaccFlightAndVehicles
         public int ArmorPenetrationLevel = 5;
         [Header("Knockback")]
         [SerializeField] float KnockbackRadius = 0;
-        [SerializeField] bool KnobckbackModeAcceleration = false;
-        [SerializeField] float KnockbackStrength_rigidbody = 150f;
-        [SerializeField] float KnockbackStrength_players = 1.5f;
+        [SerializeField] bool KnockbackModeAcceleration = false;
+        [SerializeField] float KnockbackStrength_rigidbody = 3750f;
+        [SerializeField] float KnockbackStrength_players = 10f;
+        [SerializeField] private bool ExpandingShockwave = false;
+        [Tooltip("Set damage level using the bullet damage system, (-9 - 14)")]
+        [SerializeField] private int Shockwave_damage_level = -999;
+        [SerializeField] private float ExpandingShockwave_Speed = 343f;
+        [SerializeField] private Transform shockWaveSphere;
         private Animator MissileAnimator;
         [System.NonSerialized] public SaccEntity EntityControl;
         private bool StartTrack = false;
@@ -70,6 +75,8 @@ namespace SaccFlightAndVehicles
             VehicleRigid = EntityControl.VehicleRigidbody;
             MissileAnimator = gameObject.GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
+            if (ExpandingShockwave)
+            { ExplosionLifeTime = Mathf.Max(ExplosionLifeTime, KnockbackRadius / ExpandingShockwave_Speed); }
         }
         public void EnableWeapon()
         {
@@ -221,7 +228,10 @@ namespace SaccFlightAndVehicles
         private void Explode()
         {
             if (AGMRigid)
-            { AGMRigid.constraints = RigidbodyConstraints.FreezePosition; }
+            {
+                AGMRigid.constraints = RigidbodyConstraints.FreezePosition;
+                AGMRigid.velocity = Vector3.zero;
+            }
             Exploding = true;
             if (hitwater && WaterExplosionSounds.Length > 0)
             {
@@ -247,16 +257,33 @@ namespace SaccFlightAndVehicles
 
 
             if (KnockbackRadius == 0) return;
+            if (ExpandingShockwave)
+            {
+                _ExpandingShockwave_Speed = ExpandingShockwave_Speed;
+            }
+            else
+            {
+                _ExpandingShockwave_Speed = 0;
+                CurrentShockwave = KnockbackRadius;
+            }
+            if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(true);
+            Shockwave();
+        }
+        float CurrentShockwave;
+        float _ExpandingShockwave_Speed;
+        public void Shockwave()
+        {
+            CurrentShockwave += ExpandingShockwave_Speed * Time.deltaTime;
+            if (shockWaveSphere) shockWaveSphere.localScale = Vector3.one * CurrentShockwave * 2;
             //rigidbodies
-            int numHits = Physics.OverlapSphereNonAlloc(transform.position, KnockbackRadius, hitobjs);
-            int numRBs = 0;
+            int numHits = Physics.OverlapSphereNonAlloc(transform.position, CurrentShockwave, hitobjs);
             for (int i = 0; i < numHits; i++)
             {
                 if (!hitobjs[i]) continue;
                 Rigidbody thisRB = hitobjs[i].attachedRigidbody;
                 if (!thisRB) continue;
                 bool gayflag = false;
-                for (int o = 0; o < numRBs; o++)
+                for (int o = 0; o < numHitRBs; o++)
                 {
                     if (thisRB == HitRBs[o])
                     {
@@ -265,34 +292,59 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 if (gayflag) continue;
-                HitRBs[numRBs] = thisRB;
-                numRBs++;
-                if (numRBs == 30) break;
-            }
-            for (int i = 0; i < numRBs; i++)
-            {
-                if (HitRBs[i].isKinematic) continue;
-                Vector3 explosionDirRB = HitRBs[i].worldCenterOfMass - transform.position;
-                float knockbackRB = KnockbackRadius - explosionDirRB.magnitude;
+                HitRBs[numHitRBs] = thisRB;
+                numHitRBs++;
+                if (numHitRBs == 30) break;
+
+
+                if (thisRB.isKinematic) continue;
+                Vector3 explosionDirRB = thisRB.worldCenterOfMass - transform.position;
+                float knockbackRB = (KnockbackRadius - explosionDirRB.magnitude) / KnockbackRadius;
                 if (knockbackRB > 0)
                 {
-                    HitRBs[i].AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnobckbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
-                    SaccEntity hitEntity = HitRBs[i].GetComponent<SaccEntity>();
+                    thisRB.AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnockbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
+                    SaccEntity hitEntity = thisRB.GetComponent<SaccEntity>();
                     if (hitEntity && hitEntity.IsOwner)
                     {
                         hitEntity.SendEventToExtensions("SFEXT_L_WakeUp");
+                        if (Shockwave_damage_level > -10)
+                        {
+                            hitEntity.SendDamageEvent(Shockwave_damage_level);
+                        }
                     }
                 }
             }
-            //players
-            Vector3 explosionDir = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - transform.position;
-            float knockback = KnockbackRadius - explosionDir.magnitude;
-            if (knockback > 0)
+            if (!ShockwaveHitMe)
             {
-                Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + KnockbackStrength_players * knockback * explosionDir.normalized);
+                if (Vector3.Distance(Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position, transform.position) < CurrentShockwave)
+                {
+                    //players
+                    Vector3 explosionDir = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - transform.position;
+                    float knockback = (KnockbackRadius - explosionDir.magnitude) / KnockbackRadius;
+                    if (knockback > 0)
+                    {
+                        Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + KnockbackStrength_players * knockback * explosionDir.normalized);
+                    }
+                    ShockwaveHitMe = true;
+                }
+            }
+
+            if (CurrentShockwave < KnockbackRadius && ExpandingShockwave)
+            {
+                SendCustomEventDelayedFrames(nameof(Shockwave), 1);
+            }
+            else
+            {
+                CurrentShockwave = 0;
+                ShockwaveHitMe = false;
+                numHitRBs = 0;
+                Rigidbody[] HitRBs = new Rigidbody[30];
+                if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(false);
             }
         }
+        bool ShockwaveHitMe;
         Collider[] hitobjs = new Collider[100];
+        uint numHitRBs;
         Rigidbody[] HitRBs = new Rigidbody[30];
     }
 }
