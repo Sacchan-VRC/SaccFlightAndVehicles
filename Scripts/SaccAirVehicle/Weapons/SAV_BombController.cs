@@ -51,6 +51,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] bool KnockbackModeAcceleration = false;
         [SerializeField] float KnockbackStrength_rigidbody = 3750f;
         [SerializeField] float KnockbackStrength_players = 10f;
+        [SerializeField] float KnockbackStrength_players_vert = 2f;
         [SerializeField] private bool ExpandingShockwave = false;
         [Tooltip("Set damage level using the bullet damage system, (-9 - 14)")]
         [SerializeField] private int Shockwave_damage_level = -999;
@@ -402,7 +403,9 @@ namespace SaccFlightAndVehicles
                     float knockback = (KnockbackRadius - explosionDir.magnitude) / KnockbackRadius;
                     if (knockback > 0)
                     {
-                        Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + KnockbackStrength_players * knockback * explosionDir.normalized);
+                        Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + (KnockbackStrength_players * knockback * explosionDir.normalized) +
+                        KnockbackStrength_players_vert * knockback * Vector3.up
+                        );
                     }
                     ShockwaveHitMe = true;
                 }
