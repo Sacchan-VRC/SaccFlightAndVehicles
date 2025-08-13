@@ -297,8 +297,7 @@ namespace SaccFlightAndVehicles
                             // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                         }
                     }
-                    if (HUDControl)
-                    { Hud(); }
+                    Hud();
                     UpdateAmmoVisuals();
                 }
                 else if (_firing)
@@ -339,11 +338,11 @@ namespace SaccFlightAndVehicles
                 }
             }
             if (!IsOwner) return;
-            if (Selected && HUDControl)
+            if (Selected)
             {
                 float DeltaTime = Time.fixedDeltaTime;
                 var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                Vector3 HudControlPosition = HUDControl.transform.position;
+                Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
                 //check 1 target per frame to see if it's infront of us and worthy of being our current target
@@ -512,11 +511,12 @@ namespace SaccFlightAndVehicles
         {
             if (GUNHasTarget)
             {
+                Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 if (TargetIndicator)
                 {
                     //Target Indicator
                     TargetIndicator.gameObject.SetActive(true);
-                    TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
+                    TargetIndicator.position = HudControlPosition + AAMCurrentTargetDirection;
                     TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
                     TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - HUDControl.transform.position, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                 }
@@ -525,7 +525,6 @@ namespace SaccFlightAndVehicles
                 {
                     //GUN Lead Indicator
                     float deltaTime = Time.deltaTime;
-                    Vector3 HudControlPosition = HUDControl.transform.position;
                     GUNLeadIndicator.gameObject.SetActive(true);
                     Vector3 TargetPos;
                     if (!AAMCurrentTargetSAVControl)//target is a dummy target
@@ -551,7 +550,7 @@ namespace SaccFlightAndVehicles
                     GUNLeadIndicator.position = PredictedPos;
                     //move lead indicator to match the distance of the rest of the hud
                     GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
-                    GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HUDControl.transform.position, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
+                    GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HudControlPosition, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
 
                     RelativeTargetVelLastFrame = RelativeTargetVel;
                 }

@@ -170,7 +170,7 @@ namespace SaccFlightAndVehicles
             NumAAM = FullAAMs;
             reloadspeed = FullAAMs / FullReloadTimeSec;
             FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
-            if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         private GameObject InstantiateWeapon()
         {
@@ -181,7 +181,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Pilot = true;
-            if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+            UpdateAmmoVisuals();
             //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct
             var Target = AAMTargets[AAMTarget];
             if (Target && Target.transform.parent)
@@ -221,7 +221,7 @@ namespace SaccFlightAndVehicles
 
         public void SFEXT_P_PassengerEnter()
         {
-            if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         public void SFEXT_G_Explode()
         {
@@ -246,6 +246,8 @@ namespace SaccFlightAndVehicles
         {
             if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+            if (HUDText_AAM_ammo_TMP) { HUDText_AAM_ammo_TMP.text = NumAAM.ToString("F0"); }
+            if (HUDText_AAM_ammo_TMPUGUI) { HUDText_AAM_ammo_TMPUGUI.text = NumAAM.ToString("F0"); }
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -678,9 +680,9 @@ namespace SaccFlightAndVehicles
             if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
             {
                 FireNextSerialization = true;
-                RequestSerialization();
                 LaunchAAM();
-                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; RequestSerialization(); }
+                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; }
+                RequestSerialization();
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }
