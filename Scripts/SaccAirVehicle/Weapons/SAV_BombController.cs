@@ -56,6 +56,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Set damage level using the bullet damage system, (-9 - 14)")]
         [SerializeField] private int Shockwave_damage_level = -999;
         [SerializeField] private float ExpandingShockwave_Speed = 343f;
+        [Tooltip("Maximum number of rigidboes that can be blasted, to save performance")]
+        [SerializeField] private int Shockwave_max_rigidbodies = 30;
         [SerializeField] private Transform shockWaveSphere;
         private Transform WakeParticle_Trans;
         private float TorpedoHeight;
@@ -99,6 +101,7 @@ namespace SaccFlightAndVehicles
             }
             if (ExpandingShockwave)
             { ExplosionLifeTime = Mathf.Max(ExplosionLifeTime, KnockbackRadius / ExpandingShockwave_Speed); }
+            HitRBs = new Rigidbody[Shockwave_max_rigidbodies];
         }
         public void EnableWeapon()
         {
@@ -349,6 +352,7 @@ namespace SaccFlightAndVehicles
             if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(true);
             Shockwave();
         }
+        bool hitMAXRBs = false;
         float CurrentShockwave;
         float _ExpandingShockwave_Speed;
         public void Shockwave()
@@ -357,41 +361,43 @@ namespace SaccFlightAndVehicles
             if (shockWaveSphere) shockWaveSphere.localScale = Vector3.one * CurrentShockwave * 2;
             //rigidbodies
             int numHits = Physics.OverlapSphereNonAlloc(transform.position, CurrentShockwave, hitobjs);
-            for (int i = 0; i < numHits; i++)
+            if (!hitMAXRBs)
             {
-                if (!hitobjs[i]) continue;
-                Rigidbody thisRB = hitobjs[i].attachedRigidbody;
-                if (!thisRB) continue;
-                bool gayflag = false;
-                for (int o = 0; o < numHitRBs; o++)
+                for (int i = 0; i < numHits; i++)
                 {
-                    if (thisRB == HitRBs[o])
+                    if (!hitobjs[i]) continue;
+                    Rigidbody thisRB = hitobjs[i].attachedRigidbody;
+                    if (!thisRB) continue;
+                    bool gayflag = false;
+                    for (int o = 0; o < numHitRBs; o++)
                     {
-                        gayflag = true;
-                        break;
-                    }
-                }
-                if (gayflag) continue;
-                HitRBs[numHitRBs] = thisRB;
-                numHitRBs++;
-                if (numHitRBs == 30) break;
-
-
-                if (thisRB.isKinematic) continue;
-                Vector3 explosionDirRB = thisRB.worldCenterOfMass - transform.position;
-                float knockbackRB = (KnockbackRadius - explosionDirRB.magnitude) / KnockbackRadius;
-                if (knockbackRB > 0)
-                {
-                    thisRB.AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnockbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
-                    SaccEntity hitEntity = thisRB.GetComponent<SaccEntity>();
-                    if (hitEntity && hitEntity.IsOwner)
-                    {
-                        hitEntity.SendEventToExtensions("SFEXT_L_WakeUp");
-                        if (Shockwave_damage_level > -10)
+                        if (thisRB == HitRBs[o])
                         {
-                            hitEntity.SendDamageEvent(Shockwave_damage_level);
+                            gayflag = true;
+                            break;
                         }
                     }
+                    if (gayflag) continue;
+                    if (thisRB.isKinematic) continue;
+
+                    Vector3 explosionDirRB = thisRB.worldCenterOfMass - transform.position;
+                    float knockbackRB = (KnockbackRadius - explosionDirRB.magnitude) / KnockbackRadius;
+                    if (knockbackRB > 0)
+                    {
+                        thisRB.AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnockbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
+                        SaccEntity hitEntity = thisRB.GetComponent<SaccEntity>();
+                        if (hitEntity && hitEntity.IsOwner)
+                        {
+                            hitEntity.SendEventToExtensions("SFEXT_L_WakeUp");
+                            if (Shockwave_damage_level > -10)
+                            {
+                                hitEntity.SendDamageEvent(Shockwave_damage_level);
+                            }
+                        }
+                    }
+                    HitRBs[numHitRBs] = thisRB;
+                    numHitRBs++;
+                    if (numHitRBs == Shockwave_max_rigidbodies) { hitMAXRBs = true; break; }
                 }
             }
             if (!ShockwaveHitMe)
@@ -419,14 +425,15 @@ namespace SaccFlightAndVehicles
             {
                 CurrentShockwave = 0;
                 ShockwaveHitMe = false;
+                hitMAXRBs = false;
                 numHitRBs = 0;
-                Rigidbody[] HitRBs = new Rigidbody[30];
+                Rigidbody[] HitRBs = new Rigidbody[Shockwave_max_rigidbodies];
                 if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(false);
             }
         }
         bool ShockwaveHitMe;
         Collider[] hitobjs = new Collider[100];
         uint numHitRBs;
-        Rigidbody[] HitRBs = new Rigidbody[30];
+        Rigidbody[] HitRBs;
     }
 }
