@@ -106,7 +106,7 @@ namespace SaccFlightAndVehicles
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            Exploding = false;
+            Exploding = hitwater = false;
             if (ColliderAlwaysActive) { BombCollider.enabled = true; ColliderActive = true; }
             else { BombCollider.enabled = false; ColliderActive = false; }
             BombRigid.velocity += transform.forward * LaunchSpeed;
@@ -193,6 +193,7 @@ namespace SaccFlightAndVehicles
             transform.position = LaunchPoint;
             BombRigid.position = LaunchPoint;
             UnderWater = false;
+            hitwater = false;
             BombRigid.drag = DragStart;
             if (PassBySound)
             {

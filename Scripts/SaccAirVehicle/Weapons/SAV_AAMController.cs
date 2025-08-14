@@ -475,6 +475,7 @@ namespace SaccFlightAndVehicles
             AAMRigid.position = LaunchPoint;
             TargetSAVControl = null;
             TargetEntityControl = null;
+            hitwater = false;
             StartTrack = false;
             Exploding = false;
         }

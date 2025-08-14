@@ -169,6 +169,7 @@ namespace SaccFlightAndVehicles
             Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
             transform.position = LaunchPoint;
             AGMRigid.position = LaunchPoint;
+            hitwater = false;
             StartTrack = false;
             Exploding = false;
         }
