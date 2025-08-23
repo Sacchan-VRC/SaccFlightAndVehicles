@@ -143,6 +143,7 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            if (AtGScreen) AtGScreen.SetActive(false);
             InVR = EntityControl.InVR;
 
             UpdateAmmoVisuals();
@@ -198,7 +199,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             AGMLocked = false;
-            AtGScreen.SetActive(false);
+            if (AtGScreen) AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
             gameObject.SetActive(false);
             func_active = false;
@@ -246,7 +247,7 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             func_active = true;
-            AtGScreen.SetActive(true);
+            if (AtGScreen) AtGScreen.SetActive(true);
             AtGCam.gameObject.SetActive(true);
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -255,7 +256,7 @@ namespace SaccFlightAndVehicles
         {
             func_active = false;
             PickupTrigger = 0;
-            AtGScreen.SetActive(false);
+            if (AtGScreen) AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
@@ -413,15 +414,12 @@ namespace SaccFlightAndVehicles
                     float ZoomLevel = AtGCam.fieldOfView / 90;
                     AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, 1 - Mathf.Pow(0.5f, ZoomLevel * CamTurnSmoothness * DeltaTime));
 
-                    if (AtGCam)
-                    {
-                        AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotLastFrame * Vector3.forward);
-                        AtGCam.transform.rotation = AGMCamRotSlerper;
+                    AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotLastFrame * Vector3.forward);
+                    AtGCam.transform.rotation = AGMCamRotSlerper;
 
-                        Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
-                        temp2.z = 0;
-                        AtGCam.transform.localRotation = Quaternion.Euler(temp2);
-                    }
+                    Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
+                    temp2.z = 0;
+                    AtGCam.transform.localRotation = Quaternion.Euler(temp2);
                     AGMCamRotLastFrame = newangle;
                 }
 
