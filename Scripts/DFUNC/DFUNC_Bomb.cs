@@ -139,6 +139,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             inVR = EntityControl.InVR;
             UpdateAmmoVisuals();
+            LastBombDropTime = Mathf.Max(LastBombDropTime, Time.time - BombHoldDelay + 0.5f);
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
@@ -194,7 +195,6 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
-            LastBombDropTime = Mathf.Max(LastBombDropTime, Time.time - BombHoldDelay + 0.5f);
             Selected = EntityControl.InVR || !KeyboardInput_InstantFire;
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
