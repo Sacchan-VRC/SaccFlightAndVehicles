@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -11,6 +12,14 @@ namespace SaccFlightAndVehicles
     {
         [Tooltip("Scripts other than SaccGroundVehicle work, but the wheel related stuff will not work if you choose something else")]
         public UdonSharpBehaviour SGVControl;
+        [Tooltip("Keep this gameobject always enabled. So it can be used as an interactable by people outside of the vehicle.")]
+        [SerializeField] private bool ObjectAlwaysEnabled;
+        [Tooltip("Toggle if if fuel runs out?")]
+        [SerializeField] private bool NoFuelTurnOff;
+        [SerializeField] private bool WreckedTurnOff;
+        [SerializeField] private bool KeepAwakeWhileOn;
+        [SerializeField] Animator ToggleAnimator;
+        [SerializeField] string ToggleAnimator_boolname = "HandlingToggle";
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
         [SerializeField] private bool Funcon_Invert;
@@ -42,6 +51,7 @@ namespace SaccFlightAndVehicles
         private bool Toggled;
         private bool Selected;
         private bool TriggerLastFrame;
+        bool KeepingAwake;
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
@@ -84,6 +94,9 @@ namespace SaccFlightAndVehicles
             {
                 boolSGVToggleOriginalValues[i] = (bool)SGVControl.GetProgramVariable(boolSGVNames[i]);
             }
+
+            if (ObjectAlwaysEnabled)
+            { gameObject.SetActive(true); }
         }
         void Update()
         {
@@ -99,7 +112,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (!TriggerLastFrame)
                     {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleValues));
+                        Toggle();
                     }
                     TriggerLastFrame = true;
                 }
@@ -112,132 +125,185 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             Selected = true;
+            TriggerLastFrame = true;
             gameObject.SetActive(true);
         }
         public void DFUNC_Deselected()
         {
             Selected = false;
-            gameObject.SetActive(false);
+            if (!ObjectAlwaysEnabled)
+                gameObject.SetActive(false);
         }
         public void SFEXT_O_PilotExit()
         {
             Selected = false;
-            gameObject.SetActive(false);
+            if (!ObjectAlwaysEnabled)
+                gameObject.SetActive(false);
         }
-        public void ToggleValues()
+        [NetworkCallable]
+        public void ToggleOn()
         {
-            if (Toggled)
+            if (Toggled) return;
+            if (KeepAwakeWhileOn && !KeepingAwake)
             {
-                if (ToggledCoMPos)
-                {
-                    CoM.localPosition = CoMOriginalPos;
-                    EntityControl.SetCoM();
-                }
-
-                if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
-                for (int i = 0; i < floatSGVNames.Length; i++)
-                {
-                    SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggleOriginalValues[i]);
-                }
-                for (int i = 0; i < boolSGVNames.Length; i++)
-                {
-                    SGVControl.SetProgramVariable(boolSGVNames[i], boolSGVToggleOriginalValues[i]);
-                }
-
-                if (isSGV)
-                {
-                    for (int i = 0; i < floatDriveWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < DriveWheels.Length; x++)
-                        {
-                            DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggleOriginalValues[i]);
-                            DriveWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                    for (int i = 0; i < floatSteerWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < SteerWheels.Length; x++)
-                        {
-                            SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggleOriginalValues[i]);
-                            SteerWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                    for (int i = 0; i < floatOtherWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < OtherWheels.Length; x++)
-                        {
-                            OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggleOriginalValues[i]);
-                            OtherWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                }
-                Toggled = false;
+                KeepingAwake = true;
+                SGVControl.SetProgramVariable("KeepAwake", (int)SGVControl.GetProgramVariable("KeepAwake") + 1);
             }
-            else
+            if (ToggleAnimator)
             {
-                if (ToggledCoMPos)
-                {
-                    CoM.position = ToggledCoMPos.position;
-                    EntityControl.SetCoM();
-                }
-
-                if (Dial_Funcon) { Dial_Funcon.SetActive(!Funcon_Invert); }
-                for (int i = 0; i < floatSGVNames.Length; i++)
-                {
-                    SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggledValues[i]);
-                }
-                for (int i = 0; i < boolSGVNames.Length; i++)
-                {
-                    SGVControl.SetProgramVariable(boolSGVNames[i], !boolSGVToggleOriginalValues[i]);
-                }
-
-                if (isSGV)
-                {
-                    for (int i = 0; i < floatDriveWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < DriveWheels.Length; x++)
-                        {
-                            DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggledValues[i]);
-                            DriveWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                    for (int i = 0; i < floatSteerWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < SteerWheels.Length; x++)
-                        {
-                            SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggledValues[i]);
-                            SteerWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                    for (int i = 0; i < floatOtherWheelsNames.Length; i++)
-                    {
-                        for (int x = 0; x < OtherWheels.Length; x++)
-                        {
-                            OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggledValues[i]);
-                            OtherWheels[x].SendCustomEvent("ChangeSurface");
-                        }
-                    }
-                }
-                Toggled = true;
+                ToggleAnimator.SetBool(ToggleAnimator_boolname, true);
             }
+
+            if (ToggledCoMPos)
+            {
+                CoM.position = ToggledCoMPos.position;
+                EntityControl.SetCoM();
+            }
+
+            if (Dial_Funcon) { Dial_Funcon.SetActive(!Funcon_Invert); }
+            for (int i = 0; i < floatSGVNames.Length; i++)
+            {
+                SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggledValues[i]);
+            }
+            for (int i = 0; i < boolSGVNames.Length; i++)
+            {
+                SGVControl.SetProgramVariable(boolSGVNames[i], !boolSGVToggleOriginalValues[i]);
+            }
+
+            if (isSGV)
+            {
+                for (int i = 0; i < floatDriveWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < DriveWheels.Length; x++)
+                    {
+                        DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggledValues[i]);
+                        DriveWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+                for (int i = 0; i < floatSteerWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < SteerWheels.Length; x++)
+                    {
+                        SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggledValues[i]);
+                        SteerWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+                for (int i = 0; i < floatOtherWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < OtherWheels.Length; x++)
+                    {
+                        OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggledValues[i]);
+                        OtherWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+            }
+            Toggled = true;
+        }
+        [NetworkCallable]
+        public void ToggleOff()
+        {
+            if (!Toggled) return;
+            if (KeepAwakeWhileOn && KeepingAwake)
+            {
+                KeepingAwake = false;
+                SGVControl.SetProgramVariable("KeepAwake", (int)SGVControl.GetProgramVariable("KeepAwake") - 1);
+            }
+            if (ToggleAnimator)
+            {
+                ToggleAnimator.SetBool(ToggleAnimator_boolname, false);
+            }
+
+            if (ToggledCoMPos)
+            {
+                CoM.localPosition = CoMOriginalPos;
+                EntityControl.SetCoM();
+            }
+
+            if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
+            for (int i = 0; i < floatSGVNames.Length; i++)
+            {
+                SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggleOriginalValues[i]);
+            }
+            for (int i = 0; i < boolSGVNames.Length; i++)
+            {
+                SGVControl.SetProgramVariable(boolSGVNames[i], boolSGVToggleOriginalValues[i]);
+            }
+
+            if (isSGV)
+            {
+                for (int i = 0; i < floatDriveWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < DriveWheels.Length; x++)
+                    {
+                        DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggleOriginalValues[i]);
+                        DriveWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+                for (int i = 0; i < floatSteerWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < SteerWheels.Length; x++)
+                    {
+                        SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggleOriginalValues[i]);
+                        SteerWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+                for (int i = 0; i < floatOtherWheelsNames.Length; i++)
+                {
+                    for (int x = 0; x < OtherWheels.Length; x++)
+                    {
+                        OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggleOriginalValues[i]);
+                        OtherWheels[x].SendCustomEvent("ChangeSurface");
+                    }
+                }
+            }
+            Toggled = false;
         }
         public void SFEXT_G_RespawnButton()
         {
-            if (Toggled)
-            {
-                ToggleValues();
-            }
+            ToggleOff();
+        }
+        public void SFEXT_G_ReAppear()
+        {
+            ToggleOff();
         }
         public void SFEXT_G_Explode()
         {
+            ToggleOff();
+        }
+        public void Toggle()
+        {
             if (Toggled)
-            {
-                ToggleValues();
-            }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleOff));
+            else if ((!NoFuelTurnOff || !NoFuel) && (!WreckedTurnOff || !wrecked))
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleOn));
         }
         public void KeyboardInput()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleValues));
+            Toggle();
+        }
+        public override void Interact()
+        {
+            Toggle();
+        }
+        private bool NoFuel;
+        public void SFEXT_G_NoFuel()
+        {
+            NoFuel = true;
+            if (NoFuelTurnOff && Toggled) ToggleOff();
+        }
+        public void SFEXT_G_NotNoFuel()
+        {
+            NoFuel = false;
+        }
+        private bool wrecked;
+        public void SFEXT_G_Wrecked()
+        {
+            wrecked = true;
+            if (WreckedTurnOff && Toggled) ToggleOff();
+        }
+        public void SFEXT_G_NotWrecked()
+        {
+            wrecked = false;
         }
     }
 }

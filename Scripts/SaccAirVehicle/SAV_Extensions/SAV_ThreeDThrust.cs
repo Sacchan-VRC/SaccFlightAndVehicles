@@ -3,18 +3,22 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class SAV_ThreeDThrust : UdonSharpBehaviour
     {
         [Header("This script can be used as an Extension OR DFUNC")]
         [Header("Not Compatable with Cruise or Limits DFUNC")]
         [Header("Will behave strangely if used with VTOL in DFUNC mode")]
-        public SaccFlightAndVehicles.SaccAirVehicle SAVControl;
+        public SaccAirVehicle SAVControl;
         public Animator ThrustAnimator;
         public Transform ThrustArrow;
+        [Tooltip("Multiply arrow scale, 1 = matches hand position")]
+        [SerializeField] float ThrustArrowMaxSize = 1f;
+        [SerializeField] bool showArrow_Desktop;
         [SerializeField] KeyCode ThrustForwardKey = KeyCode.I;
         [SerializeField] KeyCode ThrustBackKey = KeyCode.K;
         [SerializeField] KeyCode ThrustRightKey = KeyCode.L;
@@ -29,19 +33,37 @@ namespace SaccFlightAndVehicles
         public bool DoSideThrust = true;
         public bool DoUPDownThrust = true;
         public bool AllowMainEngineAndThrust = false;
+        [SerializeField] bool RequireEngine = true;
+        [SerializeField] bool DisableSAVJoystick = false;
+        [SerializeField] bool DisableSAVThrottle = false;
+        [SerializeField] bool SyncThrust = true;
+        [Space]
+        [SerializeField] bool ControlsWind = false;
+        [Tooltip("Will only sync wind if ControlsWind is true")]
+        [SerializeField] bool SyncWind = true;
+        [SerializeField] bool AllowVerticalWind = false;
+        [SerializeField] float MaxWindMagnitude = 100f;
+        [SerializeField][Range(0f, 1f)] float WindGustRatio = 0.2f;
+        [Tooltip("Set wind Gustiness when using? To override any other WindControl in the world. -1 to disable")]
+        [SerializeField] float SetGustiness = 0.03f;
+        [Tooltip("Set wind Turbulance when using? To override any other WindControl in the world. -1 to disable")]
+        [SerializeField] float SetTurbulance = .0001f;
         [Header("Only for DFUNC Mode")]
         public bool UseThrottleAsForward = true;
         public bool ThrottleAsForward_NoBackThrust = false;
+        [Space]
+        [SerializeField] float updateInterval = 0.3f;
+        [SerializeField] float NetworkSmoothTime = 8;
+        float LastUpdateTime;
         private Transform VehicleMainObj;
         private Transform ControlsRoot;
         private Rigidbody VehicleRB;
         private bool ThreeDThrottleLastFrame;
         private Vector3 HandPosThrottle;
-        private Vector3 HandPos;
         private Vector3 ThreeDVRThrottle;
         private Vector3 ThreeDKeybThrottle;
         private Vector3 ThreeDThrottle;
-        [System.NonSerialized, UdonSynced(UdonSyncMode.Linear)] public Vector3 ThreeDThrottleInput;
+        [System.NonSerialized] public Vector3 ThreeDThrottleInput;
         private Vector3 ThrottleZeroPoint;
         private VRCPlayerApi localPlayer;
         private bool InVR;
@@ -54,9 +76,12 @@ namespace SaccFlightAndVehicles
         private bool UseAsDFUNC;
         private bool Piloting;
         private float ThrottleSensitivity;
+        private float GripSensitivity;
         private bool IsOwner;
         private bool Occupied;
-        private bool OverridingThrottle = false;
+        [System.NonSerialized] public bool OverridingThrottle = false;
+        [System.NonSerialized] public bool OverridingThrottleControl = false;
+        [System.NonSerialized] public bool OverridingJoystickControl = false;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThreeDThrustActive))] public bool _ThreeDThrustActive = false;
         public bool ThreeDThrustActive//this can be toggled by a dfunc to switch between normal saccairvehicle flight to thruster only flight
         {
@@ -83,11 +108,13 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             if (DialPosition > -1) { UseAsDFUNC = true; DefaultEnabled = false; }
+            if (ControlsWind) { AllowMainEngineAndThrust = true; }
             localPlayer = Networking.LocalPlayer;
             VehicleMainObj = SAVControl.VehicleTransform;
             VehicleRB = VehicleMainObj.GetComponent<Rigidbody>();
             ControlsRoot = SAVControl.ControlsRoot;
             ThrottleSensitivity = SAVControl.ThrottleSensitivity;
+            GripSensitivity = SAVControl.GripSensitivity;
             IsOwner = SAVControl.IsOwner;
             InVR = EntityControl.InVR;
             if (DefaultEnabled)
@@ -96,7 +123,7 @@ namespace SaccFlightAndVehicles
             }
             gameObject.SetActive(false);
 
-            if (!UseThrottleAsForward && !UseAsDFUNC)
+            if (!UseThrottleAsForward && !UseAsDFUNC && !ControlsWind)
             {
                 if (!OverridingThrottle && !AllowMainEngineAndThrust)
                 {
@@ -104,17 +131,29 @@ namespace SaccFlightAndVehicles
                     SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
                 }
             }
+            if (DisableSAVThrottle)
+            {
+                if (!OverridingThrottleControl)
+                {
+                    OverridingThrottleControl = true;
+                    SAVControl.SetProgramVariable("DisableThrottleControl", (int)SAVControl.GetProgramVariable("DisableThrottleControl") + 1);
+                }
+            }
+            if (DisableSAVJoystick)
+            {
+                if (!OverridingJoystickControl)
+                {
+                    OverridingJoystickControl = true;
+                    SAVControl.SetProgramVariable("DisableJoystickControl", (int)SAVControl.GetProgramVariable("DisableJoystickControl") + 1);
+                }
+            }
         }
         public void SFEXT_G_PilotExit()
         {
             Occupied = false;
             gameObject.SetActive(false);
-            if (ThrustAnimator)
-            {
-                ThrustAnimator.SetFloat("thrustx", .5f);
-                ThrustAnimator.SetFloat("thrusty", .5f);
-                ThrustAnimator.SetFloat("thrustz", .5f);
-            }
+            ThreeDThrottleInput = Vector3.zero;
+            setAnimatorDefault();
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -127,7 +166,6 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             InVR = SAVControl.InVR;
             SwitchHandsJoyThrottle = SAVControl.SwitchHandsJoyThrottle;
-            if (ThrustArrow) { ThrustArrow.gameObject.SetActive(InVR); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -136,13 +174,19 @@ namespace SaccFlightAndVehicles
             ThreeDThrottle = Vector3.zero;
             ThreeDVRThrottle = Vector3.zero;
             ThreeDKeybThrottle = Vector3.zero;
-            if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
             if (_ThreeDThrustActive) { SAVControl.SetProgramVariable("ThrottleOverride", 0f); }
+            if (ControlsWind && SyncWind)
+            {
+                lastSentVector = SAVControl.Wind;
+                LastUpdateTime = Time.time;
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SetWind), SAVControl.Wind);
+            }
         }
         private void ThrottleStuff(float Input)
         {
-            if (Input > 0.75)
+            if (Input > GripSensitivity)
             {
+                Vector3 HandPos;
                 if (UseAsDFUNC)
                 {
                     if (LeftDial)
@@ -161,9 +205,15 @@ namespace SaccFlightAndVehicles
                 if (!ThreeDThrottleLastFrame)
                 {
                     ThrottleZeroPoint = HandPosThrottle;
-                    if (ThrustArrow) { ThrustArrow.position = HandPos; }
+                    if (ThrustArrow)
+                    {
+                        ThrustArrow.position = HandPos;
+                        if (!ThrustArrow.gameObject.activeSelf)
+                        { ThrustArrow.gameObject.SetActive(true); }
+                    }
                 }
-                ThrustArrow.LookAt(HandPos);
+                if (!ControlsWind)
+                    ThrustArrow.LookAt(HandPos);
                 Vector3 ThreeDThrottleDifference = (ThrottleZeroPoint - HandPosThrottle) * ThrottleSensitivity;
                 ThreeDVRThrottle.x = Mathf.Clamp(-ThreeDThrottleDifference.x, -1, 1);
                 ThreeDVRThrottle.y = -Mathf.Clamp(ThreeDThrottleDifference.y, -1, 1);
@@ -174,8 +224,13 @@ namespace SaccFlightAndVehicles
             else if (ThreeDThrottleLastFrame)
             {
                 ThreeDVRThrottle = Vector3.zero;
-                if (!UseAsDFUNC) { SAVControl.PlayerThrottle = 0; }
+                if (!UseAsDFUNC && UseThrottleAsForward && !ControlsWind) { SAVControl.PlayerThrottle = 0; }
                 ThreeDThrottleLastFrame = false;
+                if (ThrustArrow)
+                {
+                    if (ThrustArrow.gameObject.activeSelf)
+                    { ThrustArrow.gameObject.SetActive(false); }
+                }
             }
         }
         public void DFUNC_Selected()
@@ -190,9 +245,10 @@ namespace SaccFlightAndVehicles
             ThreeDVRThrottle = Vector3.zero;
             ThreeDKeybThrottle = Vector3.zero;
         }
+        Vector3 lastSentVector;
         private void LateUpdate()
         {
-            if (IsOwner && EngineOn)
+            if (IsOwner && (EngineOn || !RequireEngine))
             {
                 if (InVR)
                 {
@@ -228,6 +284,48 @@ namespace SaccFlightAndVehicles
                 ThreeDKeybThrottle.y = Ui + Oi;
                 ThreeDKeybThrottle.z = Ii + Ki;
 
+                if (ControlsWind)
+                {
+                    ThreeDThrottleInput = Vector3.zero;
+                    ThreeDThrottleInput.x = Mathf.Clamp(ThreeDVRThrottle.x + ThreeDKeybThrottle.x, -1, 1);
+                    ThreeDThrottleInput.y = Mathf.Clamp(ThreeDVRThrottle.y + ThreeDKeybThrottle.y, -1, 1);
+                    ThreeDThrottleInput.z = Mathf.Clamp(ThreeDVRThrottle.z + ThreeDKeybThrottle.z, -1, 1);
+
+                    Vector3 windInput = ThreeDThrottleInput;
+                    windInput.x *= (windInput.x > 0) ? ThreeDThrottleStrengthX.x : ThreeDThrottleStrengthX.y;
+                    windInput.y *= (windInput.y > 0) ? ThreeDThrottleStrengthY.x : ThreeDThrottleStrengthY.y;
+                    windInput.z *= (windInput.z > 0) ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y;
+
+                    windInput = ControlsRoot.rotation * windInput;
+
+                    if (!AllowVerticalWind)
+                    {
+                        windInput.y = ThreeDThrottleInput.y = 0;
+                    }
+                    Vector3 newWind = SAVControl.Wind + windInput * (1 - WindGustRatio) * Time.deltaTime;
+                    float windMag = newWind.magnitude;
+                    if (windMag > MaxWindMagnitude)
+                    {
+                        newWind *= MaxWindMagnitude / windMag;
+                        windMag = MaxWindMagnitude;
+                    }
+                    SetWind(newWind);
+                    UpdateThrustArrow();
+                    if (SyncWind)
+                    {
+                        if (lastSentVector != newWind)
+                        {
+                            if (Time.time - LastUpdateTime > updateInterval)
+                            {
+                                lastSentVector = newWind;
+                                LastUpdateTime = Time.time;
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SetWind), newWind);
+                            }
+                        }
+                    }
+                    return;
+                }
+
                 if (InWater) { ThreeDThrottle = ThreeDThrottleInput = Vector3.zero; }
                 else
                 {
@@ -241,160 +339,201 @@ namespace SaccFlightAndVehicles
 
                     if (!UseAsDFUNC)
                     {
-                        if (ThreeDThrottleInput.x > 0)
-                        {
-                            ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x * ThreeDThrottleStrengthX.x;
-                        }
-                        else
-                        {
-                            ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x * ThreeDThrottleStrengthX.y;
-                        }
-                        if (ThreeDThrottleInput.y > 0)
-                        {
-                            ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.x;
-                        }
-                        else
-                        {
-                            ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.y;
-                        }
-                        if (ThreeDThrottleInput.z > 0)
-                        {
-                            ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.x;
-                        }
-                        else
-                        {
-                            ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.y;
-                        }
+                        ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x *
+                            (ThreeDThrottleInput.x > 0 ? ThreeDThrottleStrengthX.x : ThreeDThrottleStrengthX.y);
+
+                        ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y *
+                            (ThreeDThrottleInput.y > 0 ? ThreeDThrottleStrengthY.x : ThreeDThrottleStrengthY.y);
+
+                        ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z *
+                            (ThreeDThrottleInput.z > 0 ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y);
                     }
-                    else//regular throttle is used for forward if it's a dfunc
+                    else
                     {
-                        if (ThreeDThrottleInput.x > 0)
-                        {
-                            ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x * ThreeDThrottleStrengthX.x;
-                        }
-                        else
-                        {
-                            ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x * ThreeDThrottleStrengthX.y;
-                        }
+                        ThreeDThrottle = ControlsRoot.right * ThreeDThrottleInput.x *
+                            (ThreeDThrottleInput.x > 0 ? ThreeDThrottleStrengthX.x : ThreeDThrottleStrengthX.y);
+
                         if (SAVControl.VerticalThrottle)
                         {
-                            if (ThreeDThrottleInput.y != 0)
+                            if (UseThrottleAsForward)
                             {
-                                if (UseThrottleAsForward)
+                                if (ThreeDThrottleInput.y > 0)
                                 {
-                                    if (ThreeDThrottleInput.y > 0)
-                                    {
-                                        SAVControl.PlayerThrottle = Mathf.Max(ThreeDThrottleInput.y, 0);
-                                    }
-                                    else if (!ThrottleAsForward_NoBackThrust)
-                                    {
-                                        if (ThreeDThrottle.z > 0)
-                                        {
-                                            ThreeDThrottle += ControlsRoot.forward * Mathf.Min(ThreeDThrottleInput.y, 0) * ThreeDThrottleStrengthZ.x;
-                                        }
-                                        else
-                                        {
-                                            ThreeDThrottle += ControlsRoot.forward * Mathf.Min(ThreeDThrottleInput.y, 0) * ThreeDThrottleStrengthZ.y;
-                                        }
-                                        SAVControl.PlayerThrottle = 0;
-                                    }
+                                    SAVControl.PlayerThrottle = Mathf.Max(ThreeDThrottleInput.y, 0);
                                 }
-                                else
+                                else SAVControl.PlayerThrottle = 0;
+                                if (!ThrottleAsForward_NoBackThrust && ThreeDThrottleInput.y < 0)
                                 {
-                                    if (ThreeDThrottleInput.y > 0)
-                                    {
-                                        ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.x;
-                                    }
-                                    else
-                                    {
-                                        ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.y;
-                                    }
+                                    ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.y *
+                                        (ThreeDThrottle.z > 0 ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y);
+                                    SAVControl.PlayerThrottle = 0;
                                 }
-                            }
-                            if (ThreeDThrottleInput.z > 0)
-                            {
-                                ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.x;
                             }
                             else
                             {
-                                ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.y;
+                                ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.y *
+                                    (ThreeDThrottleInput.y > 0 ? ThreeDThrottleStrengthY.x : ThreeDThrottleStrengthY.y);
                             }
+                            ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z *
+                                (ThreeDThrottleInput.z > 0 ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y);
                         }
                         else
                         {
-                            if (ThreeDThrottleInput.z != 0)
+                            if (UseThrottleAsForward)
                             {
-                                if (UseThrottleAsForward)
+                                if (ThreeDThrottleInput.z > 0)
                                 {
-                                    if (ThreeDThrottleInput.z > 0)
-                                    {
-                                        SAVControl.PlayerThrottle = Mathf.Max(ThreeDThrottleInput.z, 0);
-                                    }
-                                    else if (!ThrottleAsForward_NoBackThrust)
-                                    {
-                                        if (ThreeDThrottleInput.z > 0)
-                                        {
-                                            ThreeDThrottle += ControlsRoot.forward * Mathf.Min(ThreeDThrottleInput.z, 0) * ThreeDThrottleStrengthZ.x;
-                                        }
-                                        else
-                                        {
-                                            ThreeDThrottle += ControlsRoot.forward * Mathf.Min(ThreeDThrottleInput.z, 0) * ThreeDThrottleStrengthZ.y;
-                                        }
-                                        SAVControl.PlayerThrottle = 0;
-                                    }
+                                    SAVControl.PlayerThrottle = Mathf.Max(ThreeDThrottleInput.z, 0);
                                 }
-                                else
+                                else SAVControl.PlayerThrottle = 0;
+                                if (!ThrottleAsForward_NoBackThrust && ThreeDThrottleInput.z < 0)
                                 {
-                                    if (ThreeDThrottleInput.z > 0)
-                                    {
-                                        ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.x;
-                                    }
-                                    else
-                                    {
-                                        ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z * ThreeDThrottleStrengthZ.y;
-                                    }
+                                    ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z *
+                                        (ThreeDThrottle.z > 0 ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y);
+                                    SAVControl.PlayerThrottle = 0;
                                 }
-                            }
-                            if (ThreeDThrottleInput.y > 0)
-                            {
-                                ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.x;
                             }
                             else
                             {
-                                ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y * ThreeDThrottleStrengthY.y;
+                                ThreeDThrottle += ControlsRoot.forward * ThreeDThrottleInput.z *
+                                    (ThreeDThrottleInput.z > 0 ? ThreeDThrottleStrengthZ.x : ThreeDThrottleStrengthZ.y);
                             }
+                            ThreeDThrottle += ControlsRoot.up * ThreeDThrottleInput.y *
+                                (ThreeDThrottleInput.y > 0 ? ThreeDThrottleStrengthY.x : ThreeDThrottleStrengthY.y);
                         }
                     }
                 }
-                if (InVR && ThrustArrow)
-                {
-                    ThrustArrow.localScale = (Vector3.one * ThreeDThrottleInput.magnitude) / ThrottleSensitivity;
-                }
+                UpdateThrustArrow();
                 if (!AllowMainEngineAndThrust)
                 {
                     SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Min(ThreeDThrottleInput.magnitude, 1));
                 }
+                if (SyncThrust)
+                {
+                    if (lastSentVector != ThreeDThrottleInput)
+                    {
+                        if (Time.time - LastUpdateTime > updateInterval)
+                        {
+                            lastSentVector = ThreeDThrottleInput;
+                            LastUpdateTime = Time.time;
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdate), ThreeDThrottleInput);
+                        }
+                    }
+                }
             }
             if (Occupied)
             {
-                if (ThrustAnimator)
+                UpdateAnimator();
+            }
+        }
+        void UpdateAnimator()
+        {
+            if (ThrustAnimator)
+            {
+                ThrustAnimator.SetFloat("thrustx", ThreeDThrottleInput.x * .5f + .5f);
+                ThrustAnimator.SetFloat("thrusty", ThreeDThrottleInput.y * .5f + .5f);
+                ThrustAnimator.SetFloat("thrustz", ThreeDThrottleInput.z * .5f + .5f);
+            }
+        }
+        [NetworkCallable]
+        public void SetWind(Vector3 inputWind)
+        {
+            if (!IsOwner) { lastSentVector = inputWind; }
+            SAVControl.Wind = inputWind;
+            float windMag = inputWind.magnitude;
+            if (WindGustRatio > 0)
+                SAVControl.WindGustStrength = windMag * WindGustRatio;
+            if (SetGustiness > 0)
+                SAVControl.WindGustiness = SetGustiness;
+            if (SetTurbulance > 0)
+                SAVControl.WindTurbulanceScale = SetTurbulance;
+        }
+        [NetworkCallable]
+        public void NetworkUpdate(Vector3 NewThrustValues)
+        {
+            if (!Occupied) { setAnimatorDefault(); return; }
+            lastSentVector = NewThrustValues;
+            ThreeDThrottleInput_LerpTarget = NewThrustValues;
+            if (!SmoothNetworkUpdateRunning)
+            {
+                SmoothNetworkUpdateRunning = true;
+                SmoothNetworkUpdate();
+            }
+        }
+        Vector3 ThreeDThrottleInput_LerpTarget;
+        bool SmoothNetworkUpdateRunning;
+        public void SmoothNetworkUpdate()
+        {
+            if (!SmoothNetworkUpdateRunning) return;
+
+            if (ThreeDThrottleInput_LerpTarget.sqrMagnitude == 0)
+            {
+                ThreeDThrottleInput = Vector3.MoveTowards(ThreeDThrottleInput, ThreeDThrottleInput_LerpTarget, Time.deltaTime * 1.5f);
+            }
+            else
+            {
+                ThreeDThrottleInput = Vector3.Lerp(ThreeDThrottleInput, ThreeDThrottleInput_LerpTarget, 1 - Mathf.Pow(0.5f, Time.deltaTime * 4));
+            }
+            SendCustomEventDelayedFrames(nameof(SmoothNetworkUpdate), 1);
+            if (ThreeDThrottleInput.sqrMagnitude == 0)
+            {
+                SmoothNetworkUpdateRunning = false;
+
+            }
+            UpdateAnimator();
+        }
+        void UpdateThrustArrow()
+        {
+            if (!ThrustArrow) return;
+            if (InVR)
+            {
+                if (ControlsWind)
                 {
-                    ThrustAnimator.SetFloat("thrustx", ThreeDThrottleInput.x * .5f + .5f);
-                    ThrustAnimator.SetFloat("thrusty", ThreeDThrottleInput.y * .5f + .5f);
-                    ThrustAnimator.SetFloat("thrustz", ThreeDThrottleInput.z * .5f + .5f);
+                    ThrustArrow.LookAt(ThrustArrow.position + SAVControl.Wind);
+                    ThrustArrow.localScale = Vector3.one * (SAVControl.Wind.magnitude / MaxWindMagnitude / ThrottleSensitivity) * ThrustArrowMaxSize;
+                }
+                else
+                {
+                    ThrustArrow.localScale = Vector3.one * (ThreeDThrottleInput.magnitude / ThrottleSensitivity) * ThrustArrowMaxSize;
+                }
+            }
+            else if (showArrow_Desktop)
+            {
+                Quaternion headRot = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+                Vector3 headPlusOffset = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position +
+                headRot * Vector3.forward * 0.5f +
+                headRot * Vector3.down * 0.2f
+                ;
+                if (ThrustArrow)
+                {
+                    ThrustArrow.position = headPlusOffset;
+                    if (ControlsWind)
+                    {
+                        ThrustArrow.LookAt(ThrustArrow.position + SAVControl.Wind);
+                        ThrustArrow.localScale = Vector3.one * (SAVControl.Wind.magnitude / MaxWindMagnitude / ThrottleSensitivity) * ThrustArrowMaxSize;
+                    }
+                    else
+                    {
+                        ThrustArrow.LookAt(ThrustArrow.position + ControlsRoot.rotation * ThreeDThrottleInput);
+                        ThrustArrow.localScale = Vector3.one * (ThreeDThrottleInput.magnitude / ThrottleSensitivity) * ThrustArrowMaxSize;
+                    }
                 }
             }
         }
         public void SFEXT_G_Wrecked()
         {
-            if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
             ThreeDThrottle = ThreeDThrottleInput = Vector3.zero;
             setAnimatorDefault();
         }
         public void SFEXT_G_Explode()
-        { setAnimatorDefault(); }
+        {
+            setAnimatorDefault();
+            resetWind();
+        }
         private void setAnimatorDefault()
         {
+            SmoothNetworkUpdateRunning = false;
+            ThreeDThrottleInput_LerpTarget = Vector3.zero;
             if (ThrustAnimator)
             {
                 ThrustAnimator.SetFloat("thrustx", .5f);
@@ -418,7 +557,7 @@ namespace SaccFlightAndVehicles
         }
         private void FixedUpdate()
         {
-            if (IsOwner)
+            if (IsOwner && !ControlsWind)
             {
                 VehicleRB.AddForce(ThreeDThrottle, ForceMode.Acceleration);
             }
@@ -430,6 +569,21 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+        }
+        public void SFEXT_G_RespawnButton()
+        {
+            resetWind();
+        }
+        void resetWind()
+        {
+            if (!ControlsWind) return;
+            SAVControl.Wind = Vector3.zero;
+            if (WindGustRatio > 0)
+                SAVControl.WindGustStrength = 0;
+            if (SetGustiness > 0)
+                SAVControl.WindGustiness = SetGustiness;
+            if (SetTurbulance > 0)
+                SAVControl.WindTurbulanceScale = SetTurbulance;
         }
     }
 }
