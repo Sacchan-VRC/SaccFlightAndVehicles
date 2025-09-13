@@ -23,6 +23,7 @@ namespace SaccFlightAndVehicles
         private bool InResupplyZone;
         private Collider ThisCollider;
         private bool Initialized = false;
+        [SerializeField] UdonSharpBehaviour[] EventCallback;
         private void Initialize()
         {
             ThisCollider = gameObject.GetComponent<Collider>();
@@ -38,15 +39,19 @@ namespace SaccFlightAndVehicles
                     {
                         case -1: // ALL
                             SendEventTo.SendCustomEvent("ReSupply");
+                            for (int i = 0; i < EventCallback.Length; i++) { EventCallback[i].SendCustomEvent("ReSupply"); }
                             break;
                         case 0: // FUEL
                             SendEventTo.SendCustomEvent("ReFuel");
+                            for (int i = 0; i < EventCallback.Length; i++) { EventCallback[i].SendCustomEvent("ReFuel"); }
                             break;
                         case 1: // AMMO
                             SendEventTo.SendCustomEvent("ReArm");
+                            for (int i = 0; i < EventCallback.Length; i++) { EventCallback[i].SendCustomEvent("ReArm"); }
                             break;
                         case 2: // REPAIRS
                             SendEventTo.SendCustomEvent("RePair");
+                            for (int i = 0; i < EventCallback.Length; i++) { EventCallback[i].SendCustomEvent("RePair"); }
                             break;
                     }
                 }
