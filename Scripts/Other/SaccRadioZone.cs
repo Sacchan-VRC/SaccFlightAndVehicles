@@ -35,12 +35,19 @@ namespace SaccFlightAndVehicles
         float VoiceGain;
         bool InZone;
         private bool ChannelSwapped;
+        Vector3 SpawnPos;
+        Quaternion SpawnRot;
         void Start()
         {
             SendCustomEventDelayedFrames(nameof(CheckPlayersInside), Random.Range(0, 7));
             VoiceNear = RadioBase.VoiceNear;
             VoiceFar = RadioBase.VoiceFar;
             VoiceGain = RadioBase.VoiceGain;
+            if (PickupObject)
+            {
+                SpawnPos = PickupObject.transform.localPosition;
+                SpawnRot = PickupObject.transform.localRotation;
+            }
         }
         public void CheckPlayersInside()
         {
@@ -166,7 +173,9 @@ namespace SaccFlightAndVehicles
                 VRC_Pickup pickup = PickupObject.GetComponent<VRC_Pickup>();
                 if (pickup) { if (pickup.IsHeld) return; }
                 Networking.SetOwner(Networking.LocalPlayer, PickupObject.gameObject);
-                PickupObject.Respawn();
+                PickupObject.transform.localPosition = SpawnPos;
+                PickupObject.transform.localRotation = SpawnRot;
+                PickupObject.FlagDiscontinuity();
             }
         }
     }
