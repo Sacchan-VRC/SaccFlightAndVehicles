@@ -11141,9 +11141,9 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1803049916217016586}
   SGVControl: {fileID: 3243243056628280734}
-  RotationStrengthPitch: 3
-  RotationStrengthRoll: 4
-  RotationStrengthYaw: 2
+  RotationStrengthPitch: 5.1
+  RotationStrengthRoll: 6.8
+  RotationStrengthYaw: 3.4
   SwitchHandsJoyThrottle: 0
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   VehicleAnimator: {fileID: 3243243057054021814}
@@ -68502,10 +68502,10 @@ MonoBehaviour:
   Wings:
   - {fileID: 5390485614586610051}
   DoCaterpillarTracks: 0
-  TrackSourceWheels: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: []
   TrackMaterialSlots: 
+  TrackSourceWheels: []
+  TrackSpeedMulti: []
   CogWheelsTrack0: []
   CogWheelsTrack0_rotSpeeds: []
   CogWheelsTrack1: []
@@ -68814,13 +68814,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056451226300}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 3243243057054021813}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -69774,6 +69774,7 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1

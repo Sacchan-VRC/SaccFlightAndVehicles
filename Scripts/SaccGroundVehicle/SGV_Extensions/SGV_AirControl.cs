@@ -130,23 +130,27 @@ namespace SaccFlightAndVehicles
                 float pitch = Mathf.Clamp(VRJoystickPos.x + Wi + Si, -1, 1);
                 float yaw = Mathf.Clamp(VRJoystickPos.y + Qi + Ei, -1, 1);
                 float roll = Mathf.Clamp(VRJoystickPos.z + Ai + Di, -1, 1);
-                Vector3 RotForce = new Vector3(
+                RotForce = new Vector3(
                 pitch * RotationStrengthPitch
                 , yaw * RotationStrengthYaw
                 , roll * RotationStrengthRoll
                 );
-
-                VehicleRigidbody.AddRelativeTorque(RotForce, ForceMode.Acceleration);
 
                 VehicleAnimator.SetFloat(PITCH_STRING, pitch * .5f + .5f);
                 VehicleAnimator.SetFloat(YAW_STRING, yaw * .5f + .5f);
                 VehicleAnimator.SetFloat(ROLL_STRING, roll * .5f + .5f);
             }
         }
+        Vector3 RotForce;
+        void FixedUpdate()
+        {
+            VehicleRigidbody.AddRelativeTorque(RotForce, ForceMode.Acceleration);
+        }
         public void SFEXT_O_Grounded()
         {
             Grounded = true;
             AirControlReady = false;
+            RotForce = Vector3.zero;
             if (!HoldingJoyStick)
             {
                 JoystickGripLastFrame = false;
@@ -156,6 +160,7 @@ namespace SaccFlightAndVehicles
         public void DisableJoystick()
         {
             JoyOutTarget = 0f;
+            RotForce = Vector3.zero;
             if (!JoyMoving)
             {
                 JoyMoving = true;
@@ -216,6 +221,7 @@ namespace SaccFlightAndVehicles
             ResetAnim();
             DisableJoystick();
         }
+        public void SFEXT_O_PilotEnter() { RotForce = Vector3.zero; }
         public void SFEXT_G_PilotExit()
         {
             ResetAnim();
