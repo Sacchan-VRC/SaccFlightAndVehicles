@@ -219,32 +219,6 @@ namespace SaccFlightAndVehicles
         }
         private bool TriggerLastFrame;
         private bool UseLeftTrigger;
-        private void FindSelf()
-        {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in PassengerFunctionsControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in PassengerFunctionsControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.Log("DFUNCP_Tractor: Can't find self in dial functions");
-        }
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
             if (player.isLocal)
