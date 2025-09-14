@@ -59,6 +59,10 @@ namespace SaccFlightAndVehicles
         [SerializeField] KeyCode KeyboardSpeedModifier = KeyCode.LeftShift;
         [SerializeField] float K_ModifierSpeed = 0.2f;
         public float RotatingSoundMulti = .02f;
+        [SerializeField] KeyCode Keyboard_Up = KeyCode.W;
+        [SerializeField] KeyCode Keyboard_Down = KeyCode.S;
+        [SerializeField] KeyCode Keyboard_Left = KeyCode.A;
+        [SerializeField] KeyCode Keyboard_Right = KeyCode.D;
         [Header("Networking:")]
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
         public float CorrectionTime = 2f;
@@ -201,10 +205,10 @@ namespace SaccFlightAndVehicles
                 float time = Time.time;
                 float deltaTime = Time.deltaTime;
                 //get inputs
-                int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
-                int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
-                int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
-                int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+                int Wf = Input.GetKey(Keyboard_Up) ? 1 : 0; //inputs as ints
+                int Sf = Input.GetKey(Keyboard_Down) ? -1 : 0;
+                int Af = Input.GetKey(Keyboard_Left) ? -1 : 0;
+                int Df = Input.GetKey(Keyboard_Right) ? 1 : 0;
 
                 float RGrip = 0;
                 float RTrigger = 0;
