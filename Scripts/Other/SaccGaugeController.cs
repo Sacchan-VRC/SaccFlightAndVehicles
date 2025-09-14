@@ -10,14 +10,14 @@ namespace SaccFlightAndVehicles
     public class SaccGaugeController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
+        [SerializeField] Transform VehicleForwardTransform;
         public Animator[] DialsAnimator;
-        private Transform VehicleTransform;
         private Transform CenterOfMass;
         private bool HasHorizon;
         void Start()
         {
             CenterOfMass = (Transform)SAVControl.GetProgramVariable("CenterOfMass");
-            VehicleTransform = (Transform)SAVControl.GetProgramVariable("VehicleTransform");
+            if (!VehicleForwardTransform) VehicleForwardTransform = (Transform)SAVControl.GetProgramVariable("VehicleTransform");
             FullFuel = (float)SAVControl.GetProgramVariable("FullFuel");
             HasHorizon = Horizon.Length > 0;
             SeaLevel = (float)SAVControl.GetProgramVariable("SeaLevel");
@@ -91,9 +91,9 @@ namespace SaccFlightAndVehicles
                 }
                 return;
             }
-            Vector3 VelFlattened = Vector3.ProjectOnPlane((Vector3)SAVControl.GetProgramVariable("CurrentVel"), VehicleTransform.up);
-            Vector3 forward = VehicleTransform.forward;
-            float slip = Vector3.SignedAngle(forward, VelFlattened, VehicleTransform.up) / MaxSlip;
+            Vector3 VelFlattened = Vector3.ProjectOnPlane((Vector3)SAVControl.GetProgramVariable("CurrentVel"), VehicleForwardTransform.up);
+            Vector3 forward = VehicleForwardTransform.forward;
+            float slip = Vector3.SignedAngle(forward, VelFlattened, VehicleForwardTransform.up) / MaxSlip;
             // float slip = Vector3.Dot(VehicleTransform.right, (Vector3)SAVControl.GetProgramVariable("CurrentVel")) / MaxSlip;
             slip = Mathf.Clamp((slip * .5f) + .5f, 0, 1);
             for (int i = 0; i < DialsAnimator.Length; i++)
@@ -125,7 +125,7 @@ namespace SaccFlightAndVehicles
             // }
             if (!HasHorizon) { return; }
             Quaternion newrot = Quaternion.Euler(HorizonRotOffset.x, HorizonRotOffset.y, HorizonRotOffset.z);
-            Quaternion planerot = Quaternion.AngleAxis(VehicleTransform.eulerAngles.y, Vector3.up);
+            Quaternion planerot = Quaternion.AngleAxis(VehicleForwardTransform.eulerAngles.y, Vector3.up);
             newrot = planerot * newrot;
             Horizon[0].rotation = newrot;
             Quaternion locrot = Horizon[0].localRotation;
@@ -164,7 +164,7 @@ namespace SaccFlightAndVehicles
         public string CompassFloatName = "compass";
         public void DoCompass()
         {
-            float compass = (VehicleTransform.eulerAngles.y + CompassOffset) / 360f;
+            float compass = (VehicleForwardTransform.eulerAngles.y + CompassOffset) / 360f;
             compass = compass - (int)compass;
             for (int i = 0; i < DialsAnimator.Length; i++)
             {
