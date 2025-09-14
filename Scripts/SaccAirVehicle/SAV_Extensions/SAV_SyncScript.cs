@@ -153,7 +153,7 @@ namespace SaccFlightAndVehicles
             StartAngDrag = VehicleRigid.angularDrag;
             if (!InEditor)
             {
-                if (ObjectMode?Networking.IsOwner(SyncRigid.gameObject):EntityControl.IsOwner)
+                if (ObjectMode ? Networking.IsOwner(SyncRigid.gameObject) : EntityControl.IsOwner)
                 {
                     IsOwner = true;
                     if (ObjectMode)
@@ -432,7 +432,7 @@ namespace SaccFlightAndVehicles
             Quaternion newrot = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime) * SyncTransform.rotation;
             //correct rotational desync
             newrot = RealSlerp(newrot, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
-            
+
             SyncTransform.SetPositionAndRotation(newpos, newrot);
 #if UNITY_EDITOR
             if (SyncTransform_Raw)
@@ -615,7 +615,6 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.angularDrag = 9999;
             }
         }
-        public void SFEXT_L_SetPhysics() { SetPhysics(); }//not used in base prefab
         public void SetPhysics()
         {
             if (IsOwner)
