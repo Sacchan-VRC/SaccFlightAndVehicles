@@ -51,7 +51,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Silly mode where you have infinite boost but your car explodes when it overheats")]
         public bool BoostOverheatMode;
         [Tooltip("Boost is recovered at this speed")]
-        public float OverheadMode_replenishSpeed = 0.75f;
+        public float OverheatMode_replenishSpeed = 0.75f;
         [Header("Debug")]
         [UdonSynced, FieldChangeCallback(nameof(Boosting))] public float _Boosting;
         public float Boosting
@@ -176,7 +176,7 @@ namespace SaccFlightAndVehicles
                 }
                 else if (BoostOverheatMode)
                 {
-                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheadMode_replenishSpeed), 0);
+                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheatMode_replenishSpeed), 0);
                 }
             }
         }
@@ -281,7 +281,7 @@ namespace SaccFlightAndVehicles
                 }
                 else if (BoostOverheatMode)
                 {
-                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheadMode_replenishSpeed), 0);
+                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheatMode_replenishSpeed), 0);
                 }
             }
         }
