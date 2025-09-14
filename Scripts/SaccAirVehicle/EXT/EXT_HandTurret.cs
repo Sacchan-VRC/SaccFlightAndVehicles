@@ -54,12 +54,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_Explode()
         {
             Gun.localRotation = Quaternion.identity;
+            if (GunPitch) GunPitch.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
             gameObject.SetActive(false);
         }
         public void SFEXT_G_RespawnButton()
         {
             Gun.localRotation = Quaternion.identity;
+            if (GunPitch) GunPitch.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
         }
         private void LateUpdate()
