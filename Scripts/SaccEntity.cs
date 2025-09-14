@@ -58,6 +58,8 @@ namespace SaccFlightAndVehicles
         public bool PlaySelectSoundRight = true;
         [Tooltip("You can add seats that are NOT a child of this object, if you want to control the vehicle from outside")]
         public VRCStation[] ExternalSeats;
+        [Tooltip("Disallow respawning vehicle if there's someone in the passenger seat")]
+        public bool DisableRespawnIfPassenger = false;
         [Tooltip("Enable the Interact functionality on this object?")]
         [FieldChangeCallback(nameof(EnableInteract))] public bool _EnableInteract = false;
         public bool EnableInteract
@@ -1140,10 +1142,11 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void ExitStation()
+        public bool ExitStation()
         {
             if (MySeat > -1 && MySeat < VehicleStations.Length)
-            { VehicleStations[MySeat].ExitStation(localPlayer); }
+            { VehicleStations[MySeat].ExitStation(localPlayer); return true; }
+            return false;
         }
         [System.NonSerializedAttribute] public Vector3 Spawnposition;
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
@@ -1153,7 +1156,7 @@ namespace SaccFlightAndVehicles
             if (Time.time - lastRespawnTime < 3) { return; }
             VRCPlayerApi currentOwner = Networking.GetOwner(gameObject);
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero);
-            if (Occupied || _dead || BlockedCheck || PlayersInside > 0) { return; }
+            if (Occupied || _dead || BlockedCheck || (PlayersInside > 0 && DisableRespawnIfPassenger)) { return; }
             if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld) && !CustomPickup_Synced_isHeld)
             {
                 lastRespawnTime = Time.time;
