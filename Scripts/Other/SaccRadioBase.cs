@@ -44,7 +44,7 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < AllRadios_RD.Length; i++)
             {
                 AllRadios_RD[i].RadioBase = this;
-                AllRadios_RD[i].Init();
+                // AllRadios_RD[i].Init();
             }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
@@ -177,7 +177,7 @@ namespace SaccFlightAndVehicles
         {
             for (int i = 0; i < AllRadios_RD.Length; i++)
             {
-                if (!AllRadios_RD[i].EntityControl.Initialized) continue;
+                if (!AllRadios_RD[i].Initialized) continue;
                 for (int o = 0; o < AllRadios_RD[i].RadioSeats.Length; o++)
                 {
                     if (MyRadio)

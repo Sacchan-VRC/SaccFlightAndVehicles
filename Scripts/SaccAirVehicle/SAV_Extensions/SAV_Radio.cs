@@ -44,7 +44,7 @@ namespace SaccFlightAndVehicles
             }
             get => _Channel;
         }
-        private bool Initialized;
+        [System.NonSerialized] public bool Initialized;
         private VRCPlayerApi localPlayer;
         private int CurrentOwnerID = -1;
         private bool ChannelSwapped;
