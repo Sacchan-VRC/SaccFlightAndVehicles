@@ -329,6 +329,73 @@ namespace SaccFlightAndVehicles
             }
             get => DisableGroundDetection;
         }
+        [System.NonSerializedAttribute] public bool _KeepAwake;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(KeepAwake_))] public int KeepAwake = 0;
+        public int KeepAwake_
+        {
+            set
+            {
+                if (value > 0 && KeepAwake == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_KeepAwake_Activated");
+                }
+                else if (value == 0 && KeepAwake > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_KeepAwake_Deactivated");
+                }
+                _KeepAwake = value > 0;
+                KeepAwake = value;
+            }
+            get => KeepAwake;
+        }
+        [System.NonSerializedAttribute] public bool _DisableJoystickControl;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableJoystickControl_))] public int DisableJoystickControl = 0;
+        public int DisableJoystickControl_
+        {
+            set
+            {
+                if (value > 0 && DisableJoystickControl == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableJoystickControl_Activated");
+                    if (JoystickGripLastFrame)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
+                        JoystickGripLastFrame = false;
+                    }
+                }
+                else if (value == 0 && DisableJoystickControl > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableJoystickControl_Deactivated");
+                }
+                _DisableJoystickControl = value > 0;
+                DisableJoystickControl = value;
+            }
+            get => DisableJoystickControl;
+        }
+        [System.NonSerializedAttribute] public bool _DisableThrottleControl;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableThrottleControl_))] public int DisableThrottleControl = 0;
+        public int DisableThrottleControl_
+        {
+            set
+            {
+                if (value > 0 && DisableThrottleControl == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableThrottleControl_Activated");
+                    if (ThrottleGripLastFrame)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                        ThrottleGripLastFrame = false;
+                    }
+                }
+                else if (value == 0 && DisableThrottleControl > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableThrottleControl_Deactivated");
+                }
+                _DisableThrottleControl = value > 0;
+                DisableThrottleControl = value;
+            }
+            get => DisableThrottleControl;
+        }
         [System.NonSerializedAttribute] public bool _ThrottleOverridden;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
         public int ThrottleOverridden_
@@ -635,7 +702,7 @@ namespace SaccFlightAndVehicles
                             JoyStickGrippingLastFrame_toggle = false;
                         }
                         //VR Steering wheel
-                        if (Grabbing || GrabToggle)
+                        if ((Grabbing || GrabToggle) && !_DisableJoystickControl)
                         {
                             Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                             VehicleRotLastFrame = ControlsRoot.rotation;
@@ -687,118 +754,121 @@ namespace SaccFlightAndVehicles
                             }
                         }
                         //Throttle
-                        if (UseTwistThrottle)
+                        if (!_DisableJoystickControl)
                         {
-                            if (ThrottleGrip > GripSensitivity)
+                            if (UseTwistThrottle)
                             {
-                                Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameThrottle);//difference in vehicle's rotation since last frame
-                                VehicleRotLastFrameThrottle = ControlsRoot.rotation;
-                                ThrottleZeroPointTwist = VehicleRotDif * ThrottleZeroPointTwist;//zero point rotates with the vehicle so it appears still to the pilot
-                                if (!ThrottleGripLastFrame)//first frame you gripped Throttle
+                                if (ThrottleGrip > GripSensitivity)
                                 {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
-                                    VehicleRotDif = Quaternion.identity;
-                                    if (SwitchHandsJoyThrottle)
-                                    { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
-                                    else
-                                    { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }
-                                    ThrottleValue = -ThrottleInput * TwistThrottleDegrees;
-                                    ThrottleValueLastFrame = 0;
-                                    CompareAngleLastFrameThrottle = Vector3.up;
-                                    ThrottleValueLastFrame = 0;
-                                    if (SwitchHandsJoyThrottle)
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
-                                    else
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
-                                    ThrottleGripLastFrame = true;
-                                }
-                                //difference between the vehicle and the hand's rotation, and then the difference between that and the ThrottleZeroPoint
-                                Quaternion ThrottleDifference;
-                                ThrottleDifference = Quaternion.Inverse(ControlsRoot.rotation) *
-                                    (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation
-                                                            : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation)
-                                * Quaternion.Inverse(ThrottleZeroPointTwist)
-                                 * ControlsRoot.rotation;
+                                    Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameThrottle);//difference in vehicle's rotation since last frame
+                                    VehicleRotLastFrameThrottle = ControlsRoot.rotation;
+                                    ThrottleZeroPointTwist = VehicleRotDif * ThrottleZeroPointTwist;//zero point rotates with the vehicle so it appears still to the pilot
+                                    if (!ThrottleGripLastFrame)//first frame you gripped Throttle
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
+                                        VehicleRotDif = Quaternion.identity;
+                                        if (SwitchHandsJoyThrottle)
+                                        { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
+                                        else
+                                        { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }
+                                        ThrottleValue = -ThrottleInput * TwistThrottleDegrees;
+                                        ThrottleValueLastFrame = 0;
+                                        CompareAngleLastFrameThrottle = Vector3.up;
+                                        ThrottleValueLastFrame = 0;
+                                        if (SwitchHandsJoyThrottle)
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                        else
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                        ThrottleGripLastFrame = true;
+                                    }
+                                    //difference between the vehicle and the hand's rotation, and then the difference between that and the ThrottleZeroPoint
+                                    Quaternion ThrottleDifference;
+                                    ThrottleDifference = Quaternion.Inverse(ControlsRoot.rotation) *
+                                        (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation
+                                                                : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation)
+                                    * Quaternion.Inverse(ThrottleZeroPointTwist)
+                                     * ControlsRoot.rotation;
 
-                                Vector3 ThrottlePosPitch = (ThrottleDifference * Vector3.up);
-                                Vector3 CompareAngle = Vector3.ProjectOnPlane(ThrottlePosPitch, Vector3.right);
-                                ThrottleValue += (Vector3.SignedAngle(CompareAngleLastFrameThrottle, CompareAngle, Vector3.right));
-                                CompareAngleLastFrameThrottle = CompareAngle;
-                                ThrottleValueLastFrame = ThrottleValue;
-                                PlayerThrottle = Mathf.Clamp(-ThrottleValue / TwistThrottleDegrees, 0f, 1f);
+                                    Vector3 ThrottlePosPitch = (ThrottleDifference * Vector3.up);
+                                    Vector3 CompareAngle = Vector3.ProjectOnPlane(ThrottlePosPitch, Vector3.right);
+                                    ThrottleValue += (Vector3.SignedAngle(CompareAngleLastFrameThrottle, CompareAngle, Vector3.right));
+                                    CompareAngleLastFrameThrottle = CompareAngle;
+                                    ThrottleValueLastFrame = ThrottleValue;
+                                    PlayerThrottle = Mathf.Clamp(-ThrottleValue / TwistThrottleDegrees, 0f, 1f);
+                                }
+                                else
+                                {
+                                    PlayerThrottle = Mathf.Max(AccelKeyi - DecelKeyi, 0);
+                                    if (ThrottleGripLastFrame)//first frame you let go of Throttle
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                                        ThrottleGripLastFrame = false;
+                                        if (SwitchHandsJoyThrottle)
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                        else
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                    }
+                                }
                             }
                             else
                             {
-                                PlayerThrottle = Mathf.Max(AccelKeyi - DecelKeyi, 0);
-                                if (ThrottleGripLastFrame)//first frame you let go of Throttle
+                                if (HasAfterburner)
                                 {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
-                                    ThrottleGripLastFrame = false;
-                                    if (SwitchHandsJoyThrottle)
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                    if (AfterburnerOn)
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * KeyboardThrottleSens * DeltaTime), 0, 1f); }
                                     else
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * KeyboardThrottleSens * DeltaTime), 0, ThrottleAfterburnerPoint); }
                                 }
-                            }
-                        }
-                        else
-                        {
-                            if (HasAfterburner)
-                            {
-                                if (AfterburnerOn)
+                                else
                                 { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * KeyboardThrottleSens * DeltaTime), 0, 1f); }
-                                else
-                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * KeyboardThrottleSens * DeltaTime), 0, ThrottleAfterburnerPoint); }
-                            }
-                            else
-                            { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * KeyboardThrottleSens * DeltaTime), 0, 1f); }
 
-                            if (ThrottleGrip > GripSensitivity)
-                            {
-                                Vector3 handdistance;
-                                if (SwitchHandsJoyThrottle)
-                                { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                                else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
-                                handdistance = ControlsRoot.InverseTransformDirection(handdistance);
-
-                                float HandThrottleAxis = handdistance.z;
-
-                                if (!ThrottleGripLastFrame)
+                                if (ThrottleGrip > GripSensitivity)
                                 {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
-                                    ThrottleZeroPoint = HandThrottleAxis;
-                                    TempThrottle = PlayerThrottle;
-                                    HandDistanceZLastFrame = 0;
+                                    Vector3 handdistance;
                                     if (SwitchHandsJoyThrottle)
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
-                                    else
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
-                                    ThrottleGripLastFrame = true;
-                                }
-                                float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
-                                ThrottleDifference *= ThrottleSensitivity;
+                                    { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                                    else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                                    handdistance = ControlsRoot.InverseTransformDirection(handdistance);
 
-                                //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                                if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/) || !HasAfterburner))
-                                {
-                                    PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                                    float HandThrottleAxis = handdistance.z;
+
+                                    if (!ThrottleGripLastFrame)
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
+                                        ThrottleZeroPoint = HandThrottleAxis;
+                                        TempThrottle = PlayerThrottle;
+                                        HandDistanceZLastFrame = 0;
+                                        if (SwitchHandsJoyThrottle)
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                        else
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                        ThrottleGripLastFrame = true;
+                                    }
+                                    float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
+                                    ThrottleDifference *= ThrottleSensitivity;
+
+                                    //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
+                                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/) || !HasAfterburner))
+                                    {
+                                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                                    }
+                                    else
+                                    {
+                                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
+                                    }
+                                    HandDistanceZLastFrame = HandThrottleAxis;
                                 }
                                 else
                                 {
-                                    PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
-                                }
-                                HandDistanceZLastFrame = HandThrottleAxis;
-                            }
-                            else
-                            {
-                                if (ThrottleGripLastFrame)
-                                {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
-                                    if (SwitchHandsJoyThrottle)
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
-                                    else
-                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
-                                    ThrottleGripLastFrame = false;
+                                    if (ThrottleGripLastFrame)
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                                        if (SwitchHandsJoyThrottle)
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                        else
+                                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                        ThrottleGripLastFrame = false;
+                                    }
                                 }
                             }
                         }
@@ -859,50 +929,50 @@ namespace SaccFlightAndVehicles
                             }
                         }
                         FuelEvents();
-                        if (JoystickOverridden_ > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
+                        if (!_DisableJoystickControl)
                         {
-                            YawInput = JoystickOverride.z;
-                        }
-                        else//joystick override disabled, player has control
-                        {
-                            if (!InVR)
+                            if (_JoystickOverridden && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                             {
-                                Vector2 LStickPos = new Vector2(0, 0);
-                                Vector2 RStickPos = new Vector2(0, 0);
-                                if (!InEditor)
-                                {
-                                    //LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                                    //RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                                    //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                                }
-                                VRJoystickPos = LStickPos.y;
+                                YawInput = JoystickOverride.z;
                             }
+                            else//joystick override disabled, player has control
+                            {
+                                if (!InVR)
+                                {
+                                    Vector2 LStickPos = new Vector2(0, 0);
+                                    Vector2 RStickPos = new Vector2(0, 0);
+                                    if (!InEditor)
+                                    {
+                                        //LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                                        LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                                        //RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                                        //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                                    }
+                                    VRJoystickPos = LStickPos.y;
+                                }
 
-                            /*                         RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                                                    RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits; */
-                            //roll isn't subject to flight limits
-                            float YawAddAmount = VRJoystickPos + (-(float)(Ai + Di + lefti + righti) * DeltaTime * KeyboardSteeringSpeed);
-                            if (InVR)
-                            {
-                                if (Mathf.Abs(YawAddAmount) > 0)
+                                float YawAddAmount = VRJoystickPos + (-(float)(Ai + Di + lefti + righti) * DeltaTime * KeyboardSteeringSpeed);
+                                if (InVR)
                                 {
-                                    YawInput = Mathf.Clamp(YawAddAmount, -1, 1);
+                                    if (Mathf.Abs(YawAddAmount) > 0)
+                                    {
+                                        YawInput = Mathf.Clamp(YawAddAmount, -1, 1);
+                                    }
+                                    else
+                                    {
+                                        YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeedVR * DeltaTime);
+                                    }
                                 }
                                 else
                                 {
-                                    YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeedVR * DeltaTime);
-                                }
-                            }
-                            else
-                            {
-                                if (Mathf.Abs(YawAddAmount) > 0)
-                                {
-                                    YawInput = Mathf.Clamp(YawInput + YawAddAmount, -1, 1);
-                                }
-                                else
-                                {
-                                    YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeed * DeltaTime);
+                                    if (Mathf.Abs(YawAddAmount) > 0)
+                                    {
+                                        YawInput = Mathf.Clamp(YawInput + YawAddAmount, -1, 1);
+                                    }
+                                    else
+                                    {
+                                        YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeed * DeltaTime);
+                                    }
                                 }
                             }
                         }
@@ -926,7 +996,7 @@ namespace SaccFlightAndVehicles
                     {
                         WindAndAoA();
                     }
-                    else if (!Asleep && GroundedLastFrame && !KeepAwake)
+                    else if (!Asleep && GroundedLastFrame && !_KeepAwake)
                     {
                         FallAsleep();
                     }
@@ -942,7 +1012,7 @@ namespace SaccFlightAndVehicles
                         { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                         FuelEvents();
                     }
-                    if (JoystickOverridden_ > 0)
+                    if (_JoystickOverridden)
                     { RotationInputs = JoystickOverride; }
                     DoRepeatingWorld();
                 }
@@ -1147,14 +1217,11 @@ namespace SaccFlightAndVehicles
             SetRespawnPos();
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
         }
-        private void WakeUp()
+        private void WakeUp()/*  */
         {
             Asleep = false;
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
         }
-        private bool KeepAwake = false;
-        public void SFEXT_L_KeepAwake() { KeepAwake = true; }
-        public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void FallAsleep()
         {
             Asleep = true;

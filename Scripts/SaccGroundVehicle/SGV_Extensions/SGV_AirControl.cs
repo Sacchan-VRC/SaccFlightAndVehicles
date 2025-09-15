@@ -168,7 +168,7 @@ namespace SaccFlightAndVehicles
             }
             if (SGVControlsDisabled)
             {
-                SGVControl.SetProgramVariable("DisableInput", (int)SGVControl.GetProgramVariable("DisableInput") - 1);
+                SGVControl.SetProgramVariable("DisableJoystickControl", (int)SGVControl.GetProgramVariable("DisableJoystickControl") - 1);
                 VehicleAnimator.SetBool(AIRCONTROL_STRING, false);
                 SGVControlsDisabled = false;
             }
@@ -253,7 +253,7 @@ namespace SaccFlightAndVehicles
             }
             if (!SGVControlsDisabled)
             {
-                SGVControl.SetProgramVariable("DisableInput", (int)SGVControl.GetProgramVariable("DisableInput") + 1);
+                SGVControl.SetProgramVariable("DisableJoystickControl", (int)SGVControl.GetProgramVariable("DisableJoystickControl") + 1);
                 VehicleAnimator.SetBool(AIRCONTROL_STRING, true);
                 SGVControlsDisabled = true;
             }

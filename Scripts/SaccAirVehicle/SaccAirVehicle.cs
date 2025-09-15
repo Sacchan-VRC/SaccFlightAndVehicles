@@ -18,6 +18,8 @@ namespace SaccFlightAndVehicles
         public bool OnlyChangeColliders = false;
         [Tooltip("Position used to raycast from in order to calculate ground effect")]
         public Transform GroundEffectEmpty;
+        [Tooltip("Always apply thrust in the world space up direction? (Balloon?)")]
+        public bool Thrust_AlwaysWorldUp;
         [Tooltip("Position pitching forces are applied at")]
         public Transform PitchMoment;
         [Tooltip("Position yawing forces are applied at")]
@@ -216,6 +218,15 @@ namespace SaccFlightAndVehicles
         public float VTOLGroundEffectStrength = 4;
         [Tooltip("Real angle offset from (0 == thrusting backwards) that the SFEXT_O_Enter/ExitVTOL is called. The event used for disabling cruise and flight limits")]
         public float EnterVTOLEvent_Angle = 20;
+        [Header("Realism:")]
+        [Tooltip("Use square instead of cubic lift? (may be useful for making more realistic aircraft)")]
+        public bool AlternateLift = false;
+        [Tooltip("Point where the drag force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        public Transform CenterOfDrag;
+        [Tooltip("Point where the thrust force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        public Transform CenterOfThrust;
+        [Tooltip("Point where the lift force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        public Transform CenterOfLift;
         [Header("Other:")]
         public bool ReverseThrustAllowAfterburner = false;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
@@ -355,12 +366,12 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
 
 #if UNITY_EDITOR // for debugging
-        public Vector3 VehicleForce;
+        public Vector3 ThrustAcc, LiftAcc;
         public Vector3 VehicleTorque;
         public Vector3 Pitching;
         public Vector3 Yawing;
 # else
-        private Vector3 VehicleForce;
+        private Vector3 ThrustAcc, LiftAcc;
         private Vector3 VehicleTorque;
         private Vector3 Pitching;
         private Vector3 Yawing;
@@ -623,6 +634,73 @@ namespace SaccFlightAndVehicles
                 InvertThrust = value;
             }
             get => InvertThrust;
+        }
+        [System.NonSerializedAttribute] public bool _KeepAwake;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(KeepAwake_))] public int KeepAwake = 0;
+        public int KeepAwake_
+        {
+            set
+            {
+                if (value > 0 && KeepAwake == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_KeepAwake_Activated");
+                }
+                else if (value == 0 && KeepAwake > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_KeepAwake_Deactivated");
+                }
+                _KeepAwake = value > 0;
+                KeepAwake = value;
+            }
+            get => KeepAwake;
+        }
+        [System.NonSerializedAttribute] public bool _DisableJoystickControl;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableJoystickControl_))] public int DisableJoystickControl = 0;
+        public int DisableJoystickControl_
+        {
+            set
+            {
+                if (value > 0 && DisableJoystickControl == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableJoystickControl_Activated");
+                    if (JoystickGripLastFrame)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
+                        JoystickGripLastFrame = false;
+                    }
+                }
+                else if (value == 0 && DisableJoystickControl > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableJoystickControl_Deactivated");
+                }
+                _DisableJoystickControl = value > 0;
+                DisableJoystickControl = value;
+            }
+            get => DisableJoystickControl;
+        }
+        [System.NonSerializedAttribute] public bool _DisableThrottleControl;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableThrottleControl_))] public int DisableThrottleControl = 0;
+        public int DisableThrottleControl_
+        {
+            set
+            {
+                if (value > 0 && DisableThrottleControl == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableThrottleControl_Activated");
+                    if (ThrottleGripLastFrame)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                        ThrottleGripLastFrame = false;
+                    }
+                }
+                else if (value == 0 && DisableThrottleControl > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisableThrottleControl_Deactivated");
+                }
+                _DisableThrottleControl = value > 0;
+                DisableThrottleControl = value;
+            }
+            get => DisableThrottleControl;
         }
         [System.NonSerializedAttribute] public bool _DisablePhysicsApplication;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsApplication_))] public int DisablePhysicsApplication = 0;
@@ -944,7 +1022,7 @@ namespace SaccFlightAndVehicles
                             JoyStickGrippingLastFrame_toggle = false;
                         }
                         //VR Joystick
-                        if (Grabbing || GrabToggle)
+                        if ((Grabbing || GrabToggle) && !_DisableJoystickControl)
                         {
                             Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                             VehicleRotLastFrame = ControlsRoot.rotation;
@@ -1009,14 +1087,17 @@ namespace SaccFlightAndVehicles
                             }
                             JoystickGripLastFrame = false;
                         }
-                        if (HasAfterburner && !AfterburnerOn)
+                        if (!_DisableThrottleControl)
                         {
-                            PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * KeyboardThrottleSens * DeltaTime), 0, ThrottleAfterburnerPoint);
+                            if (HasAfterburner && !AfterburnerOn)
+                            {
+                                PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * KeyboardThrottleSens * DeltaTime), 0, ThrottleAfterburnerPoint);
+                            }
+                            else
+                            { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * KeyboardThrottleSens * DeltaTime), 0, 1f); }
                         }
-                        else
-                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * KeyboardThrottleSens * DeltaTime), 0, 1f); }
                         //VR Throttle
-                        if (ThrottleGrip > GripSensitivity)
+                        if (ThrottleGrip > GripSensitivity && !_DisableThrottleControl)
                         {
                             Vector3 handdistance;
                             if (SwitchHandsJoyThrottle)
@@ -1102,102 +1183,108 @@ namespace SaccFlightAndVehicles
                             Taxiinglerper = 0;
                         }
                         //keyboard control for afterburner
-                        if (Input.GetKeyDown(AfterBurnerKey))
+                        if (!_DisableThrottleControl)
                         {
-                            if (HasAfterburner)
+                            if (Input.GetKeyDown(AfterBurnerKey))
                             {
-                                if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner) && (ReverseThrustAllowAfterburner || !_InvertThrust))
+                                if (HasAfterburner)
                                 {
-                                    if (PlayerThrottle == 1)
-                                    { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                    if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner) && (ReverseThrustAllowAfterburner || !_InvertThrust))
+                                    {
+                                        if (PlayerThrottle == 1)
+                                        { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                        else
+                                        { PlayerThrottle = 1; }
+                                    }
                                     else
-                                    { PlayerThrottle = 1; }
+                                    {
+                                        if (PlayerThrottle == ThrottleAfterburnerPoint)
+                                        { PlayerThrottle = 0; }
+                                        else
+                                        { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                    }
                                 }
+                                else if (PlayerThrottle < 1)
+                                { PlayerThrottle = 1; }
                                 else
-                                {
-                                    if (PlayerThrottle == ThrottleAfterburnerPoint)
-                                    { PlayerThrottle = 0; }
-                                    else
-                                    { PlayerThrottle = ThrottleAfterburnerPoint; }
-                                }
+                                { PlayerThrottle = 0; }
                             }
-                            else if (PlayerThrottle < 1)
-                            { PlayerThrottle = 1; }
-                            else
-                            { PlayerThrottle = 0; }
-                        }
-                        if (_ThrottleOverridden)
-                        {
-                            //handled in FixedUpdate()
-                        }
-                        else//if cruise control disabled, use inputs
-                        {
-                            if (!InVR)
+                            if (_ThrottleOverridden)
                             {
-                                float LTrigger = 0;
-                                float RTrigger = 0;
-                                if (!InEditor)
+                                //handled in FixedUpdate()
+                            }
+                            else//if cruise control disabled, use inputs
+                            {
+                                if (!InVR)
                                 {
-                                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                                    float LTrigger = 0;
+                                    float RTrigger = 0;
+                                    if (!InEditor)
+                                    {
+                                        LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                                        RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                                    }
+                                    if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
+                                    { ThrottleInput = LTrigger; }
+                                    else { ThrottleInput = PlayerThrottle; }
                                 }
-                                if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
-                                { ThrottleInput = LTrigger; }
                                 else { ThrottleInput = PlayerThrottle; }
                             }
-                            else { ThrottleInput = PlayerThrottle; }
                         }
                         FuelEvents();
 
-                        if (_JoystickOverridden)
+                        if (!_DisableJoystickControl)
                         {
-                            //handled in FixedUpdate()
-                        }
-                        else//joystick override disabled, player has control
-                        {
-                            if (!InVR)
+                            if (_JoystickOverridden)
                             {
-                                //allow stick flight in desktop mode
-                                Vector2 LStickPos = Vector2.zero;
-                                Vector2 RStickPos = Vector2.zero;
-                                if (!InEditor)
+                                //handled in FixedUpdate()
+                            }
+                            else//joystick override disabled, player has control
+                            {
+                                if (!InVR)
                                 {
-                                    LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                                    RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                                    //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                                }
-                                VRJoystickPos.x = LStickPos.y;
-                                VRJoystickPos.y = RStickPos.x;
-                                VRJoystickPos.z = LStickPos.x;
-                                //make stick input square
-                                if (SquareJoyInput)
-                                {
-                                    Vector2 LeftStick = new Vector2(VRJoystickPos.z, VRJoystickPos.x);
-                                    if (Mathf.Abs(LeftStick.x) > Mathf.Abs(LeftStick.y))
+                                    //allow stick flight in desktop mode
+                                    Vector2 LStickPos = Vector2.zero;
+                                    Vector2 RStickPos = Vector2.zero;
+                                    if (!InEditor)
                                     {
-                                        if (Mathf.Abs(LeftStick.x) > 0)
+                                        LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                                        LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                                        RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                                        //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                                    }
+                                    VRJoystickPos.x = LStickPos.y;
+                                    VRJoystickPos.y = RStickPos.x;
+                                    VRJoystickPos.z = LStickPos.x;
+                                    //make stick input square
+                                    if (SquareJoyInput)
+                                    {
+                                        Vector2 LeftStick = new Vector2(VRJoystickPos.z, VRJoystickPos.x);
+                                        if (Mathf.Abs(LeftStick.x) > Mathf.Abs(LeftStick.y))
                                         {
-                                            float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.x);
+                                            if (Mathf.Abs(LeftStick.x) > 0)
+                                            {
+                                                float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.x);
+                                                LeftStick *= temp;
+                                            }
+                                        }
+                                        else if (Mathf.Abs(LeftStick.y) > 0)
+                                        {
+                                            float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.y);
                                             LeftStick *= temp;
                                         }
+                                        VRJoystickPos.z = LeftStick.x;
+                                        VRJoystickPos.x = LeftStick.y;
                                     }
-                                    else if (Mathf.Abs(LeftStick.y) > 0)
-                                    {
-                                        float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.y);
-                                        LeftStick *= temp;
-                                    }
-                                    VRJoystickPos.z = LeftStick.x;
-                                    VRJoystickPos.x = LeftStick.y;
                                 }
-                            }
 
-                            RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1);
-                            if ((RotationInputs.x < 0 && VertGs > 0) || (RotationInputs.x > 0 && VertGs < 0)) { RotationInputs.x *= Limits; }
-                            RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
-                            //roll isn't subject to flight limits
-                            RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
-                            SetRotInputs();
+                                RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1);
+                                if ((RotationInputs.x < 0 && VertGs > 0) || (RotationInputs.x > 0 && VertGs < 0)) { RotationInputs.x *= Limits; }
+                                RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
+                                //roll isn't subject to flight limits
+                                RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
+                                SetRotInputs();
+                            }
                         }
 
                         //ability to adjust input to be more precise at low amounts. 'exponant'
@@ -1283,7 +1370,7 @@ namespace SaccFlightAndVehicles
                 {
                     WindAndAoA();
                 }
-                else if (!Asleep && GroundedLastFrame && !KeepAwake)
+                else if (!Asleep && GroundedLastFrame && !_KeepAwake)
                 {
                     FallAsleep();
                 }
@@ -1326,7 +1413,6 @@ namespace SaccFlightAndVehicles
                         downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
                         PitchDown = downspeed < 0;//air is hitting plane from above?
                         SpeedLiftFactor = AirSpeed * AirSpeed;
-                        SpeedLiftFactor_Lift = Mathf.Min(SpeedLiftFactor * Lift, MaxLift);
 
                         rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
@@ -1366,58 +1452,68 @@ namespace SaccFlightAndVehicles
                         + Mathf.Max(Outputs.y, 0)//Afterburner throttle
                         * ThrottleStrengthAB);
 
-                        SpeedLiftFactor_pd = Mathf.Min(AirSpeed * AirSpeed * Lift, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
+
+                        if (AlternateLift)
+                        {
+                            SpeedLiftFactor_Lift = Mathf.Abs(sidespeed) * Lift;// Mathf.Min(, MaxLift);
+                            SpeedLiftFactor_pd = Mathf.Abs(downspeed) * Lift;// Mathf.Min(, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
+                        }
+                        else
+                        {
+                            SpeedLiftFactor_Lift = Mathf.Min(SpeedLiftFactor * Lift, MaxLift);
+                            SpeedLiftFactor_pd = Mathf.Min(AirSpeed * AirSpeed * Lift, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
+                        }
 
                         //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                         //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
-                        Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor_Lift * AoALiftYaw,// X Sideways
+                        LiftAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor_Lift * AoALiftYaw,// X Sideways
                                 ((PitchDown ? downspeed * PitchDownLiftMulti : downspeed) * ExtraLift * SpeedLiftFactor_pd * AoALiftPitch),// Y Up
                                 0);//Z Forward
 
-                        if (VTOLenabled)
+                        //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
+                        if (Thrust_AlwaysWorldUp)
                         {
-                            //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
-                            Vector3 VTOLInputAcc;//rotate and scale Vector for VTOL thrust
+                            ThrustAcc = transform.InverseTransformDirection(Vector3.up) * Thrust;
+                        }
+                        else if (VTOLenabled)
+                        {
                             if (VTOLOnly)//just use regular thrust strength if vtol only, no transition to plane flight
                             {
-                                VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
+                                ThrustAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
                                     * Vector3.forward);
-                                VTOLAngleForwardDot = Vector3.Dot(VTOLInputAcc, Vector3.forward);
+                                VTOLAngleForwardDot = Vector3.Dot(ThrustAcc, Vector3.forward);
                                 VTOLAngleForward = VTOLAngleForwardDot > 0;
-                                VTOLInputAcc *= Thrust;
+                                ThrustAcc *= Thrust;
                                 //VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
                             }
                             else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                             {
                                 float downthrust = Thrust * VTOLThrottleStrengthMulti;
-                                VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
+                                ThrustAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
                                     * Vector3.forward);
-                                VTOLAngleForwardDot = Vector3.Dot(VTOLInputAcc, Vector3.forward);
+                                VTOLAngleForwardDot = Vector3.Dot(ThrustAcc, Vector3.forward);
                                 VTOLAngleForward = VTOLAngleForwardDot > 0;
                                 VTOLAngleForward90 = Mathf.Min((Mathf.Acos(Mathf.Clamp(VTOLAngleForwardDot, -1, 1)) * 0.63661977236758f /* divide by 90 degrees in radians */), 1);
-                                VTOLInputAcc *= Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTOLAngleForward90);
+                                ThrustAcc *= Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTOLAngleForward90);
                             }
 
                             //add ground effect to the VTOL thrust
-                            GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(VTOLInputAcc), VTOLGroundEffectStrength, 1);
-                            VTOLInputAcc *= GroundEffectAndVelLift;
+                            GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(ThrustAcc), VTOLGroundEffectStrength, 1);
+                            ThrustAcc *= GroundEffectAndVelLift;
 
-                            //Add Airplane Ground Effect
-                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, SpeedLiftFactor);
-                            //add lift and thrust
-
-                            FinalInputAcc += VTOLInputAcc;
-                            FinalInputAcc.y += GroundEffectAndVelLift;
-                            FinalInputAcc *= Atmosphere;
                         }
                         else//Simpler version for non-VTOL craft
                         {
-                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, SpeedLiftFactor);
-
-                            FinalInputAcc.y += GroundEffectAndVelLift;
-                            FinalInputAcc.z += Thrust;
-                            FinalInputAcc *= Atmosphere;
+                            ThrustAcc = Vector3.forward * Thrust;
                         }
+                        if (AlternateLift)
+                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, AirSpeed);
+                        else
+                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, SpeedLiftFactor);
+                        LiftAcc.y += GroundEffectAndVelLift;
+
+                        ThrustAcc *= Atmosphere;
+                        LiftAcc *= Atmosphere;
 
                         float outputdif = (EngineOutput - EngineOutputLastFrame) / DeltaTime;
                         float ADVYaw = outputdif * AdverseYaw;
@@ -1461,13 +1557,12 @@ namespace SaccFlightAndVehicles
 
                         if (DroneMode)
                         {
-                            FinalInputAcc.y *= _EngineOn ? ThrottleInput : 0;
+                            LiftAcc.y *= _EngineOn ? ThrottleInput : 0;
                         }
 
-                        VehicleForce = FinalInputAcc;
                         if (HasWheelColliders && WheelSuspension)
                         {
-                            float suspensionDownCof = FinalInputAcc.y / VehicleRigidbody.mass / 9.81f;
+                            float suspensionDownCof = LiftAcc.y / VehicleRigidbody.mass / 9.81f;
                             suspensionDownCof = Mathf.Clamp(suspensionDownCof, 0, 1);
                             for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
                             {
@@ -1496,22 +1591,41 @@ namespace SaccFlightAndVehicles
                     // so until I work out why, just multiply forces by mass
                     float RBMass = VehicleRigidbody.mass;
                     // lerp velocity toward zero/windspeed for 'air friction'
-                    VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
+                    if (CenterOfDrag)
+                    {
+                        Vector3 drag = -AirVel * ((AirFriction + SoundBarrier) * ExtraDrag);
+                        VehicleRigidbody.AddForceAtPosition(drag * RBMass, CenterOfDrag.position, ForceMode.Force);
+                    }
+                    else
+                    {
+                        VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
+                    }
                     if (wrecked)
                     {
                         float negHealthPc = Mathf.Clamp01(Health / ExplodeHealth);
                         VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
-                        VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc) * RBMass, ForceMode.Force);
+                        if (CenterOfLift)
+                            VehicleRigidbody.AddForceAtPosition(VehicleTransform.rotation * LiftAcc * RBMass, CenterOfLift.position, ForceMode.Force);
+                        else
+                            VehicleRigidbody.AddRelativeForce(LiftAcc * RBMass * (1 - negHealthPc), ForceMode.Force);
                     }
                     else
-                    { VehicleRigidbody.AddRelativeForce(VehicleForce * RBMass, ForceMode.Force); }
+                    {
+                        if (CenterOfThrust)
+                            VehicleRigidbody.AddForceAtPosition(VehicleTransform.rotation * ThrustAcc * RBMass, CenterOfThrust.position, ForceMode.Force);
+                        else
+                            VehicleRigidbody.AddRelativeForce(ThrustAcc * RBMass, ForceMode.Force);
+                        if (CenterOfLift)
+                            VehicleRigidbody.AddForceAtPosition(VehicleTransform.rotation * LiftAcc * RBMass, CenterOfLift.position, ForceMode.Force);
+                        else
+                            VehicleRigidbody.AddRelativeForce(LiftAcc * RBMass, ForceMode.Force);
+                    }
                     VehicleRigidbody.AddRelativeTorque(VehicleTorque * RBMass, ForceMode.Force);
                     //apply pitching using pitch moment
                     if (PitchMoment)
                     { VehicleRigidbody.AddForceAtPosition(Pitching * RBMass, PitchMoment.position, ForceMode.Force); }
                     else
                     { VehicleRigidbody.AddRelativeTorque(Pitching * RBMass, ForceMode.Force); }
-                    //deltatime is built into ForceMode.Force
                     //apply yawing using yaw moment
                     if (YawMoment)
                     { VehicleRigidbody.AddForceAtPosition(Yawing * RBMass, YawMoment.position, ForceMode.Force); }
@@ -1585,7 +1699,7 @@ namespace SaccFlightAndVehicles
 
             if (IsOwner)
             {
-                VehicleForce = Vector3.zero;
+                LiftAcc = ThrustAcc = Vector3.zero;
                 VehicleTorque = Vector3.zero;
                 VehicleRigidbody.velocity = Vector3.zero;
                 VehicleRigidbody.angularVelocity = Vector3.zero;
@@ -1646,7 +1760,7 @@ namespace SaccFlightAndVehicles
         {
             VehicleRigidbody.drag = 0;
             VehicleRigidbody.angularDrag = 0;
-            VehicleForce = Vector3.zero;
+            LiftAcc = ThrustAcc = Vector3.zero;
             VehicleTorque = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleRigidbody.velocity = Vector3.zero;
@@ -1693,9 +1807,6 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.WakeUp();
             EnableLiftSurfaces(IsOwner);
         }
-        private bool KeepAwake = false;
-        public void SFEXT_L_KeepAwake() { KeepAwake = true; }
-        public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void FallAsleep()
         {
             Asleep = true;
@@ -2011,7 +2122,7 @@ namespace SaccFlightAndVehicles
             { SendNotLowFuel(); }
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
-            VehicleForce = Vector3.zero;
+            LiftAcc = ThrustAcc = Vector3.zero;
             VehicleTorque = Vector3.zero;
             EntityControl.SetWreckedFalse();
         }
@@ -2258,12 +2369,16 @@ namespace SaccFlightAndVehicles
                 if ((EntityControl.Piloting || !Occupied) && !EntityControl.pilotLeftFlag)
                 // pilot wasn't in the vehicle when you took ownership, or you just took ownership by getting in
                 {
-                    PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput;
+                    if (!_DisableThrottleControl)
+                    {
+                        PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput;
+                    }
                 }
                 else// user was in the vehicle when they left or you took ownership with a grapple
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
-                    PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
+                    PlayerThrottle = ThrottleInput = 0;
+                    EngineOutputLastFrame = EngineOutput;
                 }
             }
             if (!UsingManualSync)
@@ -2290,10 +2405,16 @@ namespace SaccFlightAndVehicles
             VTOLAngleInput = VTOLAngle;
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
             GDHitRigidbody = null;
-            if (_EngineOn)
-            { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
-            else
-            { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
+            if (!_DisableThrottleControl)
+            {
+                if (_EngineOn)
+                { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
+                else
+                {
+                    PlayerThrottle = ThrottleInput = 0;
+                    EngineOutputLastFrame = EngineOutput;
+                }
+            }
 
             Piloting = true;
             if (EntityControl._dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
