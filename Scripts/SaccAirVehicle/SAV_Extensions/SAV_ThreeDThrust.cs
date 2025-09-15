@@ -166,6 +166,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             InVR = SAVControl.InVR;
             SwitchHandsJoyThrottle = SAVControl.SwitchHandsJoyThrottle;
+            if (showArrow_Desktop && ThrustArrow) { ThrustArrow.gameObject.SetActive(true); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -181,6 +182,7 @@ namespace SaccFlightAndVehicles
                 LastUpdateTime = Time.time;
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SetWind), SAVControl.Wind);
             }
+            if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
         }
         private void ThrottleStuff(float Input)
         {
@@ -208,7 +210,7 @@ namespace SaccFlightAndVehicles
                     if (ThrustArrow)
                     {
                         ThrustArrow.position = HandPos;
-                        if (!ThrustArrow.gameObject.activeSelf)
+                        if (InVR && ThrustArrow.gameObject.activeSelf)
                         { ThrustArrow.gameObject.SetActive(true); }
                     }
                 }
@@ -228,7 +230,7 @@ namespace SaccFlightAndVehicles
                 ThreeDThrottleLastFrame = false;
                 if (ThrustArrow)
                 {
-                    if (ThrustArrow.gameObject.activeSelf)
+                    if (InVR && ThrustArrow.gameObject.activeSelf)
                     { ThrustArrow.gameObject.SetActive(false); }
                 }
             }
