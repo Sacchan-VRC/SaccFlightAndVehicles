@@ -49423,6 +49423,7 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -55193,9 +55194,9 @@ MonoBehaviour:
   FullReloadTimeSec: 8
   AGMLock: {fileID: 4371473018531844314}
   AGMUnlock: {fileID: 4371473019781911918}
-  LockableLayers:
+  LockableLayermask:
     serializedVersion: 2
-    m_Bits: 133121
+    m_Bits: 2147616769
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
   AGMInheritVelocity: 1
@@ -88210,13 +88211,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 4371473019873987475}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: -2692614534935363141}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -95406,7 +95407,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6547058811089756650}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.4449978}
+  m_LocalPosition: {x: 0, y: 0, z: 0.4387}
   m_LocalScale: {x: 0.32208067, y: 0.32208067, z: 0.32208067}
   m_ConstrainProportionsScale: 0
   m_Children:

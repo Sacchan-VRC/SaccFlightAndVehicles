@@ -98951,13 +98951,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2934804655299911390}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: -5424269735798070188}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -100815,6 +100815,7 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -106743,10 +106744,10 @@ MonoBehaviour:
   MaxLift: 0
   VelLift: 0
   VelLiftMax: 0
-  MaxGs: 20
+  MaxGs: 25
   GDamage: 20
-  Crash_Damage_Speed: 10
-  Crash_Death_Speed: 50
+  Crash_Damage_Speed: 15
+  Crash_Death_Speed: 75
   GroundEffectMaxDistance: 0
   GroundEffectStrength: 0
   GroundEffectLiftMax: 0
