@@ -162,18 +162,19 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6612988979853252858}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 535500133013250016}
   OtherScripts_Event_Name: RespawnRadio
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &6612988979853252858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1108,7 +1109,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: -0.0325}
-  m_SizeDelta: {x: 1348, y: 218}
+  m_SizeDelta: {x: 0.6, y: 0.44}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5784858301973509183
 Canvas:
@@ -1816,3 +1817,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
