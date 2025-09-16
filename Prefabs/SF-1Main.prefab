@@ -93799,6 +93799,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &4371473020080694781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94528,6 +94529,7 @@ MonoBehaviour:
   VehicleMesh: {fileID: 7510463846146837827}
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 4371473018256058482}
+  Thrust_AlwaysWorldUp: 0
   PitchMoment: {fileID: 4371473019930906791}
   YawMoment: {fileID: 4371473018543437814}
   GroundDetector: {fileID: 4371473019694781309}
@@ -94744,6 +94746,10 @@ MonoBehaviour:
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 0.14
   EnterVTOLEvent_Angle: 20
+  AlternateLift: 0
+  CenterOfDrag: {fileID: 0}
+  CenterOfThrust: {fileID: 0}
+  CenterOfLift: {fileID: 0}
   ReverseThrustAllowAfterburner: 0
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -94776,7 +94782,8 @@ MonoBehaviour:
   EngineOffOnExit: 1
   DroneMode: 0
   _EngineOn: 0
-  VehicleForce: {x: 0, y: 0, z: 0}
+  ThrustAcc: {x: 0, y: 0, z: 0}
+  LiftAcc: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
   Pitching: {x: 0, y: 0, z: 0}
   Yawing: {x: 0, y: 0, z: 0}
@@ -123311,7 +123318,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.2
     m_AsymptoteValue: 0.125
-    m_Stiffness: 1
+    m_Stiffness: 0.05
   m_SidewaysFriction:
     m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
@@ -123384,7 +123391,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.2
     m_AsymptoteValue: 0.125
-    m_Stiffness: 1
+    m_Stiffness: 0.05
   m_SidewaysFriction:
     m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
@@ -123457,7 +123464,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.2
     m_AsymptoteValue: 0.125
-    m_Stiffness: 1
+    m_Stiffness: 0.05
   m_SidewaysFriction:
     m_ExtremumSlip: 0.2
     m_ExtremumValue: 1
