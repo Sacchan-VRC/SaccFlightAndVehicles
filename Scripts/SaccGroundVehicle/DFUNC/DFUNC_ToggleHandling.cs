@@ -14,9 +14,12 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SGVControl;
         [Tooltip("Keep this gameobject always enabled. So it can be used as an interactable by people outside of the vehicle.")]
         [SerializeField] private bool ObjectAlwaysEnabled;
+        [Tooltip("Enable VRC's Interact functionality (require collider)")]
+        [SerializeField] private bool EnableInteract = false;
         [Tooltip("Toggle if if fuel runs out?")]
         [SerializeField] private bool NoFuelTurnOff;
         [SerializeField] private bool WreckedTurnOff;
+        [SerializeField] private bool PilotExitTurnOff;
         [SerializeField] private bool KeepAwakeWhileOn;
         [SerializeField] Animator ToggleAnimator;
         [SerializeField] string ToggleAnimator_boolname = "HandlingToggle";
@@ -57,6 +60,7 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
             CoM = EntityControl.CenterOfMass;
             CoMOriginalPos = CoM.localPosition;
+            DisableInteractive = !EnableInteract;
 
             if (SGVControl.GetUdonTypeName() == GetUdonTypeName<SaccGroundVehicle>())
             {
@@ -133,6 +137,10 @@ namespace SaccFlightAndVehicles
             Selected = false;
             if (!ObjectAlwaysEnabled)
                 gameObject.SetActive(false);
+        }
+        public void SFEXT_G_PilotExit()
+        {
+            if (PilotExitTurnOff) { ToggleOff(); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -304,6 +312,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_NotWrecked()
         {
             wrecked = false;
+        }
+        public void SFEXT_O_OnPlayerJoined()
+        {
+            if (EntityControl.IsOwner)
+                if (Toggled) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleOn));
         }
     }
 }
