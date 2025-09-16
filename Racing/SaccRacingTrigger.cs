@@ -270,14 +270,11 @@ namespace SaccFlightAndVehicles
             //Debug.Log("Finish Race!");
             RaceFinishTime = Time.time;
             RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime());
-            CurrentCourse.TimeReporter.MyLastRace_Reverse = !TrackForward;
             if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
             {
                 //if i am not on board, AND my time is better than the worst time on board OR
                 //if i am on board, and my time is better than my previous time
                 //add submit my time
-                CurrentCourse.TimeReporter.MyLastTime = RaceTime;
-                CurrentCourse.TimeReporter.MyLastVehicle = PlaneName;
                 int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames);
                 if (mypos < 0)//i am not on the board
                 {
@@ -297,8 +294,6 @@ namespace SaccFlightAndVehicles
             }
             else//track was finished backward
             {
-                CurrentCourse.TimeReporter.MyLastTime_R = RaceTime;
-                CurrentCourse.TimeReporter.MyLastVehicle_R = PlaneName;
                 int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames_R);
                 if (mypos < 0)//i am not on the board
                 {
@@ -466,11 +461,7 @@ namespace SaccFlightAndVehicles
         }
         private void SendMyTime(bool reverse)
         {
-            Networking.SetOwner(localPlayer, CurrentCourse.TimeReporter.gameObject);
-            CurrentCourse.TimeReporter.ReportedVehicle = PlaneName;
-            CurrentCourse.TimeReporter.Reported_RaceReverse = reverse;
-            CurrentCourse.TimeReporter.ReportedTime = RaceTime;
-            CurrentCourse.TimeReporter.RequestSerialization();
+            CurrentCourse.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "NewRecord", RaceTime, PlaneName, localPlayer.displayName, reverse);
         }
         public void SetCourse()
         {

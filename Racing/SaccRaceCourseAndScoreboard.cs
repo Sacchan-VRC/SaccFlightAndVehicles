@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using TMPro;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -13,7 +14,6 @@ namespace SaccFlightAndVehicles
     {
         [Tooltip("Used by other scripts to get the races name.")]
         public string RaceName;
-        public SaccRaceTimeReporter TimeReporter;
         [Tooltip("All checkpoint objects for this race in order, animations are sent to them as they are passed")]
         public GameObject[] RaceCheckpoints;
         [Tooltip("Laps mode. To finish the race you must enter the first checkpoint again, which starts the race again")]
@@ -189,20 +189,17 @@ namespace SaccFlightAndVehicles
                 // }
             }
         }
-        public void NewRecord()//owner runs this
+        [NetworkCallable]
+        public void NewRecord(float ReportedTime, string ReportedVehicle, string PlayerName, bool Reverse)
         {
-            float newtime = TimeReporter._ReportedTime;
-            string newvehicle = TimeReporter.ReportedVehicle;
-            string playername = Networking.GetOwner(TimeReporter.gameObject).displayName;
-            bool reverse = TimeReporter.Reported_RaceReverse;
             int posonboard;
-            if (reverse)
-            { posonboard = CheckIfOnBoard(playername, ref PlayerNames_R); }
+            if (Reverse)
+            { posonboard = CheckIfOnBoard(PlayerName, ref PlayerNames_R); }
             else
-            { posonboard = CheckIfOnBoard(playername, ref PlayerNames); }
+            { posonboard = CheckIfOnBoard(PlayerName, ref PlayerNames); }
             bool NewTopRcrd = false;
             if (PlayerTimes.Length > 0)
-            { if (newtime < PlayerTimes[0]) { NewTopRcrd = true; } }
+            { if (ReportedTime < PlayerTimes[0]) { NewTopRcrd = true; } }
             else NewTopRcrd = true;
             if (NewTopRcrd)
             {
@@ -216,53 +213,53 @@ namespace SaccFlightAndVehicles
             }
             if (posonboard > -1)//on board
             {
-                if (reverse)
+                if (Reverse)
                 {
-                    if (newtime > PlayerTimes_R[posonboard])
+                    if (ReportedTime > PlayerTimes_R[posonboard])
                     {
-                        PlayerTimes_MostRecent_R[posonboard] = newtime;
+                        PlayerTimes_MostRecent_R[posonboard] = ReportedTime;
                         PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
                     }
                     else
                     {
-                        PlayerNames_R[posonboard] = playername;
-                        PlayerTimes_MostRecent_R[posonboard] = newtime;
-                        PlayerTimes_R[posonboard] = newtime;
-                        PlayerVehicles_R[posonboard] = newvehicle;
+                        PlayerNames_R[posonboard] = PlayerName;
+                        PlayerTimes_MostRecent_R[posonboard] = ReportedTime;
+                        PlayerTimes_R[posonboard] = ReportedTime;
+                        PlayerVehicles_R[posonboard] = ReportedVehicle;
                         PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
                     }
                 }
                 else
                 {
-                    if (newtime > PlayerTimes[posonboard])
+                    if (ReportedTime > PlayerTimes[posonboard])
                     {
-                        PlayerTimes_MostRecent[posonboard] = newtime;
+                        PlayerTimes_MostRecent[posonboard] = ReportedTime;
                         PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
                     }
                     else
                     {
-                        PlayerNames[posonboard] = playername;
-                        PlayerTimes_MostRecent[posonboard] = newtime;
-                        PlayerTimes[posonboard] = newtime;
-                        PlayerVehicles[posonboard] = newvehicle;
+                        PlayerNames[posonboard] = PlayerName;
+                        PlayerTimes_MostRecent[posonboard] = ReportedTime;
+                        PlayerTimes[posonboard] = ReportedTime;
+                        PlayerVehicles[posonboard] = ReportedVehicle;
                         PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
                     }
                 }
             }
             else//not on board
             {
-                if (reverse)
+                if (Reverse)
                 {
-                    if (PlayerTimes_R.Length < MaxRecordedTimes || newtime < PlayerTimes_R[PlayerTimes_R.Length - 1])
+                    if (PlayerTimes_R.Length < MaxRecordedTimes || ReportedTime < PlayerTimes_R[PlayerTimes_R.Length - 1])
                     {
-                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
+                        AddNewPlayerToBoard(PlayerName, ReportedTime, ReportedVehicle, ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
                     }
                 }
                 else
                 {
-                    if (PlayerTimes.Length < MaxRecordedTimes || newtime < PlayerTimes[PlayerTimes.Length - 1])
+                    if (PlayerTimes.Length < MaxRecordedTimes || ReportedTime < PlayerTimes[PlayerTimes.Length - 1])
                     {
-                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
+                        AddNewPlayerToBoard(PlayerName, ReportedTime, ReportedVehicle, ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
                     }
                 }
             }
