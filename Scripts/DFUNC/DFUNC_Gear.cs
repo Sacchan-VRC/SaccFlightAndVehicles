@@ -27,7 +27,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
-        [System.NonSerializedAttribute] public bool GearUp = false;
+        [System.NonSerializedAttribute] public bool GearUp = true;
         private bool DragApplied = false;
         private bool IsOwner = false;
         private bool DisableGroundDetector = false;
