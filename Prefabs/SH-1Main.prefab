@@ -43437,6 +43437,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &5375975541755607644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44254,6 +44255,7 @@ MonoBehaviour:
   VehicleMesh: {fileID: 7978705244105965653}
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 8333115238555617820}
+  Thrust_AlwaysWorldUp: 0
   PitchMoment: {fileID: 0}
   YawMoment: {fileID: 3794158492767849092}
   GroundDetector: {fileID: 8333115238806481908}
@@ -44398,6 +44400,10 @@ MonoBehaviour:
   VTOLLoseControlSpeed: 1
   VTOLGroundEffectStrength: 0.3
   EnterVTOLEvent_Angle: 20
+  AlternateLift: 0
+  CenterOfDrag: {fileID: 0}
+  CenterOfThrust: {fileID: 0}
+  CenterOfLift: {fileID: 0}
   ReverseThrustAllowAfterburner: 0
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -44430,7 +44436,8 @@ MonoBehaviour:
   EngineOffOnExit: 1
   DroneMode: 0
   _EngineOn: 0
-  VehicleForce: {x: 0, y: 0, z: 0}
+  ThrustAcc: {x: 0, y: 0, z: 0}
+  LiftAcc: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
   Pitching: {x: 0, y: 0, z: 0}
   Yawing: {x: 0, y: 0, z: 0}
@@ -77239,6 +77246,8 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   TargetEyePosition: {fileID: 2653143539570689386}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -78355,6 +78364,8 @@ MonoBehaviour:
   - {fileID: 8333115238474179255}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   TargetEyePosition: {fileID: 388422482105506395}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -95384,6 +95395,8 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   TargetEyePosition: {fileID: 2653143539710161896}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -95740,6 +95753,8 @@ MonoBehaviour:
   - {fileID: 5176589018563589172}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   TargetEyePosition: {fileID: 2653143540183886235}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -96069,13 +96084,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238970575334}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 1439720729650657754}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -106062,9 +106077,9 @@ MonoBehaviour:
   FullReloadTimeSec: 8
   AGMLock: {fileID: 8333115239407741684}
   AGMUnlock: {fileID: 8333115238839294822}
-  LockableLayers:
+  LockableLayermask:
     serializedVersion: 2
-    m_Bits: 133121
+    m_Bits: 2147616769
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
   AGMInheritVelocity: 1
@@ -122598,6 +122613,7 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -133137,6 +133153,8 @@ MonoBehaviour:
   - {fileID: 6416334152273725288}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 1651320211060793692}
   TargetEyePosition: {fileID: 2653143541454527584}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -133413,6 +133431,8 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   TargetEyePosition: {fileID: 2653143541203552689}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -148830,6 +148850,8 @@ MonoBehaviour:
   MoveTransforms: []
   MoveTransforms_CoPosition: []
   TakeControlKey: 32
+  PilotRadio: {fileID: 0}
+  ThisSeatRadio: {fileID: 0}
 --- !u!114 &5977842168220115740
 MonoBehaviour:
   m_ObjectHideFlags: 0

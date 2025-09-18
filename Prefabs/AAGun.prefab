@@ -188,10 +188,14 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2041867257}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
+  RotationCalibrationTarget: {fileID: 6124371904254225451}
 --- !u!114 &204394095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15804,11 +15808,14 @@ MonoBehaviour:
   HUDControl: {fileID: 505994400869694293}
   AAM: {fileID: 3618790963229616095}
   MissileType: 1
+  AnimFloatName: AAMs
+  AnimFiredTriggerName: aamlaunched
   RotatingSound: {fileID: 5639847567931604606}
   RotatingSoundMulti: 0.02
   AAMTargeting: {fileID: 464908274}
   AAMTargetLock: {fileID: 244561739}
   DamageFeedBack: {fileID: 6014378832009447336}
+  AAMLaunchSound: {fileID: 0}
   JoyStick: {fileID: 6124371903860333399}
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   SwitchHandsJoyThrottle: 0
@@ -15831,14 +15838,20 @@ MonoBehaviour:
   AAMMaxTargetDistance: 6000
   AAMLockAngle: 20
   AAMLockTime: 1.5
+  LockTimeABDivide: 2
+  LockTimeMinDivide: 0.2
   AAMLaunchDelay: 0
   AAMLaunchPoint: {fileID: 980607809}
   AllowNoAmmoLock: 0
+  HighAspectPreventLock: 0
+  HighAspectAngle: 85
   LoseLockWhenFired: 0
   SendLockWarning: 1
   DisableTargeting: 0
   OnlyTargetVehicles: 0
   BulletDamageTaken: 10
+  WorldParent: {fileID: 0}
+  TargetLayers: 110000001f000000
   AI_GUN: 0
   AI_GUN_TurnStrength: 1
   AI_GUN_BurstLength: {x: 1.5, y: 4}
@@ -37943,10 +37956,12 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -37955,10 +37970,11 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  Pickup_DisableCollisionOnGrab: 0
+  OnboardVehicleLayer: 31
+  OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
-  DialFuncPos: 0
-  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &1831767551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38014,6 +38030,12 @@ RotationConstraint:
 --- !u!4 &6124371904254225447 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: cb045ada1dcf7bc4db515b43d72e6cb6,
+    type: 3}
+  m_PrefabInstance: {fileID: 6124371904254097063}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6124371904254225451 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400012, guid: cb045ada1dcf7bc4db515b43d72e6cb6,
     type: 3}
   m_PrefabInstance: {fileID: 6124371904254097063}
   m_PrefabAsset: {fileID: 0}
