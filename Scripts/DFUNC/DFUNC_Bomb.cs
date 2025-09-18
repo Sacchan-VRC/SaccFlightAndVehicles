@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using TMPro;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -70,7 +71,6 @@ namespace SaccFlightAndVehicles
         [Header("")]
         [Tooltip("Delegate firing sync to EXT_Turret script to sync shoot direction properly.\nIf using FireSyncDelegate, syncmode can be set to None")]
         public UdonBehaviour FireSyncDelegate;
-        [UdonSynced(UdonSyncMode.None)] private bool BombFireNow = false;
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
@@ -145,8 +145,6 @@ namespace SaccFlightAndVehicles
         private int StartEntityLayer;
         public void SFEXT_G_PilotEnter()
         {
-            OnEnableDeserializationBlocker = true;
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10); // from testing 8 was the min that worked
             gameObject.SetActive(true);
             if (EntityControl.EntityPickup)
             {
@@ -163,7 +161,6 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         {
             DisableThisObject();
@@ -263,9 +260,7 @@ namespace SaccFlightAndVehicles
             LastBombDropTime = Time.time;
             if (!FireSyncDelegate)
             {
-                FireNextSerialization = true;
-                RequestSerialization();
-                LaunchBombs_Event();
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
             }
             else
             {
@@ -276,6 +271,7 @@ namespace SaccFlightAndVehicles
         {
             LaunchBombs_Event();
         }
+        [NetworkCallable]
         public void LaunchBombs_Event()
         {
             for (int i = 0; i < NumBomb_PerShot; i++)
@@ -452,22 +448,6 @@ namespace SaccFlightAndVehicles
                     else EntityControl.ToggleStickSelectionRight(this);
                 }
             }
-        }
-        private bool FireNextSerialization = false;
-        public override void OnPreSerialization()
-        {
-            if (FireNextSerialization)
-            {
-                FireNextSerialization = false;
-                BombFireNow = true;
-            }
-            else { BombFireNow = false; }
-        }
-        bool OnEnableDeserializationBlocker;
-        public override void OnDeserialization()
-        {
-            if (OnEnableDeserializationBlocker) { return; }
-            if (BombFireNow) { LaunchBombs_Event(); }
         }
     }
 }

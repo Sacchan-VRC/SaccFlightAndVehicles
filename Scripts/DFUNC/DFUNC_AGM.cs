@@ -5,10 +5,11 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using TMPro;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_AGM : UdonSharpBehaviour
     {
         [Tooltip("NOT required if 'Hand Held Mode' is enabled")]
@@ -61,7 +62,6 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
-        [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
@@ -81,43 +81,41 @@ namespace SaccFlightAndVehicles
         private float FullAGMsDivider;
         private int NumChildrenStart;
         // public Transform Debug_LockPointRaw, Debug_TransformLock;
-        [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
-        public Vector3 AGMTarget
+        [System.NonSerializedAttribute] public Vector3 AGMTarget;
+
+        [NetworkCallable]
+        public void SetTarget(Vector3 inputLocation)
         {
-            set
+            // if (Debug_LockPointRaw) Debug_LockPointRaw.position = value;
+            RaycastHit[] hits = Physics.SphereCastAll(inputLocation, 150, Vector3.up, 0, LockableLayermask, QueryTriggerInteraction.Ignore);
+            float NearestDist = float.MaxValue;
+            if (hits.Length > 0)
             {
-                // if (Debug_LockPointRaw) Debug_LockPointRaw.position = value;
-                RaycastHit[] hits = Physics.SphereCastAll(value, 150, Vector3.up, 0, LockableLayermask, QueryTriggerInteraction.Ignore);
-                float NearestDist = float.MaxValue;
-                if (hits.Length > 0)
+                foreach (RaycastHit hit in hits)
                 {
-                    foreach (RaycastHit hit in hits)
+                    if (hit.collider)
                     {
-                        if (hit.collider)
+                        MeshCollider mc = hit.collider.GetComponent<MeshCollider>();
+                        float tempdist;
+                        if (mc && !mc.convex)
+                            tempdist = Vector3.Distance(hit.collider.transform.position, inputLocation);
+                        else
+                            tempdist = Vector3.Distance(hit.collider.ClosestPoint(inputLocation), inputLocation);
+                        if (tempdist < NearestDist)
                         {
-                            MeshCollider mc = hit.collider.GetComponent<MeshCollider>();
-                            float tempdist;
-                            if (mc && !mc.convex)
-                                tempdist = Vector3.Distance(hit.collider.transform.position, value);
-                            else
-                                tempdist = Vector3.Distance(hit.collider.ClosestPoint(value), value);
-                            if (tempdist < NearestDist)
-                            {
-                                NearestDist = tempdist;
-                                TrackedTransform = hit.collider.transform;
-                                TrackedObjectOffset = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(value));
-                            }
+                            NearestDist = tempdist;
+                            TrackedTransform = hit.collider.transform;
+                            TrackedObjectOffset = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
                         }
                     }
                 }
-                else
-                {//extreme lag/late joiners if object targeted was in air/sea/not near anything (or if trying to lock terrain apparently)
-                    TrackedTransform = transform.root;//hopefully a non-moving object
-                    TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
-                }
-                _AGMTarget = value;
             }
-            get => _AGMTarget;
+            else
+            {//extreme lag/late joiners if object targeted was in air/sea/not near anything (or if trying to lock terrain apparently)
+                TrackedTransform = transform.root;//hopefully a non-moving object
+                TrackedObjectOffset = TrackedTransform.InverseTransformPoint(inputLocation);
+            }
+            AGMTarget = inputLocation;
         }
         private VRCPlayerApi localPlayer;
         private bool InVR;
@@ -185,11 +183,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotEnter()
         {
-            OnEnableDeserializationBlocker = true;
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
         }
-        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
@@ -270,7 +265,7 @@ namespace SaccFlightAndVehicles
             layerm &= ~(1 << EntityControl.OnboardVehicleLayer);// remove your own vehicle from the raycast layers
             if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, layerm, QueryTriggerInteraction.Ignore))
             {
-                AGMTarget = lockpoint.point;
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetTarget), lockpoint.point);
                 AGMLocked = true;
                 AGMUnlocking = 0;
                 RequestSerialization();
@@ -350,7 +345,7 @@ namespace SaccFlightAndVehicles
                                     if (angle < targetangle)
                                     {
                                         targetangle = angle;
-                                        AGMTarget = target.collider.transform.position;
+                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetTarget), target.collider.transform.position);
                                     }
                                 }
                                 //the spherecastall should really be a cone but this works for now
@@ -453,8 +448,12 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-
-        public void LaunchAGM()
+        [NetworkCallable]
+        public void LaunchAGMs_Event()
+        {
+            LaunchAGM();
+        }
+        void LaunchAGM()
         {
             if (AGMAnimator && DoAnimFiredTrigger) { AGMAnimator.SetTrigger(AnimFiredTriggerName); }
             if (NumAGM > 0) { NumAGM--; }
@@ -548,27 +547,22 @@ namespace SaccFlightAndVehicles
         {
             PickupTrigger = 0;
         }
-        private void LaunchAGM_Owner()
+        [NetworkCallable]
+        public void LaunchAGM_Owner()
         {
-            FireNextSerialization = true;
-            RequestSerialization();
-            LaunchAGM();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event));
         }
-        private bool FireNextSerialization = false;
-        public override void OnPreSerialization()
+        public void UpdateLaterJoiner(Vector3 inputLocation, int playerID)
         {
-            if (FireNextSerialization)
-            {
-                FireNextSerialization = false;
-                AGMFireNow = true;
-            }
-            else { AGMFireNow = false; }
+            if (!Utilities.IsValid(localPlayer)) return;
+            if (localPlayer.playerId != playerID) return;
+            SetTarget(inputLocation);
         }
-        bool OnEnableDeserializationBlocker;
-        public override void OnDeserialization()
+        public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (OnEnableDeserializationBlocker) { return; }
-            if (AGMFireNow) { LaunchAGM(); }
+            if (!Piloting) return;
+            int playerID = player.playerId;
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(UpdateLaterJoiner), TrackedTransform.TransformPoint(TrackedObjectOffset), playerID);
         }
     }
 }

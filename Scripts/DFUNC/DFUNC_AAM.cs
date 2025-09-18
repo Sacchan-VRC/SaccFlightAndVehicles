@@ -4,10 +4,11 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using TMPro;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_AAM : UdonSharpBehaviour
     {
         [SerializeField] public UdonSharpBehaviour SAVControl;
@@ -77,9 +78,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
         public Transform TargetingTransform;
         private float HighAspectPreventLockAngleDot;
-        [UdonSynced] private bool AAMFireNow;
-        [UdonSynced] private bool SendTargeted;
-        private float SendTargeted_Time;
         const float SENDTARGETED_INTERVAL = 1;
         private float AAMTargetedTime = 2;
         private float boolToggleTime;
@@ -92,7 +90,7 @@ namespace SaccFlightAndVehicles
         private int NumAAMTargets;
         private float AAMLockTimer = 0;
         private bool AAMHasTarget = false;
-        [System.NonSerializedAttribute, FieldChangeCallback(nameof(AAMLocked)), UdonSynced] public bool _AAMLocked = false;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(AAMLocked))] public bool _AAMLocked = false;
         public bool AAMLocked
         {
             set
@@ -191,11 +189,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotEnter()
         {
-            OnEnableDeserializationBlocker = true;
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
         }
-        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
@@ -298,8 +293,9 @@ namespace SaccFlightAndVehicles
             PickupTrigger = 0;
             AAMLockTimer = 0;
             AAMHasTarget = false;
-            AAMLocked = false;
-            RequestSerialization();
+            if (AAMLocked)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AAMLockedFalse)); }
+
             if (AAMTargetIndicator)
             {
                 AAMTargetIndicator.localRotation = Quaternion.identity;
@@ -345,7 +341,13 @@ namespace SaccFlightAndVehicles
                         if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
                         else { AAMLocked = false; }
                     }
-                    if (lockedLast != AAMLocked) { RequestSerialization(); }
+                    if (lockedLast != AAMLocked)
+                    {
+                        if (AAMLocked)
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AAMLockedTrue));
+                        else
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AAMLockedFalse));
+                    }
 
                     //firing AAM
                     if (Trigger > 0.75 || Input.GetKey(FireKey))
@@ -393,8 +395,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Max distance an enemy can be targeted at")]
         public float AAMMaxTargetDistance = 6000;
         [System.NonSerializedAttribute] public GameObject[] AAMTargets;
-        [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
-        private int AAMTargetChecker = 0;
+        public ushort AAMTarget = 0;
+        private ushort AAMTargetChecker = 0;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         private Transform VehicleTransform;
         private Rigidbody VehicleRigid;
@@ -532,8 +534,7 @@ namespace SaccFlightAndVehicles
                                 //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                                 if (SendLockWarning && Time.time - AAMTargetedTime > SENDTARGETED_INTERVAL)
                                 {
-                                    SendTargeted_Time = Time.time;
-                                    RequestSerialization();
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(TargetedAlarm), AAMTarget);
                                     AAMTargetedTime = Time.time;
                                 }
                             }
@@ -598,7 +599,13 @@ namespace SaccFlightAndVehicles
             }
             /////////////////
         }
-        public void LaunchAAM()
+        [NetworkCallable]
+        public void LaunchAAMs_Event(ushort TargetID)
+        {
+            AAMTarget = TargetID;
+            LaunchAAM();
+        }
+        void LaunchAAM()
         {
             if (AAMLaunchSound) { AAMLaunchSound.PlayOneShot(AAMLaunchSound.clip); }
             AAMLastFiredTime = Time.time;
@@ -679,44 +686,37 @@ namespace SaccFlightAndVehicles
         {
             if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
             {
-                FireNextSerialization = true;
-                LaunchAAM();
-                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; }
-                RequestSerialization();
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAMs_Event), AAMTarget);
+                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock))
+                {
+                    AAMLockTimer = 0;
+                    AAMLocked = false;
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AAMLockedFalse));
+                }
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }
-        private bool FireNextSerialization = false;
-        public override void OnPreSerialization()
+        [NetworkCallable]
+        public void TargetedAlarm(ushort TargetID)
         {
-            if (FireNextSerialization)
+            AAMTarget = TargetID;
+            var Target = AAMTargets[TargetID];
+            if (Target && Target.transform.parent)
             {
-                FireNextSerialization = false;
-                AAMFireNow = true;
+                AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
-            else { AAMFireNow = false; }
-            if (Time.time - SendTargeted_Time < SENDTARGETED_INTERVAL)
-            { SendTargeted = true; }
-            else { SendTargeted = false; }
+            if (AAMCurrentTargetSAVControl != null && AAMCurrentTargetSAVControl.EntityControl.InVehicle)
+            { AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted"); }
         }
-        bool OnEnableDeserializationBlocker;
-        public override void OnDeserialization()
+        [NetworkCallable]
+        public void AAMLockedTrue()
         {
-            if (OnEnableDeserializationBlocker) { return; }
-            if (AAMFireNow) { LaunchAAM(); }
-            if (SendTargeted)
-            {
-                if (!Pilot)
-                {
-                    var Target = AAMTargets[AAMTarget];
-                    if (Target && Target.transform.parent)
-                    {
-                        AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
-                    }
-                    if (AAMCurrentTargetSAVControl != null && AAMCurrentTargetSAVControl.EntityControl.InVehicle)
-                    { AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted"); }
-                }
-            }
+            if (!EntityControl.Occupied) return;
+            AAMLocked = true;
+        }
+        public void AAMLockedFalse()
+        {
+            AAMLocked = false;
         }
     }
 }
