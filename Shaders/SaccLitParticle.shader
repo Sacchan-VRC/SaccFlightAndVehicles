@@ -64,7 +64,7 @@ Shader "SaccFlight/SaccLitParticle" {
                 float3 diffuse = (directDiffuse * _Color_Lights + indirectDiffuse * _Color_Ambient) * diffuseColor;
 /// Final Color:
                 float3 finalColor = diffuse;
-                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb, _MainTex_var.a * i.color.a);
+                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb, _MainTex_var.a * i.color.a * _Color_Ambient.a);
                 UNITY_APPLY_FOG(i.fogCoord, finalRGBA );
                 return finalRGBA;
             }
@@ -124,7 +124,7 @@ Shader "SaccFlight/SaccLitParticle" {
                 float3 diffuse = directDiffuse * diffuseColor * _MainTex_var.a * i.color.a;
 /// Final Color:
                 float3 finalColor = diffuse;
-                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb * _Color_Lights, 0);
+                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb * _Color_Lights * _Color_Ambient.a, 0);
                 UNITY_APPLY_FOG(i.fogCoord, finalRGBA);
                 return finalRGBA;
             }

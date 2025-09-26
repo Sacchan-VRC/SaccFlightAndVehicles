@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 //
 namespace SaccFlightAndVehicles
 {
@@ -18,8 +19,6 @@ namespace SaccFlightAndVehicles
         public bool OnlyChangeColliders = false;
         [Tooltip("Position used to raycast from in order to calculate ground effect")]
         public Transform GroundEffectEmpty;
-        [Tooltip("Always apply thrust in the world space up direction? (Balloon?)")]
-        public bool Thrust_AlwaysWorldUp;
         [Tooltip("Position pitching forces are applied at")]
         public Transform PitchMoment;
         [Tooltip("Position yawing forces are applied at")]
@@ -227,6 +226,8 @@ namespace SaccFlightAndVehicles
         public Transform CenterOfThrust;
         [Tooltip("Point where the lift force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
         public Transform CenterOfLift;
+        [Tooltip("Always apply thrust in the world space up direction? (Balloon?)")]
+        public bool Thrust_AlwaysWorldUp;
         [Header("Other:")]
         public bool ReverseThrustAllowAfterburner = false;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
@@ -260,10 +261,6 @@ namespace SaccFlightAndVehicles
         public float RespawnDelay = 10;
         [Tooltip("Time after reappearing the vehicle is invincible for")]
         public float InvincibleAfterSpawn = 2.5f;
-        [Tooltip("Damage taken when hit by a bullet")]
-        public float BulletDamageTaken = 10f;
-        [Tooltip("Locally destroy target if prediction thinks you killed them, should only ever cause problems if you have a system that repairs vehicles during a fight")]
-        public bool PredictDamage = true;
         [Tooltip("Impact speed that defines a small crash")]
         public float SmallCrashSpeed = 1f;
         [Tooltip("Impact speed that defines a medium crash")]
@@ -280,6 +277,10 @@ namespace SaccFlightAndVehicles
         public float AtmosphereThinningStart = 12192f; //40,000 feet
         [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
         public float AtmosphereThinningEnd = 19812; //65,000 feet
+        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
+        public bool PredictExplosion = true;
+        [Tooltip("Send event when someone gets a kill on this vehicle (SFEXT_O_GotAKill)")]
+        public bool SendKillEvents;
         [Tooltip("When in desktop mode, make the joystick input square? (for game controllers, disable for actual joysticks")]
         public bool SquareJoyInput = true;
         [Tooltip("Set Engine On when entering the vehicle?")]
@@ -287,6 +288,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Set Engine Off when entering the vehicle?")]
         public bool EngineOffOnExit = true;
         public bool DroneMode = false;
+        [Tooltip("Maximum force to cause vehicle to spin when in 'wrecked' state 0HP = 0 spin, -ExplodeHealth HP = max spin, value used is random between 0 and theses values one ach axis")]
+        [SerializeField] private Vector3 WreckedSpinForce = new Vector3(2, 3, 4);
         [Header("Debug:")]
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
         public bool EngineOn
@@ -486,9 +489,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool AfterburnerOn;
         [System.NonSerializedAttribute] public bool PitchDown;//air is hitting plane from the top
         private float GDamageToTake;
-        [System.NonSerializedAttribute] public float LastHitTime = -100;
-        [System.NonSerializedAttribute] public float PredictedHealth;
-
 
         [System.NonSerializedAttribute] public int NumActiveFlares;
         [System.NonSerializedAttribute] public int NumActiveChaff;
@@ -1603,7 +1603,7 @@ namespace SaccFlightAndVehicles
                     if (wrecked)
                     {
                         float negHealthPc = Mathf.Clamp01(Health / ExplodeHealth);
-                        VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
+                        VehicleRigidbody.AddRelativeTorque(wreckedSpinForce_ * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
                         if (CenterOfLift)
                             VehicleRigidbody.AddForceAtPosition(VehicleTransform.rotation * LiftAcc * RBMass, CenterOfLift.position, ForceMode.Force);
                         else
@@ -1653,23 +1653,73 @@ namespace SaccFlightAndVehicles
         public Vector3 Gs_all;
         private Vector3[] FrameGs;
         private int GsFrameCheck;
-        public void NetworkExplode()
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
-        }
         private bool wrecked = false;
-        private Vector3 wreckedSpinForce;
+        private Vector3 wreckedSpinForce_;
         public void SFEXT_G_Wrecked()
         {
             if (wrecked) { return; }
             SetEngineOff();
-            wreckedSpinForce = new Vector3(Random.Range(-2, 2), Random.Range(-3, 3), Random.Range(-4, 4));
+            wreckedSpinForce_ = new Vector3(Random.Range(-WreckedSpinForce.x, WreckedSpinForce.x), Random.Range(-WreckedSpinForce.y, WreckedSpinForce.y), Random.Range(-WreckedSpinForce.z, WreckedSpinForce.z));
             wrecked = true;
+            int killerID = -1;
+            byte killerWeaponType = 0;
+            if (Utilities.IsValid(EntityControl.LastHitByPlayer))
+            {
+                if (Time.time == EntityControl.LastDamageSentTime)
+                {
+                    killerID = EntityControl.LastHitByPlayer.playerId;
+                    killerWeaponType = EntityControl.LastHitWeaponType;
+                }
+            }
+            if (SendKillEvents && IsOwner && EntityControl.Occupied && killerID > -1)
+            { SendKillEvent(killerID, killerWeaponType); }
         }
         public void SFEXT_G_NotWrecked()
         {
             wrecked = false;
         }
+        public void SendKillEvent(int killerID, byte weaponType)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType);
+        }
+        [NetworkCallable]
+        public void KillEvent(int killerID, byte weaponType)
+        {
+            // this exists to tell the killer that they got a kill.
+            if (killerID > -1)
+            {
+                VRCPlayerApi KillerAPI = VRCPlayerApi.GetPlayerById(killerID);
+                if (Utilities.IsValid(KillerAPI))
+                {
+                    EntityControl.LastHitByPlayer = KillerAPI;
+                    GameObject attackersVehicle = GameObject.Find(EntityControl.LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
+                    if (attackersVehicle)
+                    {
+                        EntityControl.LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
+                    }
+                    else
+                    {
+                        EntityControl.LastAttacker = null;
+                        return;
+                    }
+                }
+                else
+                {
+                    EntityControl.LastHitByPlayer = null;
+                    return;
+                }
+                EntityControl.LastHitWeaponType = weaponType;
+                if (killerID == localPlayer.playerId)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_GotAKill");
+                }
+            }
+        }
+        public void NetworkExplode()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+        }
+        [NetworkCallable]
         public void Explode()
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
@@ -2042,11 +2092,13 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
+            float addedHealth = FullHealth / RepairTime; ;
+            PredictedHealth = Mathf.Min(PredictedHealth + addedHealth, FullHealth);
 
             if (IsOwner)
             {
                 Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-                Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+                Health = Mathf.Min(Health + addedHealth, FullHealth);
                 if (LowFuelLastFrame && Fuel > LowFuel)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
@@ -2126,47 +2178,54 @@ namespace SaccFlightAndVehicles
             VehicleTorque = Vector3.zero;
             EntityControl.SetWreckedFalse();
         }
+        float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (PredictDamage)
+            if (IsOwner) return;
+            if (Time.time - EntityControl.LastResupplyTime < 2) return;//disable prediction if vehicle has recently been healing
+            if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
                 {
-                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
-                    PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
-                    if (!wrecked && PredictedHealth <= 0)
+                    LastHitTime = Time.time;
+                    PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
+                    if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
-                    }
-                    else if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
-                    {
-                        NetworkExplode();
+                        Explode();
                     }
                 }
                 else
                 {
                     LastHitTime = Time.time;
-                    PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
-                    if (!wrecked && PredictedHealth <= 0)
+                    PredictedHealth = Mathf.Min(PredictedHealth - EntityControl.LastHitDamage, FullHealth);
+                    if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
-                    }
-                    else if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
-                    {
-                        NetworkExplode();
+                        Explode();
                     }
                 }
             }
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!IsOwner) { return; }
-            Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+            if (!IsOwner || EntityControl.dead) { return; }
+            Health = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
+            if (!wrecked && Health <= 0f)
+            {
+                EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
+            }
+            else if (wrecked && Health > 0f) // healing bullets could exist ..
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairWrecked));
+            }
+            else if (EntityControl.LastHitWeaponType == 2)
+            {
+                //missiles cause a torque
+                Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce) * EntityControl.LastHitDamage) / FullHealth;
+                VehicleRigidbody.AddTorque(explosionforce, ForceMode.VelocityChange);
+            }
         }
         private float LastCollisionTime;
-        private float MinCollisionSoundDelay = 0.1f;
+        const float MINCOLLISIONSOUNDDELAY = 0.1f;
         public void SFEXT_L_OnCollisionEnter()
         {
             if (!IsOwner) { return; }
@@ -2199,7 +2258,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
+            if (Time.time - LastCollisionTime > MINCOLLISIONSOUNDDELAY)
             {
                 if (colmag > BigCrashSpeed)
                 {
@@ -2227,105 +2286,6 @@ namespace SaccFlightAndVehicles
         public void BigCrash()
         {
             EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
-        }
-        //Add .001 to each value of damage taken to prevent float comparison bullshit
-        public void SFEXT_L_MissileHit25()
-        {
-            if (PredictDamage && !EntityControl._dead)
-            { MissileDamagePrediction(.251f); }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit25));
-        }
-        public void SendMissileHit25()
-        {
-            EntityControl.SendEventToExtensions("SFEXT_G_MissileHit25");
-        }
-        public void SFEXT_G_MissileHit25()
-        {
-            if (IsOwner)
-            { TakeMissileDamage(.251f); }
-        }
-        public void SFEXT_L_MissileHit50()
-        {
-            if (PredictDamage && !EntityControl._dead)
-            { MissileDamagePrediction(.501f); }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit50));
-        }
-        public void SendMissileHit50()
-        {
-            EntityControl.SendEventToExtensions("SFEXT_G_MissileHit50");
-        }
-        public void SFEXT_G_MissileHit50()
-        {
-            if (IsOwner)
-            { TakeMissileDamage(.501f); }
-        }
-        public void SFEXT_L_MissileHit75()
-        {
-            if (PredictDamage && !EntityControl._dead)
-            { MissileDamagePrediction(.751f); }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit75));
-        }
-        public void SendMissileHit75()
-        {
-            EntityControl.SendEventToExtensions("SFEXT_G_MissileHit75");
-        }
-        public void SFEXT_G_MissileHit75()
-        {
-            if (IsOwner)
-            { TakeMissileDamage(.751f); }
-        }
-        public void SFEXT_L_MissileHit100()
-        {
-            if (PredictDamage && !EntityControl._dead)
-            { MissileDamagePrediction(1.001f); }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit100));
-        }
-        public void SendMissileHit100()
-        {
-            EntityControl.SendEventToExtensions("SFEXT_G_MissileHit100");
-        }
-        public void SFEXT_G_MissileHit100()
-        {
-            if (IsOwner)
-            { TakeMissileDamage(1.001f); }
-        }
-        public void TakeMissileDamage(float damage)
-        {
-            LastHitTime = Time.time;
-            Health -= ((FullHealth * damage) * MissileDamageTakenMultiplier);
-            Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce)) * damage;
-            VehicleRigidbody.AddTorque(explosionforce, ForceMode.VelocityChange);
-        }
-        private void MissileDamagePrediction(float Damage)
-        {
-            if (Time.time - LastHitTime > 2)
-            {
-                LastHitTime = Time.time;
-                PredictedHealth = Health - ((FullHealth * Damage) * MissileDamageTakenMultiplier);
-                if (!wrecked && PredictedHealth <= 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_MissileKill");
-                    EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
-                }
-                else if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
-                {
-                    NetworkExplode();
-                }
-            }
-            else
-            {
-                LastHitTime = Time.time;
-                PredictedHealth -= ((FullHealth * Damage) * MissileDamageTakenMultiplier);
-                if (!wrecked && PredictedHealth <= 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_MissileKill");
-                    EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
-                }
-                else if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
-                {
-                    NetworkExplode();
-                }
-            }
         }
         public void SFEXT_P_PassengerEnter()
         {

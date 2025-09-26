@@ -61,7 +61,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071058, y: 0.0000026226041, z: 0.0000024735925, w: 0.7071079}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7942758451114969376}
@@ -141,7 +141,7 @@ ParticleSystem:
       m_RotationOrder: 4
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
-  scalingMode: 1
+  scalingMode: 0
   randomSeed: 0
   InitialModule:
     serializedVersion: 3
@@ -202,8 +202,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 60
-      minScalar: 40
+      scalar: 6
+      minScalar: 4
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -320,7 +320,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4
+      scalar: 0.4
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -784,7 +784,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 9.62
+      value: 0.962
       mode: 0
       spread: 0
       speed:
@@ -5080,7 +5080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 0
+    SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
@@ -5089,10 +5089,19 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5910949226118119162}
-  HitPoints: 30
+  Health: 30
   DamageFromBullet: 10
   DamageFromCollision: 30
+  RespawnDelay: 10
   ExplodeOther: []
+  DisableBulletHitEvent: 0
+  ArmorLevel: 1
+  NoDamageBelow: 0
+  SendKillMessages: 0
+  TargetKilledMessages:
+  - '%KILLER% destroyed a Target'
+  KillFeed: {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &5910949226118119162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5112,7 +5121,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 0
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: 48c850b32bb96514ba9bb894e56450fb,
     type: 2}
   programSource: {fileID: 11400000, guid: b9b1cfc14f614b34387380a039819c18, type: 2}

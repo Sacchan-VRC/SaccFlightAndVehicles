@@ -36,21 +36,21 @@ namespace SaccFlightAndVehicles
         public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
         [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
         public bool ThrowSpaceVehicle = false;
-        [Tooltip("For colliders using the armor system (Tanks), final damage = base damage * 2^(ArmorPenetrationLevel - ColliderArmorLevel)")]
-        [Range(0, 14)]
-        public int ArmorPenetrationLevel = 5;
+        public float DirectHitDamage = 320;
+        [Tooltip("event_WeaponType is sent with damage and kill events, but not used for anything in the base prefab.\n0=None/Suicide,1=Gun,2=AAM,3=AGM,4=Bomb,5=Rocket,6=Cannon,7=Laser,8=Beam,9=Torpedo,10=VLS,11=Javelin,12=Railgun, anything else is undefined (custom) 0-255")]
+        [SerializeField] private byte event_WeaponType = 3;
         [Header("Knockback")]
-        [SerializeField] float KnockbackRadius = 0;
-        [SerializeField] bool KnockbackModeAcceleration = false;
+        [SerializeField] float SplashRadius = 10;
+        [Tooltip("Do not reduce knockback strength based on mass")]
+        [SerializeField] bool KnockbackIgnoreMass = false;
         [SerializeField] float KnockbackStrength_rigidbody = 3750f;
         [SerializeField] float KnockbackStrength_players = 10f;
         [SerializeField] float KnockbackStrength_players_vert = 2f;
         [SerializeField] private bool ExpandingShockwave = false;
-        [Tooltip("Set damage level using the bullet damage system, (-9 - 14)")]
-        [SerializeField] private int Shockwave_damage_level = -999;
+        [SerializeField] private float AGMDamage = 320;
         [SerializeField] private float ExpandingShockwave_Speed = 343f;
         [Tooltip("Maximum number of rigidboes that can be blasted, to save performance")]
-        [SerializeField] private int Shockwave_max_rigidbodies = 30;
+        [SerializeField] private int Shockwave_max_targets = 30;
         [SerializeField] private Transform shockWaveSphere;
         private Animator MissileAnimator;
         [System.NonSerialized] public SaccEntity EntityControl;
@@ -64,6 +64,7 @@ namespace SaccFlightAndVehicles
         private Rigidbody AGMRigid;
         private Rigidbody VehicleRigid;
         private bool hitwater;
+        private UdonSharpBehaviour DirectHitObjectScript = null;
         private bool initialized;
         private int LifeTimeExplodesSent;
         private bool ColliderAlwaysActive;
@@ -79,30 +80,38 @@ namespace SaccFlightAndVehicles
             MissileAnimator = gameObject.GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
             if (ExpandingShockwave)
-            { ExplosionLifeTime = Mathf.Max(ExplosionLifeTime, KnockbackRadius / ExpandingShockwave_Speed); }
-            HitRBs = new Rigidbody[Shockwave_max_rigidbodies];
+            { ExplosionLifeTime = Mathf.Max(ExplosionLifeTime, SplashRadius / ExpandingShockwave_Speed); }
+            HitRBs = new Rigidbody[Shockwave_max_targets];
+            HitTargets = new SaccTarget[Shockwave_max_targets];
         }
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            if (EntityControl.InEditor) { IsOwner = true; }
-            else { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
+            IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner");
             if (ColliderAlwaysActive) { AGMCollider.enabled = true; ColliderActive = true; }
             else { AGMCollider.enabled = false; ColliderActive = false; }
             LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
             AGMRigid.velocity += ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity);
             TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
             TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
-            SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
-            LifeTimeExplodesSent++;
-            SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
-
-            if (ColliderAlwaysActive && !EntityControl.IsOwner && AGMRigid && !AGMRigid.isKinematic && SAVControl)
+            if (MaxLifetime == 0)
             {
-                // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
-                // So in the updates until then move projectile by vehiclespeed
-                ensureNoSelfCollision_time = Time.fixedTime;
-                ensureNoSelfCollision();
+                if (!Exploding && gameObject.activeSelf)
+                { hitwater = false; Explode(); }
+            }
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+                LifeTimeExplodesSent++;
+                SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
+
+                if (ColliderAlwaysActive && !EntityControl.IsOwner && AGMRigid && !AGMRigid.isKinematic && SAVControl)
+                {
+                    // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
+                    // So in the updates until then move projectile by vehiclespeed
+                    ensureNoSelfCollision_time = Time.fixedTime;
+                    ensureNoSelfCollision();
+                }
             }
         }
         float ensureNoSelfCollision_time;
@@ -172,52 +181,79 @@ namespace SaccFlightAndVehicles
             hitwater = false;
             StartTrack = false;
             Exploding = false;
+            DirectHitObjectScript = null;
+            ShockwaveActive = false;
         }
         private void OnCollisionEnter(Collision other)
         {
+            if (Exploding) return;
             // Ricochets could be added here
             if (IsOwner && other.gameObject)
             {
                 SaccEntity HitVehicle = other.gameObject.GetComponent<SaccEntity>();
-                if (HitVehicle)
+                SaccTarget HitTarget = other.gameObject.GetComponent<SaccTarget>();
+                if (HitVehicle || HitTarget)
                 {
-                    int dmgLvl = ArmorPenetrationLevel;
-
-                    int Armor = 0;
+                    float Armor = -1;
+                    bool ColliderHasArmorValue = false;
                     if (other.collider.transform.childCount > 0)
                     {
                         string pname = other.collider.transform.GetChild(0).name;
-                        getArmorValue(pname, ref Armor);
+                        ColliderHasArmorValue = getArmorValue(pname, ref Armor);
                     }
-                    bool DoDamage = false;
-                    dmgLvl = dmgLvl - Armor;
-                    if (dmgLvl > 0) DoDamage = true;
-                    if (DoDamage) HitVehicle.WeaponDamageVehicle(dmgLvl, gameObject);
-                }
-            }
-            if (!Exploding)
-            {
-                hitwater = false; Explode();
-            }
-        }
-        void getArmorValue(string name, ref int armor)
-        {
-            int index = name.LastIndexOf(':');
-            if (index > -1)
-            {
-                name = name.Substring(index);
-                if (name.Length == 3)
-                {
-                    if (name[1] >= '0' && name[1] <= '9')
+
+                    if (HitVehicle)
                     {
-                        if (name[2] >= '0' && name[2] <= '9')
+                        if (!ColliderHasArmorValue)
                         {
-                            armor = 10 * (name[1] - 48);
-                            armor += name[2] - 48;
+                            Armor = HitVehicle.ArmorStrength;
+                        }
+                        float dmg = AGMDamage / Armor;
+                        if (dmg > HitVehicle.NoDamageBelow)
+                        {
+                            HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                            DirectHitObjectScript = HitVehicle;
+                        }
+                    }
+                    else if (HitTarget)
+                    {
+                        if (!ColliderHasArmorValue)
+                        {
+                            Armor = HitTarget.ArmorStrength;
+                        }
+                        float dmg = AGMDamage / Armor;
+                        if (dmg > HitTarget.NoDamageBelow)
+                        {
+                            HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
+                            DirectHitObjectScript = HitTarget;
                         }
                     }
                 }
             }
+            hitwater = false;
+            Explode();
+        }
+        bool getArmorValue(string name, ref float armor)
+        {
+            // Find the last colon in the string
+            int index = name.LastIndexOf(':');
+            if (index < 0 || index == name.Length - 1) // Check if colon exists and not at the end
+            {
+                return false;
+            }
+            string numberStr = name.Substring(index + 1); // Get substring after colon
+            // Check if the remaining part is a valid number
+            if (!float.TryParse(numberStr, out float parsedArmor))
+            {
+                return false;
+            }
+            // Only accept positive numbers
+            if (parsedArmor <= 0f)
+            {
+                return false;
+            }
+            armor = parsedArmor;
+            return true;
         }
         private void OnTriggerEnter(Collider other)
         {
@@ -232,6 +268,7 @@ namespace SaccFlightAndVehicles
         }
         private void Explode()
         {
+            if (Exploding) return;
             if (AGMRigid)
             {
                 AGMRigid.constraints = RigidbodyConstraints.FreezePosition;
@@ -261,7 +298,7 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
 
 
-            if (KnockbackRadius == 0) return;
+            if (SplashRadius == 0) return;
             if (ExpandingShockwave)
             {
                 _ExpandingShockwave_Speed = ExpandingShockwave_Speed;
@@ -269,66 +306,138 @@ namespace SaccFlightAndVehicles
             else
             {
                 _ExpandingShockwave_Speed = 0;
-                CurrentShockwave = KnockbackRadius;
+                CurrentShockwave = SplashRadius;
             }
-            if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(true);
-            Shockwave();
+            if (!ShockwaveActive)
+            {
+                if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(true);
+                ShockwaveActive = true;
+                Shockwave();
+            }
         }
-        bool hitMAXRBs = false;
+        bool hitMAXTargets = false;
         float CurrentShockwave;
         float _ExpandingShockwave_Speed;
+        bool ShockwaveActive;
         public void Shockwave()
         {
-            CurrentShockwave += ExpandingShockwave_Speed * Time.deltaTime;
+            CurrentShockwave = Mathf.Min(CurrentShockwave + (_ExpandingShockwave_Speed * Time.deltaTime), SplashRadius);
             if (shockWaveSphere) shockWaveSphere.localScale = Vector3.one * CurrentShockwave * 2;
             //rigidbodies
             int numHits = Physics.OverlapSphereNonAlloc(transform.position, CurrentShockwave, hitobjs);
-            if (!hitMAXRBs)
+            if (!hitMAXTargets)
             {
                 for (int i = 0; i < numHits; i++)
                 {
                     if (!hitobjs[i]) continue;
                     Rigidbody thisRB = hitobjs[i].attachedRigidbody;
-                    if (!thisRB) continue;
-                    bool gayflag = false;
-                    for (int o = 0; o < numHitRBs; o++)
+                    if (thisRB)
                     {
-                        if (thisRB == HitRBs[o])
+                        bool gayflag = false;
+                        for (int o = 0; o < numHitRBs; o++)
                         {
-                            gayflag = true;
-                            break;
-                        }
-                    }
-                    if (gayflag) continue;
-                    if (thisRB.isKinematic) continue;
-
-                    Vector3 explosionDirRB = thisRB.worldCenterOfMass - transform.position;
-                    float knockbackRB = (KnockbackRadius - explosionDirRB.magnitude) / KnockbackRadius;
-                    if (knockbackRB > 0)
-                    {
-                        thisRB.AddForce(KnockbackStrength_rigidbody * knockbackRB * explosionDirRB.normalized, KnockbackModeAcceleration ? ForceMode.VelocityChange : ForceMode.Impulse);
-                        SaccEntity hitEntity = thisRB.GetComponent<SaccEntity>();
-                        if (hitEntity && hitEntity.IsOwner)
-                        {
-                            hitEntity.SendEventToExtensions("SFEXT_L_WakeUp");
-                            if (Shockwave_damage_level > -10)
+                            if (thisRB == HitRBs[o])
                             {
-                                hitEntity.SendDamageEvent(Shockwave_damage_level);
+                                gayflag = true;
+                                break;
+                            }
+                        }
+                        if (gayflag) continue;
+
+                        Vector3 explosionDirRB = thisRB.worldCenterOfMass - transform.position;
+
+                        float DamageFalloff;
+                        if (ExpandingShockwave)
+                            DamageFalloff = 1 - (CurrentShockwave / SplashRadius);
+                        else
+                            DamageFalloff = 1 - (Mathf.Min(explosionDirRB.magnitude, SplashRadius) / SplashRadius);
+                        if (DamageFalloff > 0)
+                        {
+                            if (!thisRB.isKinematic && Networking.IsOwner(thisRB.gameObject))
+                                thisRB.AddForce(KnockbackStrength_rigidbody * DamageFalloff * explosionDirRB.normalized, KnockbackIgnoreMass ? ForceMode.VelocityChange : ForceMode.Impulse);
+                            if (IsOwner)
+                            {
+                                SaccEntity hitEntity = thisRB.GetComponent<SaccEntity>();
+                                if (hitEntity)
+                                {
+                                    if ((UdonSharpBehaviour)hitEntity != DirectHitObjectScript)
+                                    {
+                                        float SplashDamage = AGMDamage * DamageFalloff;
+                                        if (SplashDamage > hitEntity.NoDamageBelow)
+                                        {
+                                            hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    SaccTarget hitTarget = thisRB.GetComponent<SaccTarget>();
+                                    if (hitTarget)
+                                    {
+                                        if ((UdonSharpBehaviour)hitTarget != DirectHitObjectScript)
+                                        {
+                                            float SplashDamage = AGMDamage * DamageFalloff;
+                                            if (SplashDamage > hitTarget.NoDamageBelow)
+                                            {
+                                                hitTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        HitRBs[numHitRBs] = thisRB;
+                        numHitRBs++;
+                        numHitObjects++;
+                        if (numHitObjects == Shockwave_max_targets) { hitMAXTargets = true; break; }
+                    }
+                    else
+                    {
+                        if (IsOwner)
+                        {
+                            Vector3 explosionDirTarget = hitobjs[i].transform.position - transform.position;
+                            SaccTarget thisTarget = hitobjs[i].GetComponent<SaccTarget>();
+                            if (thisTarget)
+                            {
+                                bool gayflag = false;
+                                for (int o = 0; o < numHitTargets; o++)
+                                {
+                                    if (thisTarget == HitTargets[o])
+                                    {
+                                        gayflag = true;
+                                        break;
+                                    }
+                                }
+                                if (gayflag) continue;
+                                if ((UdonSharpBehaviour)thisTarget != DirectHitObjectScript)
+                                {
+                                    float DamageFalloff;
+                                    if (ExpandingShockwave)
+                                        DamageFalloff = 1 - (CurrentShockwave / SplashRadius);
+                                    else
+                                        DamageFalloff = 1 - (Mathf.Min(explosionDirTarget.magnitude, SplashRadius) / SplashRadius);
+                                    float SplashDamage = AGMDamage * DamageFalloff;
+                                    if (SplashDamage > thisTarget.NoDamageBelow)
+                                    {
+                                        thisTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                    }
+                                }
+                                HitTargets[numHitTargets] = thisTarget;
+                                numHitTargets++;
+                                numHitObjects++;
+                                if (numHitObjects == Shockwave_max_targets) { hitMAXTargets = true; break; }
                             }
                         }
                     }
-                    HitRBs[numHitRBs] = thisRB;
-                    numHitRBs++;
-                    if (numHitRBs == Shockwave_max_rigidbodies) { hitMAXRBs = true; break; }
                 }
             }
+            //players
             if (!ShockwaveHitMe)
             {
                 if (Vector3.Distance(Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position, transform.position) < CurrentShockwave)
                 {
-                    //players
                     Vector3 explosionDir = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - transform.position;
-                    float knockback = (KnockbackRadius - explosionDir.magnitude) / KnockbackRadius;
+                    float knockback = (SplashRadius - explosionDir.magnitude) / SplashRadius;
                     if (knockback > 0)
                     {
                         Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + (KnockbackStrength_players * knockback * explosionDir.normalized) +
@@ -339,23 +448,31 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-            if (CurrentShockwave < KnockbackRadius && ExpandingShockwave)
+            if ((CurrentShockwave < SplashRadius && ExpandingShockwave) && ShockwaveActive)
             {
                 SendCustomEventDelayedFrames(nameof(Shockwave), 1);
             }
             else
             {
+                ShockwaveActive = false;
                 CurrentShockwave = 0;
                 ShockwaveHitMe = false;
-                hitMAXRBs = false;
+                hitMAXTargets = false;
                 numHitRBs = 0;
-                Rigidbody[] HitRBs = new Rigidbody[Shockwave_max_rigidbodies];
-                if (shockWaveSphere) shockWaveSphere.gameObject.SetActive(false);
+                numHitTargets = 0;
+                numHitObjects = 0;
+                HitRBs = new Rigidbody[Shockwave_max_targets];
+                HitTargets = new SaccTarget[Shockwave_max_targets];
+                if (shockWaveSphere) SendCustomEventDelayedFrames(nameof(disableShockWaveSphere), 1);// so it's visible for at least 1 frame and it's max size is visible
             }
         }
+        public void disableShockWaveSphere() { shockWaveSphere.gameObject.SetActive(false); }
         bool ShockwaveHitMe;
+        uint numHitObjects; // RBs+Targets
         Collider[] hitobjs = new Collider[100];
         uint numHitRBs;
         Rigidbody[] HitRBs;
+        uint numHitTargets;
+        SaccTarget[] HitTargets;
     }
 }

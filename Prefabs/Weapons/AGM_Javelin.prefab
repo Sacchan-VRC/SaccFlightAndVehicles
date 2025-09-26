@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 30682635028267764, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
+      propertyPath: m_Name
+      value: ShockwaveSphere
+      objectReference: {fileID: 0}
     - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
       propertyPath: RotSpeed
@@ -20,13 +25,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
+      propertyPath: SplashRadius
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
       propertyPath: FlyStraightTime
       value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
+      propertyPath: event_WeaponType
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
       propertyPath: AirPhysicsStrength
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
+      propertyPath: ExpandingShockwave
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
@@ -49,6 +69,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
+    - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
+      propertyPath: KnockbackStrength_players
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6269940399642995168, guid: f6fafbc07384a3e4783dcbe970eb76cb,
+        type: 3}
+      propertyPath: KnockbackStrength_players_vert
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6614819950822259329, guid: f6fafbc07384a3e4783dcbe970eb76cb,
         type: 3}
       propertyPath: m_Name

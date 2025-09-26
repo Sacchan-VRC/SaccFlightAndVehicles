@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -10,7 +11,7 @@ namespace SaccFlightAndVehicles
     public class SaccTarget : UdonSharpBehaviour
     {
         [Header("Do not put colliders on child objects, it wont work properly (unless rigidbody?)")]
-        [UdonSynced] public float HitPoints = 30f;
+        [UdonSynced] public float Health = 30f;
         [Tooltip("Particle collisions will do this much damage")]
         public float DamageFromBullet = 10f;
         [Tooltip("Direct hits from missiles or any rigidbody will do this much damage")]
@@ -21,11 +22,17 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour[] ExplodeOther;
         [Tooltip("Ignore particles hitting the object?")]
         public bool DisableBulletHitEvent = false;
-        [Tooltip("Using the particle damage system, ignore damage events below this level of damage")]
-        [Range(-9, 14)]
-        public int BulletArmorLevel = -9;
+        [Tooltip("All attack damage will be divided by this value")]
+        public float ArmorStrength = 1f;
+        [Tooltip("If an attack does less than this amount of damage, all damage will be discarded.")]
+        public float NoDamageBelow = 0f;
+        [Space]
+        [Tooltip("Send event when someone gets a kill on this target")]
+        public bool SendKillEvents;
+        [SerializeField] private string[] TargetKilledMessages = { "%KILLER% destroyed a Target", };
+        public UdonBehaviour KillFeed;
         private Animator TargetAnimator;
-        private float FullHealth;
+        [System.NonSerialized] public float FullHealth;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public GameObject LastHitParticle;
         [System.NonSerializedAttribute] public SaccEntity LastAttacker;
@@ -34,32 +41,44 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             TargetAnimator = gameObject.GetComponent<Animator>();
-            FullHealth = HitPoints;
+            FullHealth = Health;
             localPlayer = Networking.LocalPlayer;
             TargetAnimator.SetBool("dead", false);
-            TargetAnimator.SetFloat("healthpc", HitPoints / FullHealth);
+            TargetAnimator.SetFloat("healthpc", Health / FullHealth);
         }
         void OnParticleCollision(GameObject other)
         {
             if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
+            byte weaponType = 1; // default weapon type
+            float damage = 10f * ArmorStrength; // default damage
 
-            int dmg = 1;
-            if (other.transform.childCount > 0)
+            // Loop through all children to find damage and weapon type
+            foreach (Transform child in other.transform)
             {
-                string pname = other.transform.GetChild(0).name;
-                getDamageValue(pname, ref dmg);
+                string pname = child.name;
+                if (pname.StartsWith("d:"))
+                {
+                    if (float.TryParse(pname.Substring(2), out float dmg))
+                    {
+                        damage = dmg;
+                    }
+                }
+                else if (pname.StartsWith("t:"))
+                {
+                    if (byte.TryParse(pname.Substring(2), out byte wt))
+                    {
+                        weaponType = wt;
+                    }
+                }
             }
-            if (dmg < BulletArmorLevel) return;
 
-            if (!Networking.LocalPlayer.IsOwner(gameObject) && Time.time - lastUpdateTime > 1)
-                Networking.SetOwner(localPlayer, gameObject);
-
-            if (Networking.LocalPlayer.IsOwner(gameObject)) BulletDamage_Owner();
-            else WeaponDamageTarget(dmg, other);
+            if (damage > 0 && damage < NoDamageBelow) return;
+            WeaponDamageTarget(damage, other, weaponType);
         }
-        public void WeaponDamageTarget(int dmg, GameObject damagingObject)
+        public void WeaponDamageTarget(float damage, GameObject damagingObject, byte weaponType)
         {
+            if (dead) return;
             //Try to find the saccentity that shot at us
             GameObject EnemyObjs = damagingObject;
             SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
@@ -69,7 +88,6 @@ namespace SaccFlightAndVehicles
                 EnemyObjs = EnemyObjs.transform.parent.gameObject;
                 EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
             }
-            LastAttacker = EnemyEntityControl;
             //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
             if (!EnemyEntityControl)
             {
@@ -81,315 +99,125 @@ namespace SaccFlightAndVehicles
                     EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
                 }
                 if (EnemyUdonBehaviour)
-                { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
-            SendDamageEvent(dmg);
+            LastAttacker = EnemyEntityControl;
+            LastHitDamage = damage;
+            // I'd like to not have to send this event if you're the owner of the target but if it didn't send then
+            // damage could be ignored in the case of a race condition when two users shoot it at the same time
+            QueueDamage(damage, weaponType);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
-        void getDamageValue(string name, ref int dmg)
+        float LastDamageSentTime;
+        const float DAMAGESENDINTERVAL = 0.2f;
+        float QueuedDamage;
+        byte QueuedWeaponType;
+        void QueueDamage(float dmg, byte weaponType)
         {
-            int index = name.LastIndexOf(':');
-            if (index > -1)
+            QueuedWeaponType = weaponType;// I don't think there's much point in making a more complicated system to do this properly for now.
+            QueuedDamage += dmg;
+            if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
             {
-                name = name.Substring(index);
-                if (name.Length == 3)
-                {
-                    if (name[1] == 'x')
-                    {
-                        if (name[2] >= '0' && name[2] <= '9')
-                        {
-                            dmg = name[2] - 48;
-                            LastHitBulletDamageMulti = 1 / (float)(dmg);
-                            dmg = -dmg;
-                        }
-                    }
-                    else if (name[1] >= '0' && name[1] <= '9')
-                    {
-                        if (name[2] >= '0' && name[2] <= '9')
-                        {
-                            dmg = 10 * (name[1] - 48);
-                            dmg += name[2] - 48;
-                            LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg - 1);
-                        }
-                    }
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                QueuedDamage = 0;
             }
-        }
-        public void SendDamageEvent(int dmg)
-        {
-            switch (dmg)
-            {
-                case 2:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2x));
-                    break;
-                case 3:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4x));
-                    break;
-                case 4:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8x));
-                    break;
-                case 5:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage16x));
-                    break;
-                case 6:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage32x));
-                    break;
-                case 7:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage64x));
-                    break;
-                case 8:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage128x));
-                    break;
-                case 9:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage256x));
-                    break;
-                case 10:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage512x));
-                    break;
-                case 11:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage1024x));
-                    break;
-                case 12:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2048x));
-                    break;
-                case 13:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4096x));
-                    break;
-                case 14:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8192x));
-                    break;
-
-                case -2:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageHalf));
-                    break;
-                case -3:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageThird));
-                    break;
-                case -4:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageQuarter));
-                    break;
-                case -5:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageFifth));
-                    break;
-                case -6:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSixth));
-                    break;
-                case -7:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSeventh));
-                    break;
-                case -8:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageEighth));
-                    break;
-                case -9:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageNinth));
-                    break;
-                default:
-                    if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-                    break;
-            }
-        }
-        [System.NonSerializedAttribute] public float LastHitBulletDamageMulti = 1;
-        public void BulletDamageNinth()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .11111111111111f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageEighth()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .125f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageSeventh()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .14285714285714f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageSixth()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .16666666666666f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageFifth()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .2f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageQuarter()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .25f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageThird()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .33333333333333f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageHalf()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = .5f;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamageDefault()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 1;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage2x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 2;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage4x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 4;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage8x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 8;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage16x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 16;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage32x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 32;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage64x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 64;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage128x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 128;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage256x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 256;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage512x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 512;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage1024x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 1024;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage2048x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 2048;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage4096x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 4096;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage8192x()
-        {
-            if (!localPlayer.IsOwner(gameObject)) return;
-            LastHitBulletDamageMulti = 8192;
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        public void BulletDamage_Owner()
-        {
-            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
-            SendNetworkUpdate();
-        }
-        private void OnCollisionEnter(Collision other)
-        {
-            if (!other.collider) return;
-            // the owner of unsynced objects(missiles etc) returns the master.
-            // so we need to find owner another way
-            SAV_AAMController aam = other.collider.GetComponent<SAV_AAMController>();
-            bool isColliderOwner;
-            if (aam)
-                isColliderOwner = (bool)aam.AAMLauncherControl.GetProgramVariable("IsOwner");
             else
             {
-                SAV_AGMController agm = other.collider.GetComponent<SAV_AGMController>();
-                if (agm)
-                    isColliderOwner = (bool)agm.AGMLauncherControl.GetProgramVariable("IsOwner");
-                else
+                SendCustomEventDelayedSeconds(nameof(sendQueuedDamage), DAMAGESENDINTERVAL);
+            }
+        }
+        public void sendQueuedDamage()
+        {
+            if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
+            {
+                if (QueuedDamage > 0)
                 {
-                    SAV_BombController bomb = other.collider.GetComponent<SAV_BombController>();
-                    if (bomb)
-                        isColliderOwner = (bool)bomb.BombLauncherControl.GetProgramVariable("IsOwner");
-                    else
-                        isColliderOwner = localPlayer.IsOwner(other.collider.gameObject);
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    QueuedDamage = 0;
                 }
             }
-            if (isColliderOwner && !localPlayer.IsOwner(gameObject)) { Networking.SetOwner(localPlayer, gameObject); }
-            HitPoints -= DamageFromCollision;
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(sendQueuedDamage), DAMAGESENDINTERVAL);
+            }
+        }
+        [System.NonSerialized] public float LastHitDamage;
+        [System.NonSerialized] public byte LastHitWeaponType;
+        [System.NonSerialized] public VRCPlayerApi LastHitByPlayer;
+        [NetworkCallable]
+        public void SendDamageEvent(float dmg, byte weaponType)
+        {
+            LastHitByPlayer = NetworkCalling.CallingPlayer;
+            LastHitDamage = dmg;
+            LastHitWeaponType = weaponType;
+            LastDamageSentTime = Time.time;
+            if (!localPlayer.IsOwner(gameObject)) return;
+            Health = Mathf.Min(Health - dmg, FullHealth);
+            int killerID = -1;
+            byte killerWeaponType = 0;
+            if (Utilities.IsValid(LastHitByPlayer))
+            {
+                killerID = LastHitByPlayer.playerId;
+                killerWeaponType = LastHitWeaponType;
+            }
+            if (SendKillEvents && Health <= 0 && killerID > -1 && !dead)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType); }
             SendNetworkUpdate();
+        }
+        [NetworkCallable]
+        public void KillEvent(int killerID, byte weaponType)
+        {
+            // this exists to tell the killer that they got a kill.
+            if (killerID > -1)
+            {
+                VRCPlayerApi KillerAPI = VRCPlayerApi.GetPlayerById(killerID);
+                if (Utilities.IsValid(KillerAPI))
+                {
+                    LastHitByPlayer = KillerAPI;
+                    GameObject attackersVehicle = GameObject.Find(LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
+                    if (attackersVehicle)
+                    {
+                        LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
+                    }
+                    else
+                    {
+                        LastAttacker = null;
+                        return;
+                    }
+                }
+                else
+                {
+                    LastHitByPlayer = null;
+                    return;
+                }
+                LastHitWeaponType = weaponType;
+                if (killerID == localPlayer.playerId)
+                {
+                    KillFeed.SetProgramVariable("useCustomKillMessage", true);
+                    KillFeed.SetProgramVariable("KilledPlayerID", -2);
+                    int MsgIndex = (byte)Random.Range(0, TargetKilledMessages.Length);
+                    string killmessage = TargetKilledMessages[MsgIndex];
+                    KillFeed.SetProgramVariable("MyKillMsg", killmessage);
+                    KillFeed.SetProgramVariable("WeaponType", weaponType);
+                    KillFeed.SendCustomEvent("sendKillMessage");
+                    KillFeed.SetProgramVariable("useCustomKillMessage", false);
+                }
+            }
         }
         public void RespawnTarget()
         {
             if (!localPlayer.IsOwner(gameObject))
             { Networking.SetOwner(localPlayer, gameObject); }
             respawning = false;
-            HitPoints = FullHealth;
+            Health = FullHealth;
             SendNetworkUpdate();
         }
         bool respawning;
         public void SendNetworkUpdate()
         {
-            if (HitPoints <= 0)
+            if (Health <= 0)
             {
-                HitPoints = 0;
+                Health = 0;
                 if (!respawning && RespawnDelay > 0)
                 {
                     respawning = true;
@@ -410,17 +238,19 @@ namespace SaccFlightAndVehicles
         public void Explode()
         {
             if (!localPlayer.IsOwner(gameObject)) return;
-            HitPoints = 0;
+            Health = 0;
             SendNetworkUpdate();
         }
+        float HPlast;
         bool deadlast;
         public override void OnDeserialization()
         {
             lastUpdateTime = Time.time;
-            dead = HitPoints <= 0f;
-            TargetAnimator.SetTrigger("hit");
+            if (Health < HPlast)
+                TargetAnimator.SetTrigger("hit");
+            dead = Health <= 0f;
             TargetAnimator.SetBool("dead", dead);
-            TargetAnimator.SetFloat("healthpc", HitPoints / FullHealth);
+            TargetAnimator.SetFloat("healthpc", Health / FullHealth);
             if (dead && !deadlast)
             {
                 foreach (UdonSharpBehaviour Exploder in ExplodeOther)
@@ -431,6 +261,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            HPlast = Health;
             deadlast = dead;
         }
     }

@@ -129,18 +129,19 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5249064172873764118}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 3208464906680200807}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
   Sound: {fileID: 0}
   Sound_Global: 0
+  use_OnPickupUseDown: 0
 --- !u!114 &5249064172873764118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,6 +241,7 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 7953735770794001527}
   LaunchSound: {fileID: 1936929551508333630}
+  LaunchSound_Interior: {fileID: 0}
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -257,9 +259,10 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 1
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
-  SetAtGCamSettings: 1
   EnableOnSelected: []
   FireSyncDelegate: {fileID: 0}
 --- !u!114 &5852074158986554033
@@ -611,11 +614,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 1
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 0
   CustomPickup_AllowSteal: 1
@@ -629,6 +634,7 @@ MonoBehaviour:
   OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
+  QueuedDamage: 0
 --- !u!114 &1478770456484547313
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -674,6 +680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
 --- !u!114 &2959375433102163544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,7 +700,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 0
+  _syncMethod: 2
   serializedProgramAsset: {fileID: 11400000, guid: 9911554cbfb7c104c9cf464aa6b64f34,
     type: 2}
   programSource: {fileID: 11400000, guid: b1f98066e6f60304e9d574097d4f0413, type: 2}
@@ -5692,16 +5699,27 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 4570039312978425282}
   BombLauncherControl: {fileID: 9043372115541279495}
-  DamageLevel: 0
+  BeamDamage: 10
   BeamMesh: {fileID: 3723741709581913390}
   BeamLifeTime: 0.05
   TotalLifeTime: 0.5
   BeamWidth: 0.004
   BeamRange: 3000
+  WeaponType: 8
+  ExplodeIfNoHit: 0
   RunFunctionOnHit: 0
   Func_Name: 
   HitForce: 0
   TakeOwnerOfHitObject: 0
+  SplashRadius: 0
+  KnockbackIgnoreMass: 0
+  KnockbackStrength_rigidbody: 3750
+  KnockbackStrength_players: 10
+  KnockbackStrength_players_vert: 2
+  ExpandingShockwave: 0
+  ExpandingShockwave_Speed: 343
+  Shockwave_max_targets: 30
+  shockWaveSphere: {fileID: 0}
   Explosion: {fileID: 4276839614353619269}
   DamageParticles: {fileID: 0}
   LaserParticle: {fileID: 0}

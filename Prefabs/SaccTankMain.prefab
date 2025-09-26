@@ -322,6 +322,10 @@ MonoBehaviour:
   KeyboardSpeedModifier: 304
   K_ModifierSpeed: 0.2
   RotatingSoundMulti: 0.02
+  Keyboard_Up: 119
+  Keyboard_Down: 115
+  Keyboard_Left: 97
+  Keyboard_Right: 100
   CorrectionTime: 2
   SpeedLerpTime: 25
   HORSYNC: {fileID: 0}
@@ -10716,7 +10720,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1627626562900040870}
   m_Layer: 17
-  m_Name: armor:03
+  m_Name: armor:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10950,6 +10954,8 @@ MonoBehaviour:
   - {fileID: 7228322188886426379}
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1345979705104083657}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -16687,6 +16693,14 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 7960957617269632085}
   SGVControl: {fileID: 5808748684688106119}
+  ObjectAlwaysEnabled: 0
+  EnableInteract: 0
+  NoFuelTurnOff: 0
+  WreckedTurnOff: 0
+  PilotExitTurnOff: 0
+  KeepAwakeWhileOn: 0
+  ToggleAnimator: {fileID: 0}
+  ToggleAnimator_boolname: HandlingToggle
   Dial_Funcon: {fileID: 2108484146084427209}
   Funcon_Invert: 1
   ToggledCoMPos: {fileID: 0}
@@ -18485,7 +18499,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7531465122461034355}
   m_Layer: 17
-  m_Name: armor:01
+  m_Name: armor:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38632,7 +38646,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3156683696709394759}
   m_Layer: 17
-  m_Name: armor:01
+  m_Name: armor:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39107,6 +39121,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -39273,6 +39289,37 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &3192160443646446390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5315569081427823937}
+  m_Layer: 17
+  m_Name: armor:0.01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5315569081427823937
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3192160443646446390}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8559136803549005140}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3222893482070021739
 GameObject:
   m_ObjectHideFlags: 0
@@ -45591,7 +45638,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2562443850205837607}
   m_Layer: 17
-  m_Name: armor:01
+  m_Name: armor:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45711,7 +45758,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6335632812758288014}
   m_Layer: 17
-  m_Name: armor:03
+  m_Name: armor:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46219,7 +46266,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2117643634046756097}
   m_Layer: 1
-  m_Name: damage:02
+  m_Name: damage:20
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46665,13 +46712,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 47810518563963754}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 3820787055199846551}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -51748,6 +51795,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -57843,11 +57892,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: 3
+  ArmorStrength: 1
+  NoDamageBelow: 100
   SwitchFunctionSound: {fileID: 1715985146417630143}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -57862,6 +57913,7 @@ MonoBehaviour:
   PassengerFunctionControllers: []
   AAMTargets:
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &1844016506041627939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62857,7 +62909,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1520665226732530337}
   m_Layer: 17
-  m_Name: armor:02
+  m_Name: armor:1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63108,7 +63160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2130165019174901957}
   m_Layer: 17
-  m_Name: armor:02
+  m_Name: armor:1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63809,14 +63861,14 @@ MonoBehaviour:
   GearDown: {fileID: 0}
   Wings: []
   DoCaterpillarTracks: 1
+  TracksRenderer: {fileID: 8300765705490413654}
+  TrackMaterialSlots: 0200000003000000
   TrackSourceWheels:
   - {fileID: 943869224955535769}
   - {fileID: 4264962196110607756}
-  TracksRenderer: {fileID: 8300765705490413654}
   TrackSpeedMulti:
   - {x: 0, y: 0.01037}
   - {x: 0, y: 0.01037}
-  TrackMaterialSlots: 0200000003000000
   CogWheelsTrack0:
   - {fileID: 3911358041082777215}
   - {fileID: 5868110413236084806}
@@ -69852,6 +69904,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 693688861773809267}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -70057,13 +70111,14 @@ MonoBehaviour:
   UseStickSteering: 0
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  PredictExplosion: 1
+  SendKillEvents: 0
   Crash_Damage_Speed: 10
   Crash_Death_Speed: 100
   BulletDamageTaken: 10
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  PredictDamage: 1
   RepairTime: 30
   RefuelTime: 25
   DistantRange: 400
@@ -70206,6 +70261,10 @@ MonoBehaviour:
   KeyboardSpeedModifier: 304
   K_ModifierSpeed: 0.2
   RotatingSoundMulti: 0.02
+  Keyboard_Up: 119
+  Keyboard_Down: 115
+  Keyboard_Left: 97
+  Keyboard_Right: 100
   CorrectionTime: 2
   SpeedLerpTime: 25
   HORSYNC: {fileID: 0}
@@ -70913,7 +70972,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5315569081427823937}
   m_Father: {fileID: 2593272028310133501}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!64 &4642210494727767189
@@ -71186,6 +71246,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3748775223559076591}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -77242,6 +77304,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &7636712791671523357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77610,7 +77673,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1476295721213665312}
   m_Layer: 17
-  m_Name: armor:03
+  m_Name: armor:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78516,6 +78579,7 @@ MonoBehaviour:
   GunFiringBoolName: coaxfire
   FireKey: 0
   FireNowKey: 306
+  TargetingTransform: {fileID: 0}
   AmmoBars:
   - {fileID: 6395415270457914298}
   GunRecoilEmpty: {fileID: 0}

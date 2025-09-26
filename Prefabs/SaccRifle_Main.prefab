@@ -488,12 +488,12 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6907224034448286659}
-  EntityControl: {fileID: 4180107663202659524}
-  EntityEventName: SFEXT_G_ReSupply
-  EntityEventGlobal: 1
   OtherScripts: []
   OtherScripts_Event_Name: 
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 4180107663202659524}
+  EntityEventName: SFEXT_G_ReSupply
+  EntityEventGlobal: 1
   AnimTriggerAnimator: {fileID: 38701014572352753}
   AnimTriggerName: reload
   AnimTrigger_Global: 1
@@ -834,13 +834,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 386660908943169554}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 4180107663202659524}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -6177,11 +6177,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 1
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 3806720934528545177}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -6197,6 +6199,7 @@ MonoBehaviour:
   AAMTargets:
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &344003818442891559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6236,6 +6239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
 --- !u!95 &38701014572352753
 Animator:
   serializedVersion: 5
@@ -6644,7 +6648,6 @@ MonoBehaviour:
   AllowToggleEngineOff: 1
   AllowToggleEngineOn: 1
   OpensDoor: 0
-  SoundControl: {fileID: 0}
   DoorCloseTime: 2
   DoorOpenTime: 0
   EffectedSeats: []
@@ -6766,6 +6769,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -22366,6 +22371,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Grenade
+      objectReference: {fileID: 0}
+    - target: {fileID: 6130394782934482701, guid: ede9ffc7cf3cb424fbe4b214e89fec9c,
+        type: 3}
+      propertyPath: BombDamage
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6130394782934482701, guid: ede9ffc7cf3cb424fbe4b214e89fec9c,
         type: 3}

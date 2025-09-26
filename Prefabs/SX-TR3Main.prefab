@@ -5600,6 +5600,11 @@ MonoBehaviour:
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 0.14
   EnterVTOLEvent_Angle: 20
+  AlternateLift: 0
+  CenterOfDrag: {fileID: 0}
+  CenterOfThrust: {fileID: 0}
+  CenterOfLift: {fileID: 0}
+  Thrust_AlwaysWorldUp: 0
   ReverseThrustAllowAfterburner: 0
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -5617,8 +5622,6 @@ MonoBehaviour:
   RepairTime: 30
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
-  BulletDamageTaken: 10
-  PredictDamage: 1
   SmallCrashSpeed: 5
   MediumCrashSpeed: 15
   BigCrashSpeed: 45
@@ -5627,12 +5630,15 @@ MonoBehaviour:
   SeaLevel: -1080
   AtmosphereThinningStart: 12192
   AtmosphereThinningEnd: 19812
+  SendKillEvents: 0
   SquareJoyInput: 1
   EngineOnOnEnter: 1
   EngineOffOnExit: 1
   DroneMode: 0
+  WreckedSpinForce: {x: 2, y: 3, z: 4}
   _EngineOn: 0
-  VehicleForce: {x: 0, y: 0, z: 0}
+  ThrustAcc: {x: 0, y: 0, z: 0}
+  LiftAcc: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
   Pitching: {x: 0, y: 0, z: 0}
   Yawing: {x: 0, y: 0, z: 0}
@@ -5798,6 +5804,8 @@ MonoBehaviour:
   - {fileID: 1739456737193240223}
   - {fileID: 1739456737872140855}
   TakeControlKey: 102
+  PilotRadio: {fileID: 0}
+  ThisSeatRadio: {fileID: 0}
 --- !u!114 &1739456736327934920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6662,6 +6670,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1739456738297251278}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -32584,6 +32594,8 @@ MonoBehaviour:
   SAVControl: {fileID: 7213107745132579464}
   ThrustAnimator: {fileID: 0}
   ThrustArrow: {fileID: 2281482036149478429}
+  ThrustArrowMaxSize: 1
+  showArrow_Desktop: 0
   ThrustForwardKey: 105
   ThrustBackKey: 107
   ThrustRightKey: 108
@@ -32598,8 +32610,21 @@ MonoBehaviour:
   DoSideThrust: 1
   DoUPDownThrust: 1
   AllowMainEngineAndThrust: 1
+  RequireEngine: 1
+  DisableSAVJoystick: 0
+  DisableSAVThrottle: 0
+  SyncThrust: 1
+  ControlsWind: 0
+  SyncWind: 1
+  AllowVerticalWind: 0
+  MaxWindMagnitude: 100
+  WindGustRatio: 0.2
+  SetGustiness: 0.03
+  SetTurbulance: 0.0001
   UseThrottleAsForward: 0
   ThrottleAsForward_NoBackThrust: 0
+  updateInterval: 0.3
+  NetworkSmoothTime: 8
 --- !u!114 &1739456737997940283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38696,6 +38721,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 7567775235849315319}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -39306,6 +39333,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -51591,6 +51620,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &7259475198359000148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52238,13 +52268,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 7259475198530058810}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 195247904501313554}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -52806,6 +52836,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6890430981658257704}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -64336,6 +64368,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 8688604312447510551}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -70157,11 +70191,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 7259475198696868879}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -70183,6 +70219,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &7259475200036422275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110131,6 +110168,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3228472375713074246, guid: 90cda3e55afed1a4b837a8c339eaff03,
         type: 3}
+      propertyPath: BeamDamage
+      value: 1500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3228472375713074246, guid: 90cda3e55afed1a4b837a8c339eaff03,
+        type: 3}
+      propertyPath: SplashRadius
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3228472375713074246, guid: 90cda3e55afed1a4b837a8c339eaff03,
+        type: 3}
+      propertyPath: DamageParticles
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3228472375713074246, guid: 90cda3e55afed1a4b837a8c339eaff03,
+        type: 3}
       propertyPath: BombLauncherControl
       value: 
       objectReference: {fileID: 1739456736964536773}
@@ -110141,7 +110193,8 @@ PrefabInstance:
       objectReference: {fileID: 3228472375713074246, guid: 90cda3e55afed1a4b837a8c339eaff03,
         type: 3}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3228472376260736634, guid: 90cda3e55afed1a4b837a8c339eaff03, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90cda3e55afed1a4b837a8c339eaff03, type: 3}

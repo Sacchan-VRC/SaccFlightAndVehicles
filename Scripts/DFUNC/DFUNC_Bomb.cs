@@ -62,6 +62,10 @@ namespace SaccFlightAndVehicles
         public bool HandHeld_UseEventToFire = false;
         [Tooltip("On desktop mode, fire even when not selected if OnPickupUseDown is pressed")]
         [SerializeField] bool DT_UseToFire;
+        [Tooltip("Drop a bomb when vehicle explodes?")]
+        [SerializeField] bool DropBombOnDeath;
+        [Tooltip("Should the bomb instantly explode after being dropped on vehicle death? (can use to create a damaging vehicle explosion)")]
+        [SerializeField] bool DropBombOnDeath_InstantExplode;
         private bool Held = false;
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
@@ -217,6 +221,12 @@ namespace SaccFlightAndVehicles
             UpdateAmmoVisuals();
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
+            if (DropBombOnDeath && NumBomb > 0)
+            {
+                LaunchBombs_Event();
+                NumBomb = FullBombs;
+                BombPoint = 0;
+            }
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -389,7 +399,13 @@ namespace SaccFlightAndVehicles
                 }
                 UdonSharpBehaviour USB = NewBomb.GetComponent<UdonSharpBehaviour>();
                 if (USB)
-                { USB.SendCustomEvent("EnableWeapon"); }
+                {
+                    USB.SendCustomEvent("EnableWeapon");
+                    if (EntityControl.dead && DropBombOnDeath_InstantExplode)
+                    {
+                        USB.SendCustomEvent("Explode");
+                    }
+                }
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }

@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -77,18 +78,6 @@ namespace SaccFlightAndVehicles
         public bool InvertITRYaw = false;
         [Tooltip("Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)")]
         public float RotMultiMaxSpeed = 10;
-        [Tooltip("How much the the vehicle's nose is pulled toward the direction of movement on the yaw axis")]
-        public float VelStraightenStrYaw = 0.045f;
-        [Tooltip("Degrees per second the vehicle rotates on the ground. Uses simple object rotation with a lerp, no real physics to it.")]
-        public float TaxiRotationSpeed = 35f;
-        [Tooltip("How lerped the taxi movement rotation is")]
-        public float TaxiRotationResponse = 2.5f;
-        [Tooltip("Make taxiing more realistic by not allowing vehicle to rotate on the spot")]
-        public bool DisallowTaxiRotationWhileStill = false;
-        [Tooltip("When the above is ticked, This is the speed at which the vehicle will reach its full turning speed. Meters/second.")]
-        public float TaxiFullTurningSpeed = 20f;
-        [Tooltip("Maximum Vel Lift, to stop the nose being pushed up. Technically should probably be 9.81 to counter gravity exactly")]
-        public float VelLiftMax = 10f;
         [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
         public float MaxGs = 10f;
         [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
@@ -123,10 +112,10 @@ namespace SaccFlightAndVehicles
         public float RespawnDelay = 10;
         [Tooltip("Time after reappearing the vehicle is invincible for")]
         public float InvincibleAfterSpawn = 2.5f;
-        [Tooltip("Damage taken when hit by a bullet")]
-        public float BulletDamageTaken = 10f;
-        [Tooltip("Locally destroy target if prediction thinks you killed them, should only ever cause problems if you have a system that repairs vehicles during a fight")]
-        public bool PredictDamage = true;
+        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
+        public bool PredictExplosion = true;
+        [Tooltip("Send event when someone gets a kill on this vehicle (SFEXT_O_GotAKill)")]
+        public bool SendKillEvents;
         [Tooltip("Impact speed that defines a small crash")]
         public float SmallCrashSpeed = 1f;
         [Tooltip("Impact speed that defines a medium crash")]
@@ -166,7 +155,6 @@ namespace SaccFlightAndVehicles
                     if (_EngineOn)
                     {
                         EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
-                        Taxiinglerper = 0;
                         VehicleAnimator.SetBool("EngineOn", false);
                     }
                 }
@@ -188,7 +176,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
         [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
         [System.NonSerialized] public int NumPassengers;
 
@@ -209,7 +196,8 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool Asleep;
         private bool Initialized;
         [System.NonSerializedAttribute] public float FullHealth;
-        [System.NonSerializedAttribute] public bool Taxiing = false;
+        [System.NonSerializedAttribute] public bool Taxiing = false;//here for compatability (checked by targeting/kill confirmation)
+        [System.NonSerializedAttribute] public bool Taxiing_SSV = false;//same role as planes taxiing but not checked by targeting/kill confirmation
         [System.NonSerializedAttribute] public bool Floating = false;
         [System.NonSerializedAttribute] public Vector3 RotationInputs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float YawInput;
@@ -221,7 +209,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
         private Vector3 Yawing;
         private Vector3 Thrust;
-        [System.NonSerializedAttribute] public float Taxiinglerper;
         [System.NonSerializedAttribute] public float ExtraDrag = 1;
         [System.NonSerializedAttribute] public float ExtraLift = 1;
         [System.NonSerializedAttribute] public float Speed;
@@ -235,7 +222,6 @@ namespace SaccFlightAndVehicles
         private float LowFuelDivider;
         [System.NonSerializedAttribute] public float FullGunAmmo;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
-        [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
         [System.NonSerializedAttribute] public bool UsingManualSync;
         [System.NonSerializedAttribute] public bool Grounded = false;
         private bool RepeatingWorldCheckAxis;
@@ -254,16 +240,12 @@ namespace SaccFlightAndVehicles
         private bool GrabToggle;
         private int JoyStickReleaseCount;
         private float LastGripTimeJoy;
-        private float TaxiFullTurningSpeedDivider;
         private bool LowFuelLastFrame;
         private bool NoFuelLastFrame;
         [System.NonSerializedAttribute] public float ThrottleStrengthAB;
         [System.NonSerializedAttribute] public float FuelConsumptionAB;
         [System.NonSerializedAttribute] public bool AfterburnerOn;
         private float GDamageToTake;
-        [System.NonSerializedAttribute] public float LastHitTime = -100;
-        [System.NonSerializedAttribute] public float PredictedHealth;
-
 
         [System.NonSerializedAttribute] public int NumActiveFlares;
         [System.NonSerializedAttribute] public int NumActiveChaff;
@@ -554,10 +536,6 @@ namespace SaccFlightAndVehicles
 
             LowFuelDivider = 1 / LowFuel;
 
-            if (DisallowTaxiRotationWhileStill)
-            {
-                TaxiFullTurningSpeedDivider = 1 / TaxiFullTurningSpeed;
-            }
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
             if (!GroundDetector) { DisableGroundDetection_++; }
@@ -604,7 +582,6 @@ namespace SaccFlightAndVehicles
                     RaycastHit GDHit;
                     if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, out GDHit, GroundDetectorRayDistance, GroundDetectorLayers, QueryTriggerInteraction.Ignore)))
                     {
-                        GDHitRigidbody = GDHit.collider.attachedRigidbody;
                         if (!GroundedLastFrame)
                         {
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
@@ -613,10 +590,9 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         GroundedLastFrame = false;
-                        GDHitRigidbody = null;
                     }
                 }
-                if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
+                if (Taxiing_SSV && !GroundedLastFrame && !FloatingLastFrame)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
                     VehicleRigidbody.WakeUp();
@@ -908,26 +884,6 @@ namespace SaccFlightAndVehicles
                             }
                             else { ThrottleInput = PlayerThrottle; }
                         }
-                        if (_EngineOn)
-                        {
-                            if (!_DisableTaxiRotation && Taxiing)
-                            {
-                                AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
-                                                  //rotate if trying to yaw
-                                float TaxiingStillMulti = 1;
-                                if (DisallowTaxiRotationWhileStill)
-                                { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
-                                Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
-                                VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
-
-                                StillWindMulti = Mathf.Min(Speed * .1f, 1);
-                            }
-                            else
-                            {
-                                StillWindMulti = 1;
-                                Taxiinglerper = 0;
-                            }
-                        }
                         FuelEvents();
                         if (!_DisableJoystickControl)
                         {
@@ -996,15 +952,10 @@ namespace SaccFlightAndVehicles
                     {
                         WindAndAoA();
                     }
-                    else if (!Asleep && GroundedLastFrame && !_KeepAwake)
+                    else if (!Asleep && !_KeepAwake)
                     {
                         FallAsleep();
                     }
-                    if (Taxiing)
-                    {
-                        StillWindMulti = Mathf.Min(Speed * .1f, 1);
-                    }
-                    else { StillWindMulti = 1; }
                     if (_EngineOn)
                     {
                         //allow remote piloting using extensions?
@@ -1034,7 +985,7 @@ namespace SaccFlightAndVehicles
                         //Lerp the inputs for 'rotation response'
                         LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
                     }
-                    if (Taxiing)//on ground or water (boats will never be on ground because you disable grounddetector)
+                    if (Taxiing_SSV)//on ground or water (boats will never be on ground because you disable grounddetector)
                     {
                         Yawing = (VehicleTransform.right * LerpedYaw);
                         Vector2 Outputs = UnpackThrottles(EngineOutput);
@@ -1102,6 +1053,22 @@ namespace SaccFlightAndVehicles
         public void Explode()
         {
             if (EntityControl._dead) { return; }
+
+            {
+                //this is in SFEXT_G_Wrecked in SAV.
+                int killerID = -1;
+                byte killerWeaponType = 0;
+                if (Utilities.IsValid(EntityControl.LastHitByPlayer))
+                {
+                    if (Time.time == EntityControl.LastDamageSentTime)
+                    {
+                        killerID = EntityControl.LastHitByPlayer.playerId;
+                        killerWeaponType = EntityControl.LastHitWeaponType;
+                    }
+                }
+                if (SendKillEvents && IsOwner && EntityControl.Occupied && killerID > -1)
+                { SendKillEvent(killerID, killerWeaponType); }
+            }
             SetEngineOff();
             PlayerThrottle = 0;
             ThrottleInput = 0;
@@ -1121,7 +1088,6 @@ namespace SaccFlightAndVehicles
             {
                 Health = FullHealth;//turns off low health smoke
                 Fuel = FullFuel;
-                AngleOfAttack = 0;
                 SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
                 EntityControl.SendEventToExtensions("SFEXT_O_Explode");
             }
@@ -1136,16 +1102,45 @@ namespace SaccFlightAndVehicles
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
         }
+        public void SendKillEvent(int killerID, byte weaponType)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType);
+        }
+        [NetworkCallable]
+        public void KillEvent(int killerID, byte weaponType)
+        {
+            // this exists to tell the killer that they got a kill.
+            if (killerID > -1)
+            {
+                VRCPlayerApi KillerAPI = VRCPlayerApi.GetPlayerById(killerID);
+                if (Utilities.IsValid(KillerAPI))
+                {
+                    EntityControl.LastHitByPlayer = KillerAPI;
+                    GameObject attackersVehicle = GameObject.Find(EntityControl.LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
+                    if (attackersVehicle)
+                    {
+                        EntityControl.LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
+                    }
+                    else
+                    {
+                        EntityControl.LastAttacker = null;
+                        return;
+                    }
+                }
+                else
+                {
+                    EntityControl.LastHitByPlayer = null;
+                    return;
+                }
+                EntityControl.LastHitWeaponType = weaponType;
+                if (killerID == localPlayer.playerId)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_GotAKill");
+                }
+            }
+        }
         public void SFEXT_O_OnPlayerJoined()
         {
-            if (GroundedLastFrame)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
-            }
-            if (FloatingLastFrame)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
-            }
             //sync engine status
             if (Piloting)
             {
@@ -1366,7 +1361,7 @@ namespace SaccFlightAndVehicles
         {
             //Debug.Log("TouchDown");
             if (GroundedLastFrame) { return; }
-            Taxiing = true;
+            Taxiing_SSV = true;
             Grounded = false;
             GroundedLastFrame = true;
             EntityControl.SendEventToExtensions("SFEXT_G_TouchDown");
@@ -1375,7 +1370,7 @@ namespace SaccFlightAndVehicles
         {
             //Debug.Log("TouchDownWater");
             if (FloatingLastFrame) { return; }
-            Taxiing = true;
+            Taxiing_SSV = true;
             Floating = true;
             FloatingLastFrame = true;
             EntityControl.SendEventToExtensions("SFEXT_G_TouchDownWater");
@@ -1383,7 +1378,7 @@ namespace SaccFlightAndVehicles
         public void TakeOff()
         {
             //Debug.Log("TakeOff");
-            Taxiing = false;
+            Taxiing_SSV = false;
             Floating = false;
             Grounded = false;
             FloatingLastFrame = false;
@@ -1446,11 +1441,13 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl.ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
             }
+            float addedHealth = FullHealth / RepairTime; ;
+            PredictedHealth = Mathf.Min(PredictedHealth + addedHealth, FullHealth);
 
             if (IsOwner)
             {
                 Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-                Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+                Health = Mathf.Min(Health + addedHealth, FullHealth);
                 if (LowFuelLastFrame && Fuel > LowFuel)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
@@ -1509,61 +1506,44 @@ namespace SaccFlightAndVehicles
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
         }
+        float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (PredictDamage)
+            if (IsOwner) return;
+            if (Time.time - EntityControl.LastResupplyTime < 2) return;//disable prediction if vehicle has recently been healing
+            if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
                 {
-                    PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
-                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
-                    if (PredictedHealth <= 0)
+                    LastHitTime = Time.time;
+                    PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
+                    if (!EntityControl.dead && PredictedHealth < 0)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        NetworkExplode();
+                        Explode();
                     }
                 }
                 else
                 {
-                    PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
                     LastHitTime = Time.time;
-                    if (PredictedHealth <= 0)
+                    PredictedHealth = Mathf.Min(PredictedHealth - EntityControl.LastHitDamage, FullHealth);
+                    if (!EntityControl.dead && PredictedHealth < 0)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        NetworkExplode();
+                        Explode();
                     }
                 }
             }
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!EntityControl._dead)
+            if (!IsOwner || EntityControl.dead) { return; }
+            Health = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
+            if (Health <= 0f)
             {
-                if (IsOwner)
-                {
-                    Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
-                    if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
-                    {
-                        Health = 0.0911f;
-                        //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
-                        SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
-                    }
-                }
-            }
-        }
-        public void CheckLaggyKilled()
-        {
-            if (!EntityControl._dead)
-            {
-                //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
-                if (Health == 0.0911f)
-                {
-                    NetworkExplode();
-                }
+                NetworkExplode();
             }
         }
         private float LastCollisionTime;
-        private float MinCollisionSoundDelay = 0.1f;
+        const float MINCOLLISIONSOUNDDELAY = 0.1f;
         public void SFEXT_L_OnCollisionEnter()
         {
             if (!IsOwner) { return; }
@@ -1590,7 +1570,7 @@ namespace SaccFlightAndVehicles
                     NetworkExplode();
                 }
             }
-            if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
+            if (Time.time - LastCollisionTime > MINCOLLISIONSOUNDDELAY)
             {
                 if (colmag > BigCrashSpeed)
                 {
@@ -1682,7 +1662,6 @@ namespace SaccFlightAndVehicles
         {
             if (Asleep) { WakeUp(); }
             InVR = EntityControl.InVR;
-            GDHitRigidbody = null;
             if (_EngineOn)
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
             else
@@ -1722,7 +1701,6 @@ namespace SaccFlightAndVehicles
             ThrottleInput = 0;
             //reset everything
             Piloting = false;
-            Taxiinglerper = 0;
             ThrottleGripLastFrame = false;
             JoystickGripLastFrame = false;
             DoAAMTargeting = false;

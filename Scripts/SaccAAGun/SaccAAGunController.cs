@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -95,8 +96,10 @@ namespace SaccFlightAndVehicles
         public bool DisableTargeting;
         [Tooltip("Ignore targets that don't have a SaccAirVehicle script?")]
         public bool OnlyTargetVehicles;
-        [Tooltip("Multiplies how much damage is taken from bullets")]
-        public float BulletDamageTaken = 10f;
+        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
+        public bool PredictExplosion = true;
+        [Tooltip("Send event when someone gets a kill on this vehicle (SFEXT_O_GotAKill)")]
+        public bool SendKillEvents;
         [Tooltip("Fired AAMs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         private float HighAspectPreventLockAngleDot;
@@ -114,9 +117,6 @@ namespace SaccFlightAndVehicles
         private bool AI_GUN_NOGUN;
         private bool AI_GUN_FIRING;
         public GameObject PitBullIndicator;
-        public bool PredictDamage = true;
-        private float PredictedHealth;
-        private float LastHitTime;
         private float MGAmmoRecharge = 0;
         [System.NonSerializedAttribute] public float MGAmmoFull = 4;
         private float FullMGDivider;
@@ -151,6 +151,7 @@ namespace SaccFlightAndVehicles
         private float RotateSoundVol;
         private bool LTriggerLastFrame;
         private int NumChildrenStart;
+        [System.NonSerializedAttribute] public bool Taxiing = false;
         [System.NonSerializedAttribute] public bool DoAAMTargeting = false;
         [System.NonSerializedAttribute] public int FullAAMs;
         [System.NonSerializedAttribute] public float AAMReloadTimer;
@@ -578,6 +579,22 @@ namespace SaccFlightAndVehicles
         public void Explode()//all the things players see happen when the vehicle explodes
         {
             if (EntityControl._dead) { return; }
+
+            {
+                //this is in SFEXT_G_Wrecked in SAV.
+                int killerID = -1;
+                byte killerWeaponType = 0;
+                if (Utilities.IsValid(EntityControl.LastHitByPlayer))
+                {
+                    if (Time.time == EntityControl.LastDamageSentTime)
+                    {
+                        killerID = EntityControl.LastHitByPlayer.playerId;
+                        killerWeaponType = EntityControl.LastHitWeaponType;
+                    }
+                }
+                if (SendKillEvents && IsOwner && EntityControl.Occupied && killerID > -1)
+                { SendKillEvent(killerID, killerWeaponType); }
+            }
             if (Manning && !InEditor)
             {
                 EntityControl.ExitStation();
@@ -600,6 +617,43 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
             EntityControl.SendEventToExtensions("SFEXT_G_Explode");
         }
+        public void SendKillEvent(int killerID, byte weaponType)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType);
+        }
+        [NetworkCallable]
+        public void KillEvent(int killerID, byte weaponType)
+        {
+            // this exists to tell the killer that they got a kill.
+            if (killerID > -1)
+            {
+                VRCPlayerApi KillerAPI = VRCPlayerApi.GetPlayerById(killerID);
+                if (Utilities.IsValid(KillerAPI))
+                {
+                    EntityControl.LastHitByPlayer = KillerAPI;
+                    GameObject attackersVehicle = GameObject.Find(EntityControl.LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
+                    if (attackersVehicle)
+                    {
+                        EntityControl.LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
+                    }
+                    else
+                    {
+                        EntityControl.LastAttacker = null;
+                        return;
+                    }
+                }
+                else
+                {
+                    EntityControl.LastHitByPlayer = null;
+                    return;
+                }
+                EntityControl.LastHitWeaponType = weaponType;
+                if (killerID == localPlayer.playerId)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_GotAKill");
+                }
+            }
+        }
         public void ReAppear()
         {
             AAGunAnimator.SetTrigger("reappear");
@@ -615,55 +669,39 @@ namespace SaccFlightAndVehicles
             Health = FullHealth;
             EntityControl.dead = false;
         }
+        float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (PredictDamage)
+            if (IsOwner) return;
+            if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
                 {
                     LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
-                    PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
+                    PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
                     if (!EntityControl.dead && PredictedHealth < 0)
                     {
-                        NetworkExplode();
+                        Explode();
                     }
                 }
                 else
                 {
                     LastHitTime = Time.time;
-                    PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    PredictedHealth -= Mathf.Min(EntityControl.LastHitDamage, FullHealth);
                     if (!EntityControl.dead && PredictedHealth < 0)
                     {
-                        NetworkExplode();
+                        Explode();
                     }
                 }
             }
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!EntityControl._dead)
+            if (!IsOwner || EntityControl.dead) { return; }
+            Health = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
+            if (Health <= 0f)
             {
-                if (IsOwner)
-                {
-                    Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
-                    if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
-                    {
-                        Health = 0.0911f;
-                        //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
-                        SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
-                    }
-                }
-            }
-        }
-        public void CheckLaggyKilled()
-        {
-            if (!EntityControl._dead)
-            {
-                //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
-                if (Health == 0.0911f)
-                {
-                    NetworkExplode();
-                }
+                NetworkExplode();
             }
         }
         bool rayhitIsOnCorrectLayer(RaycastHit target)

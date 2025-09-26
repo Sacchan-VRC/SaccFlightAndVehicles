@@ -2,6 +2,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -47,9 +48,10 @@ namespace SaccFlightAndVehicles
         public bool DoubleTapToExit = false;
         [Tooltip("Ignore particles hitting the object?")]
         public bool DisableBulletHitEvent = false;
-        [Tooltip("Using the particle damage system, ignore damage events below this level of damage")]
-        [Range(-9, 14)]
-        public int BulletArmorLevel = -9;
+        [Tooltip("All attack damage will be divided by this value unless overridden by a collider's armor value")]
+        public float ArmorStrength = 1f;
+        [Tooltip("If an attack does less than this amount of damage, all damage will be discarded.")]
+        public float NoDamageBelow = 0f;
         [Header("Selection Sound")]
 
         [Tooltip("Oneshot sound played each time function selection changes")]
@@ -399,54 +401,36 @@ namespace SaccFlightAndVehicles
         {
             if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
+            byte weaponType = 1; // default weapon type
+            float damage = 10f * ArmorStrength; // default damage
 
-            int dmg = 1;
-            if (other.transform.childCount > 0)
+            // Loop through all children to find damage and weapon type
+            foreach (Transform child in other.transform)
             {
-                string pname = other.transform.GetChild(0).name;
-                getDamageValue(pname, ref dmg);
-            }
-            if (dmg <= BulletArmorLevel) return;
-            // probably not a good idea
-            // if (dmg > BulletArmorLevel)
-            // {
-            //     dmg -= BulletArmorLevel;
-            //     dmg = Mathf.Min(dmg, 14);
-            // }
-            WeaponDamageVehicle(dmg, other);
-        }
-        void getDamageValue(string name, ref int dmg)
-        {
-            int index = name.LastIndexOf(':');
-            if (index > -1)
-            {
-                name = name.Substring(index);
-                if (name.Length == 3)
+                string pname = child.name;
+                if (pname.StartsWith("d:"))
                 {
-                    if (name[1] == 'x')
+                    if (float.TryParse(pname.Substring(2), out float dmg))
                     {
-                        if (name[2] >= '0' && name[2] <= '9')
-                        {
-                            dmg = name[2] - 48;
-                            LastHitBulletDamageMulti = 1 / (float)(dmg);
-                            dmg = -dmg;
-                        }
+                        damage = dmg;
                     }
-                    else if (name[1] >= '0' && name[1] <= '9')
+                }
+                else if (pname.StartsWith("t:"))
+                {
+                    if (byte.TryParse(pname.Substring(2), out byte wt))
                     {
-                        if (name[2] >= '0' && name[2] <= '9')
-                        {
-                            dmg = 10 * (name[1] - 48);
-                            dmg += name[2] - 48;
-                            LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg - 1);
-                        }
+                        weaponType = wt;
                     }
                 }
             }
+
+            if (damage > 0 && damage < NoDamageBelow) return;
+            WeaponDamageVehicle(damage, other, weaponType);
         }
-        public void WeaponDamageVehicle(int dmg, GameObject damagingObject)
+        public void WeaponDamageVehicle(float damage, GameObject damagingObject, byte weaponType)
         {
             //Try to find the saccentity that shot at us
+            if (dead) return;
             GameObject EnemyObjs = damagingObject;
             SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
             //search up the hierarchy to find the saccentity directly
@@ -455,7 +439,6 @@ namespace SaccFlightAndVehicles
                 EnemyObjs = EnemyObjs.transform.parent.gameObject;
                 EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
             }
-            LastAttacker = EnemyEntityControl;
             //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
             if (!EnemyEntityControl)
             {
@@ -467,11 +450,65 @@ namespace SaccFlightAndVehicles
                     EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
                 }
                 if (EnemyUdonBehaviour)
-                { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
+            LastAttacker = EnemyEntityControl;
+            LastHitDamage = damage;
             SendEventToExtensions("SFEXT_L_BulletHit");
-            SendDamageEvent(dmg);
+            QueueDamage(damage, weaponType);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
+        }
+        const float DAMAGESENDINTERVAL = 0.2f;
+        public float QueuedDamage;
+        byte QueuedWeaponType;
+        void QueueDamage(float dmg, byte weaponType)
+        {
+            QueuedWeaponType = weaponType;// I don't think there's much point in making a more complicated system to do this properly for now.
+            QueuedDamage += dmg;
+            if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                QueuedDamage = 0;
+            }
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(sendQueuedDamage), DAMAGESENDINTERVAL);
+            }
+        }
+        public void sendQueuedDamage()
+        {
+            if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
+            {
+                if (QueuedDamage > 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    QueuedDamage = 0;
+                }
+            }
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(sendQueuedDamage), DAMAGESENDINTERVAL);
+            }
+        }
+        [System.NonSerialized] public float LastDamageSentTime;
+        [System.NonSerialized] public float LastHitDamage;
+        [System.NonSerialized] public byte LastHitWeaponType;
+        [System.NonSerialized] public VRCPlayerApi LastHitByPlayer;
+        [NetworkCallable]
+        public void SendDamageEvent(float dmg, byte weaponType)
+        {
+            LastHitByPlayer = NetworkCalling.CallingPlayer;
+            if (LastHitByPlayer != localPlayer)
+            {
+                GameObject attackersVehicle = GameObject.Find(LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
+                if (attackersVehicle)
+                    LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
+            }
+            LastDamageSentTime = Time.time;
+            LastHitDamage = dmg;
+            LastHitWeaponType = weaponType;
+            SendEventToExtensions("SFEXT_G_BulletHit");
+            SendEventToExtensions("SFEXT_L_WakeUp");
         }
         public void InVehicleControls()
         {
@@ -755,7 +792,7 @@ namespace SaccFlightAndVehicles
             }
             player.SetPlayerTag("SF_InVehicle", string.Empty);
             player.SetPlayerTag("SF_IsPilot", string.Empty);
-            player.SetPlayerTag("SF_VehicleName", string.Empty);
+            //player.SetPlayerTag("SF_VehicleName", string.Empty);
             PilotExitTime = Time.time;
             LStickSelection = -1;
             RStickSelection = -1;
@@ -800,7 +837,7 @@ namespace SaccFlightAndVehicles
         {
             PlayersInside--;
             player.SetPlayerTag("SF_InVehicle", string.Empty);
-            player.SetPlayerTag("SF_VehicleName", string.Empty);
+            //player.SetPlayerTag("SF_VehicleName", string.Empty);
             SendEventToExtensions("SFEXT_G_PassengerExit");
         }
         public override void OnPlayerJoined(VRCPlayerApi player)
@@ -1274,192 +1311,6 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(UnsetSetDead), deadtime);
         }
         public void UnsetSetDead() { dead = false; }
-        public void SendDamageEvent(int dmg)
-        {
-            switch (dmg)
-            {
-                case 2:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2x));
-                    break;
-                case 3:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4x));
-                    break;
-                case 4:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8x));
-                    break;
-                case 5:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage16x));
-                    break;
-                case 6:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage32x));
-                    break;
-                case 7:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage64x));
-                    break;
-                case 8:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage128x));
-                    break;
-                case 9:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage256x));
-                    break;
-                case 10:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage512x));
-                    break;
-                case 11:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage1024x));
-                    break;
-                case 12:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2048x));
-                    break;
-                case 13:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4096x));
-                    break;
-                case 14:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8192x));
-                    break;
-
-                case -2:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageHalf));
-                    break;
-                case -3:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageThird));
-                    break;
-                case -4:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageQuarter));
-                    break;
-                case -5:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageFifth));
-                    break;
-                case -6:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSixth));
-                    break;
-                case -7:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSeventh));
-                    break;
-                case -8:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageEighth));
-                    break;
-                case -9:
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageNinth));
-                    break;
-                default:
-                    if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-                    break;
-            }
-        }
-        [System.NonSerializedAttribute] public float LastHitBulletDamageMulti = 1;
-        [System.NonSerializedAttribute] public byte LastHitBulletType = 0;// 0=bullet 1=tank shell
-        public void BulletDamageNinth()
-        {
-            LastHitBulletDamageMulti = .11111111111111f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageEighth()
-        {
-            LastHitBulletDamageMulti = .125f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageSeventh()
-        {
-            LastHitBulletDamageMulti = .14285714285714f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageSixth()
-        {
-            LastHitBulletDamageMulti = .16666666666666f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageFifth()
-        {
-            LastHitBulletDamageMulti = .2f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageQuarter()
-        {
-            LastHitBulletDamageMulti = .25f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageThird()
-        {
-            LastHitBulletDamageMulti = .33333333333333f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageHalf()
-        {
-            LastHitBulletDamageMulti = .5f;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamageDefault()
-        {
-            LastHitBulletDamageMulti = 1;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage2x()
-        {
-            LastHitBulletDamageMulti = 2;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage4x()
-        {
-            LastHitBulletDamageMulti = 4;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage8x()
-        {
-            LastHitBulletDamageMulti = 8;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage16x()
-        {
-            LastHitBulletDamageMulti = 16;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage32x()
-        {
-            LastHitBulletDamageMulti = 32;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage64x()
-        {
-            LastHitBulletDamageMulti = 64;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage128x()
-        {
-            LastHitBulletDamageMulti = 128;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage256x()
-        {
-            LastHitBulletDamageMulti = 256;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage512x()
-        {
-            LastHitBulletDamageMulti = 512;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage1024x()
-        {
-            LastHitBulletDamageMulti = 1024;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage2048x()
-        {
-            LastHitBulletDamageMulti = 2048;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage4096x()
-        {
-            LastHitBulletDamageMulti = 4096;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
-        public void BulletDamage8192x()
-        {
-            LastHitBulletDamageMulti = 8192;
-            SendEventToExtensions("SFEXT_G_BulletHit");
-        }
         public void SetWrecked()
         {
             wrecked = true;
@@ -1473,7 +1324,7 @@ namespace SaccFlightAndVehicles
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply_Event));
         }
         [System.NonSerialized] public uint ReSupplied;
-        private float LastResupplyTime = 0;
+        [System.NonSerialized] public float LastResupplyTime = 0;
         public void ReSupply_Event()
         {
             ReSupplied = 0;//used to know if other scripts resupplied

@@ -11,6 +11,10 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour AAMLauncherControl;
         UdonSharpBehaviour SAVControl;
+        [Tooltip("1 = direct hit takes 100% of target health.\n If AAMDamage_AbsoluteMode is true, 1 = 1 damage with direct hit.")]
+        public float AAMDamage = 1;
+        [Tooltip("Enable this to stop AAMDamage being multiplied by the vehicle's full health. See AAMDamge tooltip.")]
+        public bool AAMDamage_AbsoluteMode = false;
         [Tooltip("Missile will explode after this time")]
         public float MaxLifetime = 12;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -75,6 +79,9 @@ namespace SaccFlightAndVehicles
         public bool ThrowSpaceVehicle = true;
         private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
+
+        [Tooltip("event_WeaponType is sent with damage and kill events, but not used for anything in the base prefab.\n0=None/Suicide,1=Gun,2=AAM,3=AGM,4=Bomb,5=Rocket,6=Cannon,7=Laser,8=Beam,9=Torpedo,10=VLS,11=Javelin,12=Railgun, anything else is undefined (custom) 0-255")]
+        [SerializeField] private byte event_WeaponType = 2;
         [System.NonSerialized] public SaccEntity EntityControl;
         Transform VehicleTransform;
         private int MissileType = 1;
@@ -483,20 +490,69 @@ namespace SaccFlightAndVehicles
         {
             if (!Exploding)
             {
-                if (IsOwner)
+                if (IsOwner && other.gameObject)
                 {
-                    SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
-                    if (TargetEntity)
+                    DirectHit = true;
+                    SaccEntity HitVehicle = other.gameObject.GetComponent<SaccEntity>();
+                    SaccTarget HitTarget = other.gameObject.GetComponent<SaccTarget>();
+                    if (HitVehicle || HitTarget)
                     {
-                        DirectHit = true;
-                        TargetEntity.LastAttacker = EntityControl;
-                        TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
-                        //Debug.Log("DIRECTHIT");
+                        float Armor = 1;
+                        bool ColliderHasArmorValue = false;
+                        if (other.collider.transform.childCount > 0)
+                        {
+                            string pname = other.collider.transform.GetChild(0).name;
+                            ColliderHasArmorValue = getArmorValue(pname, ref Armor);
+                        }
+                        if (HitVehicle)
+                        {
+                            float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
+                            if (!ColliderHasArmorValue)
+                            {
+                                Armor = HitVehicle.ArmorStrength;
+                            }
+                            dmg /= Armor;
+                            if (dmg > HitVehicle.NoDamageBelow)
+                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                        }
+                        else if (HitTarget)
+                        {
+                            float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth");
+                            if (!ColliderHasArmorValue)
+                            {
+                                Armor = HitTarget.ArmorStrength;
+                            }
+                            dmg /= Armor;
+                            if (dmg > HitTarget.NoDamageBelow)
+                                HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
+                        }
                     }
                 }
                 hitwater = false;
                 Explode();
             }
+        }
+        bool getArmorValue(string name, ref float armor)
+        {
+            // Find the last colon in the string
+            int index = name.LastIndexOf(':');
+            if (index < 0 || index == name.Length - 1) // Check if colon exists and not at the end
+            {
+                return false;
+            }
+            string numberStr = name.Substring(index + 1); // Get substring after colon
+            // Check if the remaining part is a valid number
+            if (!float.TryParse(numberStr, out float parsedArmor))
+            {
+                return false;
+            }
+            // Only accept positive numbers
+            if (parsedArmor <= 0f)
+            {
+                return false;
+            }
+            armor = parsedArmor;
+            return true;
         }
         private void Explode()
         {
@@ -542,19 +598,10 @@ namespace SaccFlightAndVehicles
                 {
                     if (DamageDist < 1 && !DirectHit)
                     {
-                        //Debug.Log(string.Concat("TARGETDIST: ", Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position).ToString()));
-                        if (DamageDist > .66666f)
-                        {
-                            TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
-                        }
-                        else if (DamageDist > .33333f)
-                        {
-                            TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
-                        }
-                        else
-                        {
-                            TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
-                        }
+                        float Armor = TargetEntityControl.ArmorStrength;
+                        float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)SAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
+                        if (dmg > TargetEntityControl.NoDamageBelow)
+                        { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType); }
                     }
                     EntityControl.SendEventToExtensions("SFEXT_L_DamageFeedback");
                 }

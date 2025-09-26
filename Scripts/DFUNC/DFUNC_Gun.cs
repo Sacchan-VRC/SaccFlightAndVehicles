@@ -17,6 +17,8 @@ namespace SaccFlightAndVehicles
         public KeyCode FireKey = KeyCode.Space;
         [Tooltip("Desktop key for firing when not selected")]
         public KeyCode FireNowKey = KeyCode.None;
+        [Tooltip("Forward direction used for targeting (leave empty for vehicle's forward)")]
+        [SerializeField] private Transform TargetingTransform;
         [Tooltip("Transform of which its X scale scales with ammo")]
         public Transform[] AmmoBars;
         [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
@@ -108,7 +110,7 @@ namespace SaccFlightAndVehicles
             FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
             AAMTargets = EntityControl.AAMTargets;
             NumAAMTargets = AAMTargets.Length;
-            VehicleTransform = EntityControl.transform;
+            if (!TargetingTransform) TargetingTransform = EntityControl.transform;
             CenterOfMass = EntityControl.CenterOfMass;
             OutsideVehicleLayer = EntityControl.OutsideVehicleLayer;
             if (GunDamageParticle) GunDamageParticle.gameObject.SetActive(false);
@@ -310,7 +312,6 @@ namespace SaccFlightAndVehicles
             }
         }
         private GameObject[] AAMTargets;
-        private Transform VehicleTransform;
         private int AAMTarget;
         private int AAMTargetChecker;
         public UdonSharpBehaviour HUDControl;
@@ -343,7 +344,7 @@ namespace SaccFlightAndVehicles
                 float DeltaTime = Time.fixedDeltaTime;
                 var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                 Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
-                float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
+                float AAMCurrentTargetAngle = Vector3.Angle(TargetingTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
                 //check 1 target per frame to see if it's infront of us and worthy of being our current target
                 var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -351,7 +352,7 @@ namespace SaccFlightAndVehicles
                 var TargetCheckerParent = TargetCheckerTransform.parent;
 
                 Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-                float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
+                float NextTargetAngle = Vector3.Angle(TargetingTransform.forward, AAMNextTargetDirection);
                 float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
 
                 if (TargetChecker.activeInHierarchy)
@@ -395,12 +396,9 @@ namespace SaccFlightAndVehicles
                             AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                             AAMCurrentTargetSAVControl = NextTargetSAVControl;
                             AAMLockTimer = 0;
-                            if (HUDControl)
-                            {
-                                RelativeTargetVelLastFrame = Vector3.zero;
-                                GUN_TargetSpeedLerper = 0f;
-                                GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
-                            }
+                            RelativeTargetVelLastFrame = Vector3.zero;
+                            GUN_TargetSpeedLerper = 0f;
+                            GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
                         }
 
                     }
@@ -518,7 +516,7 @@ namespace SaccFlightAndVehicles
                     TargetIndicator.gameObject.SetActive(true);
                     TargetIndicator.position = HudControlPosition + AAMCurrentTargetDirection;
                     TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
-                    TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - HUDControl.transform.position, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
+                    TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - HUDControl.transform.position, TargetingTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                 }
 
                 if (GUNLeadIndicator)
@@ -550,7 +548,7 @@ namespace SaccFlightAndVehicles
                     GUNLeadIndicator.position = PredictedPos;
                     //move lead indicator to match the distance of the rest of the hud
                     GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
-                    GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HudControlPosition, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
+                    GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HudControlPosition, TargetingTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
 
                     RelativeTargetVelLastFrame = RelativeTargetVel;
                 }
