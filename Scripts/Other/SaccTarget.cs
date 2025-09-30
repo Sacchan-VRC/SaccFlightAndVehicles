@@ -30,6 +30,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Send event when someone gets a kill on this target")]
         public bool SendKillEvents;
         [SerializeField] private string[] TargetKilledMessages = { "%KILLER% destroyed a Target", };
+        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
+        public bool PredictExplosion = true;
         public UdonBehaviour KillFeed;
         private Animator TargetAnimator;
         [System.NonSerialized] public float FullHealth;
@@ -105,8 +107,34 @@ namespace SaccFlightAndVehicles
             LastHitDamage = damage;
             // I'd like to not have to send this event if you're the owner of the target but if it didn't send then
             // damage could be ignored in the case of a race condition when two users shoot it at the same time
+            DamagePrediction();
             QueueDamage(damage, weaponType);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
+        }
+        float LastHitTime = -100, PredictedHealth;
+        void DamagePrediction()
+        {
+            if (PredictExplosion)
+            {
+                if (Time.time - LastHitTime > 2)
+                {
+                    LastHitTime = Time.time;
+                    PredictedHealth = Mathf.Min(Health - LastHitDamage, FullHealth);
+                    if (!dead && PredictedHealth <= 0)
+                    {
+                        Explode();
+                    }
+                }
+                else
+                {
+                    LastHitTime = Time.time;
+                    PredictedHealth = Mathf.Min(PredictedHealth - LastHitDamage, FullHealth);
+                    if (!dead && PredictedHealth <= 0)
+                    {
+                        Explode();
+                    }
+                }
+            }
         }
         float LastDamageSentTime;
         const float DAMAGESENDINTERVAL = 0.2f;

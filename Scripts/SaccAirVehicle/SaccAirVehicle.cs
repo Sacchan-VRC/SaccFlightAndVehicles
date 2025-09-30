@@ -2189,7 +2189,7 @@ namespace SaccFlightAndVehicles
                 {
                     LastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
+                    if (!EntityControl.dead && PredictedHealth <= ExplodeHealth)
                     {
                         Explode();
                     }
@@ -2198,7 +2198,7 @@ namespace SaccFlightAndVehicles
                 {
                     LastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(PredictedHealth - EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < ExplodeHealth)
+                    if (!EntityControl.dead && PredictedHealth <= ExplodeHealth)
                     {
                         Explode();
                     }
