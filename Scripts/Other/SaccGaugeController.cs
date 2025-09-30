@@ -14,6 +14,8 @@ namespace SaccFlightAndVehicles
         public Animator[] DialsAnimator;
         private Transform CenterOfMass;
         private bool HasHorizon;
+        [SerializeField] private Vector3 Horizon_PitchAxis = new Vector3(1, 0, 0);
+        [SerializeField] private Vector3 Horizon_RollAxis = new Vector3(0, -1, 0);
         void Start()
         {
             CenterOfMass = (Transform)SAVControl.GetProgramVariable("CenterOfMass");
@@ -103,7 +105,6 @@ namespace SaccFlightAndVehicles
         }
         [Header("Horizon")]
         public Transform[] Horizon;
-        public Vector3 HorizonRotOffset;
         // public bool xSwap;
         // public bool ySwap;
         // public bool zSwap;
@@ -124,25 +125,13 @@ namespace SaccFlightAndVehicles
             //     DialsAnimator[i].SetFloat(RollFloatName, roll);
             // }
             if (!HasHorizon) { return; }
-            Quaternion newrot = Quaternion.Euler(HorizonRotOffset.x, HorizonRotOffset.y, HorizonRotOffset.z);
-            Quaternion planerot = Quaternion.AngleAxis(VehicleForwardTransform.eulerAngles.y, Vector3.up);
-            newrot = planerot * newrot;
-            Horizon[0].rotation = newrot;
-            Quaternion locrot = Horizon[0].localRotation;
-            // if (xSwap)
-            // { locrot.x = -locrot.x; }
-            // if (ySwap)
-            locrot.y = -locrot.y;
-            // if (zSwap)
-            // { locrot.z = -locrot.z; }
-            // if (wSwap)
-            locrot.w = -locrot.w;
+            Quaternion planerotx = Quaternion.AngleAxis(VehicleForwardTransform.eulerAngles.x, Horizon_PitchAxis);
+            Quaternion planerotz = Quaternion.AngleAxis(-VehicleForwardTransform.eulerAngles.z, Horizon_RollAxis);
+            Quaternion newrot = planerotz * planerotx;
             for (int i = 0; i < Horizon.Length; i++)
             {
-                Horizon[i].localRotation = locrot;
+                Horizon[i].localRotation = newrot;
             }
-            //can probably be done more efficiently something like this
-            // Horizon.localRotation = Quaternion.Euler(-VehicleTransform.eulerAngles.x + HorizonRotOffset.x, HorizonRotOffset.y, -VehicleTransform.eulerAngles.z + HorizonRotOffset.z);
         }
         [Header("Ascent")]
         public string AscentFloatName = "ascent";
