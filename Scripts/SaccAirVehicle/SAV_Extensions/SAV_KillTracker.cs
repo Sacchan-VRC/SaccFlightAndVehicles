@@ -24,7 +24,7 @@ namespace SaccFlightAndVehicles
             if (localPlayer == null)
             { InEditor = true; }
         }
-        public void SFEXT_G_Wrecked()
+        public void SFEXT_G_Explode()
         {
             if (KillsBoard) if (localPlayer.IsOwner(KillsBoard.gameObject)) { KillsBoard.PlaneDied(); }
         }
@@ -57,7 +57,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
 
-                if (!(KillsBoard && EntityControl.Using)) { return; }
+                if (!KillsBoard) { return; }
                 KillsBoard.MyKills++;
                 if (KillsBoard.MyKills > KillsBoard.MyBestKills)
                 {
