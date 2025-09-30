@@ -51,6 +51,7 @@ namespace SaccFlightAndVehicles
             if (LeftGripClutchToggle) { LeftGripClutchDefault = LeftGripClutchToggle.isOn; ToggleLeftGripClutch(); }
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
             if (DoubleTapToExit) { DoubleTapToExitDefault = DoubleTapToExit.isOn; ToggleDoubleTapToExit(); }
+            if (DisableRotCalibration) { DisableRotCalibrationDefault = DisableRotCalibration.isOn; ToggleDisableRotCalibration(); }
             if (StickSteering) { StickSteeringDefault = StickSteering.isOn; ToggleStickSteering(); }
             //sliders
             if (DialSensSlider) { DialSensDefault = DialSensSlider.value; SetDialSensitivity(); }
@@ -268,6 +269,22 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public Toggle DisableRotCalibration;
+        private bool DisableRotCalibrationDefault;
+        public void ToggleDisableRotCalibration()
+        {
+            bool DisableRot = !DisableRotCalibration.isOn;
+            foreach (SaccEntity SE in Vehicles)
+            {
+                foreach (SaccVehicleSeat seat in SE.VehicleSeats)
+                {
+                    if (seat)
+                    {
+                        seat.SetProgramVariable("AdjustSeatRotation", DisableRot);
+                    }
+                }
+            }
+        }
         public Toggle StickSteering;
         private bool StickSteeringDefault;
         public void ToggleStickSteering()
@@ -309,6 +326,7 @@ namespace SaccFlightAndVehicles
             if (LeftGripClutchToggle) { LeftGripClutchToggle.isOn = LeftGripClutchDefault; }
             if (AutoEngineToggle) { AutoEngineToggle.isOn = AutoEngineDefault; }
             if (DoubleTapToExit) { DoubleTapToExit.isOn = DoubleTapToExitDefault; }
+            if (DisableRotCalibration) { DisableRotCalibration.isOn = DisableRotCalibrationDefault; }
             if (StickSteering) { StickSteering.isOn = StickSteeringDefault; }
             if (SaccFlight) { SaccFlightStrengthSlider.value = SaccFlightStrengthDefault; }
         }
