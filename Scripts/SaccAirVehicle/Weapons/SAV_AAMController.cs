@@ -603,7 +603,6 @@ namespace SaccFlightAndVehicles
                         if (dmg > TargetEntityControl.NoDamageBelow)
                         { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType); }
                     }
-                    EntityControl.SendEventToExtensions("SFEXT_L_DamageFeedback");
                 }
             }
             MissileAnimator.SetTrigger("explode");
