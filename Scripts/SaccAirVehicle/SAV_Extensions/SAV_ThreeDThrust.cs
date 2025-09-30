@@ -210,7 +210,7 @@ namespace SaccFlightAndVehicles
                     if (ThrustArrow)
                     {
                         ThrustArrow.position = HandPos;
-                        if (InVR && ThrustArrow.gameObject.activeSelf)
+                        if (InVR && !ThrustArrow.gameObject.activeSelf)
                         { ThrustArrow.gameObject.SetActive(true); }
                     }
                 }
