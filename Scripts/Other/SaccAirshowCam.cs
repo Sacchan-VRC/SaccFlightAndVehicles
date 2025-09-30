@@ -34,7 +34,7 @@ namespace SaccFlightAndVehicles
         Vector3 startPos;
         Quaternion startRot;
 
-        private float CameraTurnResponse_Start, Mouse_Sensitivity_Start, CameraZoomSpeed_Start, ShakyCamAmount_Start, ShakyCamShakeSpeed_Start, LockOnTransitionLength_Start;
+        private float CameraTurnResponse_Start, Mouse_Sensitivity_Start, CameraZoomSpeed_Start, ShakyCamAmount_Start, ShakyCamShakeSpeed_Start, LockOnTransitionLength_Start, CameraHeight_Start;
         void Start()
         {
             startPos = transform.position;
@@ -45,6 +45,7 @@ namespace SaccFlightAndVehicles
             ShakyCamAmount_Start = ShakyCamAmount;
             ShakyCamShakeSpeed_Start = ShakyCamShakeSpeed;
             LockOnTransitionLength_Start = LockOnTransitionLength;
+            CameraHeight_Start = cameraHeight;
 
             if (VehiclesParent)
                 TargetVehicles = VehiclesParent.GetComponentsInChildren<SaccEntity>();
@@ -145,6 +146,7 @@ namespace SaccFlightAndVehicles
             UITXT.transform.parent.gameObject.SetActive(false);
         }
         bool held;
+        const float CAMERAFOV_START = 70f;
         float targetFov = 70f;
         float fieldOfView_smoothdamp;
         Quaternion FreeLookSlerped;
@@ -293,6 +295,9 @@ namespace SaccFlightAndVehicles
             ShakyCamShakeSpeed = ShakyCamShakeSpeed_Start;
             LockOnTransitionLength = LockOnTransitionLength_Start;
             ShakyCam = true;
+            freezePlayer = false;
+            cameraHeight = CameraHeight_Start;
+            targetFov = CAMERAFOV_START;
         }
         void UpdateUI()
         {
