@@ -70,42 +70,43 @@ namespace SaccFlightAndVehicles
                     Rigidbody TargetRigid = targetpoint.collider.attachedRigidbody;
                     if (IsOwner)
                     {
+                        SaccEntity HitVehicle = null;
                         if (TargetRigid)
+                            HitVehicle = TargetRigid.gameObject.GetComponent<SaccEntity>();
+                        else
+                            HitVehicle = targetpoint.collider.gameObject.GetComponent<SaccEntity>();
+                        if (HitVehicle)
                         {
-                            SaccEntity HitVehicle = TargetRigid.gameObject.GetComponent<SaccEntity>();
-                            if (HitVehicle)
+                            float Armor = -1;
+                            bool ColliderHasArmorValue = false;
+                            if (targetpoint.collider.transform.childCount > 0)
                             {
-                                float Armor = -1;
-                                bool ColliderHasArmorValue = false;
-                                if (targetpoint.collider.transform.childCount > 0)
-                                {
-                                    string pname = targetpoint.collider.transform.GetChild(0).name;
-                                    ColliderHasArmorValue = getArmorValue(pname, ref Armor);
-                                }
-                                if (!ColliderHasArmorValue)
-                                {
-                                    Armor = HitVehicle.ArmorStrength;
-                                }
-                                float dmg = BeamDamage / Armor;
-                                if (dmg > HitVehicle.NoDamageBelow)
-                                {
-                                    HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
-                                    DirectHitObjectScript = HitVehicle;
-                                }
+                                string pname = targetpoint.collider.transform.GetChild(0).name;
+                                ColliderHasArmorValue = getArmorValue(pname, ref Armor);
                             }
-                            if (HitForce != 0)
+                            if (!ColliderHasArmorValue)
                             {
-                                if (Networking.LocalPlayer.IsOwner(targetpoint.collider.gameObject))
-                                {
-                                    TargetRigid.AddForceAtPosition(transform.forward * HitForce, HitPosition, ForceMode.Impulse);
-                                    if (HitVehicle) HitVehicle.SendEventToExtensions("SFEXT_L_WakeUp");
-                                }
-                                else if (TakeOwnerOfHitObject)
-                                {
-                                    Networking.SetOwner(Networking.LocalPlayer, targetpoint.collider.gameObject);
-                                    TargetRigid.AddForceAtPosition(transform.forward * HitForce, HitPosition, ForceMode.Impulse);
-                                    if (HitVehicle) HitVehicle.SendEventToExtensions("SFEXT_L_WakeUp");
-                                }
+                                Armor = HitVehicle.ArmorStrength;
+                            }
+                            float dmg = BeamDamage / Armor;
+                            if (dmg > HitVehicle.NoDamageBelow)
+                            {
+                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                                DirectHitObjectScript = HitVehicle;
+                            }
+                        }
+                        if (HitForce != 0)
+                        {
+                            if (Networking.LocalPlayer.IsOwner(targetpoint.collider.gameObject))
+                            {
+                                TargetRigid.AddForceAtPosition(transform.forward * HitForce, HitPosition, ForceMode.Impulse);
+                                if (HitVehicle) HitVehicle.SendEventToExtensions("SFEXT_L_WakeUp");
+                            }
+                            else if (TakeOwnerOfHitObject)
+                            {
+                                Networking.SetOwner(Networking.LocalPlayer, targetpoint.collider.gameObject);
+                                TargetRigid.AddForceAtPosition(transform.forward * HitForce, HitPosition, ForceMode.Impulse);
+                                if (HitVehicle) HitVehicle.SendEventToExtensions("SFEXT_L_WakeUp");
                             }
                         }
                         SaccTarget HitTarget = targetpoint.collider.gameObject.GetComponent<SaccTarget>();
