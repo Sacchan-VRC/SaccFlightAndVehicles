@@ -129,6 +129,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Twist throttle like a motorbike?")]
         public bool UseTwistThrottle;
         public bool UseWSForAccelerate;
+        [Tooltip("Speed that the vehicle must be below to fall asleep")]
+        public float SleepSpeed = .01f;
         Quaternion VehicleRotLastFrameThrottle;
         Quaternion ThrottleZeroPointTwist;
         float ThrottleValue;
@@ -948,7 +950,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    if (Speed > .01f)
+                    if (Speed > SleepSpeed)
                     {
                         WindAndAoA();
                     }
@@ -1163,6 +1165,7 @@ namespace SaccFlightAndVehicles
             EntityControl.SetWreckedFalse();//compatability
             if (IsOwner)
             {
+                if (Asleep) { WakeUp(); }
                 if (!UsingManualSync)
                 {
                     VehicleRigidbody.drag = 0;
@@ -1212,13 +1215,17 @@ namespace SaccFlightAndVehicles
             SetRespawnPos();
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
         }
-        private void WakeUp()/*  */
+        float WakeUpTime;
+        private void WakeUp()
         {
+            WakeUpTime = Time.time;
             Asleep = false;
+            VehicleRigidbody.WakeUp();
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
         }
         private void FallAsleep()
         {
+            if ((Time.time - WakeUpTime) < 0.5f) return;
             Asleep = true;
             EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
             VehicleRigidbody.Sleep();
@@ -1487,6 +1494,7 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 //synced variables
+                if (Asleep) { WakeUp(); }
                 Health = FullHealth;
                 Fuel = FullFuel;
                 SetRespawnPos();

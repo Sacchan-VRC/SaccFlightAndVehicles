@@ -264,8 +264,14 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        bool sleeping;
+        public void SFEXT_L_FallAsleep()
+        { sleeping = true; }
+        public void SFEXT_L_WakeUp()
+        { sleeping = false; }
         private void FixedUpdate()
         {
+            if (sleeping) return;
             Vector3 Vel = VehicleRigidbody.velocity;
             Vector3 TopOfFloat = FloatPoints[currentfloatpoint].position + (Vector3.up * FloatRadius);
             Vector3 Waves = Vector3.zero;
