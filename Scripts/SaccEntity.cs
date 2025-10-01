@@ -455,7 +455,8 @@ namespace SaccFlightAndVehicles
             LastAttacker = EnemyEntityControl;
             LastHitDamage = damage;
             SendEventToExtensions("SFEXT_L_BulletHit");
-            QueueDamage(damage, weaponType);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, nameof(SendDamageEvent), damage, weaponType);//local
+            QueueDamage(damage, weaponType);//send to others
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
         const float DAMAGESENDINTERVAL = 0.2f;
@@ -467,7 +468,7 @@ namespace SaccFlightAndVehicles
             QueuedDamage += dmg;
             if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, weaponType);
                 QueuedDamage = 0;
             }
             else
@@ -481,7 +482,7 @@ namespace SaccFlightAndVehicles
             {
                 if (QueuedDamage > 0)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
                     QueuedDamage = 0;
                 }
             }

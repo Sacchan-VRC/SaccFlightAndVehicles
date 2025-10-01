@@ -108,12 +108,14 @@ namespace SaccFlightAndVehicles
             // I'd like to not have to send this event if you're the owner of the target but if it didn't send then
             // damage could be ignored in the case of a race condition when two users shoot it at the same time
             DamagePrediction();
-            QueueDamage(damage, weaponType);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, nameof(SendDamageEvent), damage, weaponType);//local
+            QueueDamage(damage, weaponType);//send to others
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
         float LastHitTime = -100, PredictedHealth;
         void DamagePrediction()
         {
+            if (!localPlayer.IsOwner(gameObject)) return;
             if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
@@ -146,7 +148,7 @@ namespace SaccFlightAndVehicles
             QueuedDamage += dmg;
             if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, weaponType);
                 QueuedDamage = 0;
             }
             else
@@ -160,7 +162,7 @@ namespace SaccFlightAndVehicles
             {
                 if (QueuedDamage > 0)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
                     QueuedDamage = 0;
                 }
             }
