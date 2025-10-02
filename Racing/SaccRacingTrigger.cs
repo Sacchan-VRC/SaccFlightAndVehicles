@@ -231,9 +231,18 @@ namespace SaccFlightAndVehicles
         public void SetFreezeCarFalse()
         {
             FreezeCar = false;
-            SendCustomEventDelayedSeconds(nameof(SetDeadFalse), Time.fixedDeltaTime * 2f);
+            InvincibleUnSetTimes++;
+            SendCustomEventDelayedSeconds(nameof(SetInvincibleFalse), 1);
         }
-        public void SetDeadFalse() { Vehicle_EntityControl.dead = false; }
+        ushort InvincibleUnSetTimes;
+        public void SetInvincibleFalse()
+        {
+            InvincibleUnSetTimes--;
+            if (InvincibleUnSetTimes == 0)
+            {
+                Vehicle_EntityControl.invincible = false;
+            }
+        }
         public void SetRaceCountdownFalse()
         {
             NumCountDowns--;
@@ -388,7 +397,7 @@ namespace SaccFlightAndVehicles
                         RaceCountdown = true;
                         FreezeCar = true;
                         NumCountDowns++;
-                        Vehicle_EntityControl.dead = true;//make invincible for teleport
+                        Vehicle_EntityControl.invincible = true;//make invincible for teleport
                         SendCustomEventDelayedSeconds(nameof(SetRaceCountdownFalse), CurrentCourse.CountDownLength);
                         if (!AirStart)
                         { SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f); }

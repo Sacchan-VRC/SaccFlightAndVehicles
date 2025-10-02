@@ -208,6 +208,19 @@ namespace SaccFlightAndVehicles
             }
             get => _dead;
         }
+        [System.NonSerializedAttribute] public bool _invincible = false;
+        public bool invincible
+        {
+            set
+            {
+                if (value)
+                { SendEventToExtensions("SFEXT_G_invincible"); }
+                else
+                { SendEventToExtensions("SFEXT_G_Notinvincible"); }
+                _invincible = value;
+            }
+            get => _invincible;
+        }
         [System.NonSerializedAttribute] public bool Using = false; // is pilot or holding (local)
         [System.NonSerializedAttribute] public bool Occupied = false; // has a pilot (synced)
         [System.NonSerializedAttribute] public int PlayersInside = 0; // has a user in any seat (synced)
@@ -430,7 +443,7 @@ namespace SaccFlightAndVehicles
         public void WeaponDamageVehicle(float damage, GameObject damagingObject, byte weaponType)
         {
             //Try to find the saccentity that shot at us
-            if (dead) return;
+            if (dead || invincible) return;
             GameObject EnemyObjs = damagingObject;
             SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
             //search up the hierarchy to find the saccentity directly
@@ -498,6 +511,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void SendDamageEvent(float dmg, byte weaponType)
         {
+            if (dead || invincible) return;
             LastHitByPlayer = NetworkCalling.CallingPlayer;
             if (LastHitByPlayer != localPlayer)
             {

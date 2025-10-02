@@ -1370,6 +1370,7 @@ namespace SaccFlightAndVehicles
         {
             LimitingRev = false;
             Occupied = true;
+            EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
         }
         public void SFEXT_G_PilotExit()
         {
@@ -1443,7 +1444,7 @@ namespace SaccFlightAndVehicles
         float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (IsOwner) return;
+            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             if (Time.time - EntityControl.LastResupplyTime < 2) return;//disable prediction if vehicle has recently been healing
             if (PredictExplosion)
             {
@@ -1451,7 +1452,7 @@ namespace SaccFlightAndVehicles
                 {
                     LastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < 0)
+                    if (PredictedHealth < 0)
                     {
                         Explode();
                     }
@@ -1460,7 +1461,7 @@ namespace SaccFlightAndVehicles
                 {
                     LastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(PredictedHealth - EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < 0)
+                    if (PredictedHealth < 0)
                     {
                         Explode();
                     }
@@ -1469,7 +1470,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!IsOwner || EntityControl.dead) { return; }
+            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             Health = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
             if (Health <= 0f)
             {

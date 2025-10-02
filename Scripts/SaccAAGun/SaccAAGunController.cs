@@ -672,14 +672,14 @@ namespace SaccFlightAndVehicles
         float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (IsOwner) return;
+            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
                 {
                     LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     PredictedHealth = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < 0)
+                    if (PredictedHealth < 0)
                     {
                         Explode();
                     }
@@ -688,7 +688,7 @@ namespace SaccFlightAndVehicles
                 {
                     LastHitTime = Time.time;
                     PredictedHealth -= Mathf.Min(EntityControl.LastHitDamage, FullHealth);
-                    if (!EntityControl.dead && PredictedHealth < 0)
+                    if (PredictedHealth < 0)
                     {
                         Explode();
                     }
@@ -697,7 +697,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!IsOwner || EntityControl.dead) { return; }
+            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             Health = Mathf.Min(Health - EntityControl.LastHitDamage, FullHealth);
             if (Health <= 0f)
             {
