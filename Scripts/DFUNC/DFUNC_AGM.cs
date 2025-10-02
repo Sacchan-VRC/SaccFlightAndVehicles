@@ -20,6 +20,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Camera script that is used to see the target")]
         public GameObject AGM;
         public int NumAGM = 4;
+        [Tooltip("How many bombs to create at Start() so they don't have to be created later")]
+        public int NumPreInstatiated = 5;
         public Text HUDText_AGM_ammo;
         public TextMeshPro HUDText_AGM_ammo_TMP;
         public TextMeshProUGUI HUDText_AGM_ammo_TMPUGUI;
@@ -149,7 +151,7 @@ namespace SaccFlightAndVehicles
             NumChildrenStart = transform.childCount;
             if (AGM)
             {
-                int NumToInstantiate = Mathf.Min(FullAGMs, 10);
+                int NumToInstantiate = Mathf.Min(FullAGMs, NumPreInstatiated);
                 for (int i = 0; i < NumToInstantiate; i++)
                 {
                     InstantiateWeapon();

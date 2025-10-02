@@ -765,6 +765,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
 --- !u!114 &6880201054686670441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -801,7 +802,8 @@ MonoBehaviour:
     m_Bits: 33554432
   EnableInVehicle: []
   DisableInVehicle: []
-  EnableWhenHolding: []
+  EnableWhenHolding:
+  - {fileID: 3490747018856757591}
   DisableWhenHolding: []
   EnableWhenOwner: []
   RespawnPoint: {fileID: 0}
@@ -809,11 +811,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 1
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -831,6 +835,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &3490747019937842287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -942,6 +947,7 @@ MonoBehaviour:
   use_OnPickupUseDown: 1
   MissileType: 1
   NumAAM: 6
+  NumPreInstatiated: 3
   AAMLockAngle: 15
   AAMLockTime: 1.5
   LockTimeABDivide: 2
@@ -951,6 +957,7 @@ MonoBehaviour:
   SendLockWarning: 1
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AAMInheritVelocity: 1
   AllowNoAmmoLock: 0
   LoseLockWhenFired: 1
   PitBullIndicator: {fileID: 0}
@@ -972,6 +979,7 @@ MonoBehaviour:
   TargetingTransform: {fileID: 0}
   HUDControl: {fileID: 0}
   AAMMaxTargetDistance: 6000
+  AAMTarget: 0
   HUDText_AAM_ammo: {fileID: 3490747019081937280}
   HUDText_AAM_ammo_TMP: {fileID: 0}
   HUDText_AAM_ammo_TMPUGUI: {fileID: 0}
@@ -1164,13 +1172,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 3748139418748635939}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 6880201054686670441}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0

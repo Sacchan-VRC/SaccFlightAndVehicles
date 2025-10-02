@@ -126,7 +126,8 @@ namespace SaccFlightAndVehicles
             NumChildrenStart = transform.childCount;
             if (Bomb)
             {
-                for (int i = 0; i < NumPreInstatiated; i++)
+                int NumToInstantiate = Mathf.Min(FullBombs, NumPreInstatiated);
+                for (int i = 0; i < NumToInstantiate; i++)
                 {
                     InstantiateWeapon();
                 }

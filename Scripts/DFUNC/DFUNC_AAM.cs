@@ -21,6 +21,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingRadar NumActiveChaff, MissilesIncomingHeat NumActiveFlares, MissilesIncomingOther NumActiveOtherCM)")]
         public int MissileType = 1;
         public int NumAAM = 6;
+        [Tooltip("How many bombs to create at Start() so they don't have to be created later")]
+        public int NumPreInstatiated = 5;
         [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
         public float AAMLockAngle = 15;
         [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
@@ -153,7 +155,7 @@ namespace SaccFlightAndVehicles
             NumChildrenStart = transform.childCount;
             if (AAM)
             {
-                int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+                int NumToInstantiate = Mathf.Min(FullAAMs, NumPreInstatiated);
                 for (int i = 0; i < NumToInstantiate; i++)
                 {
                     InstantiateWeapon();
