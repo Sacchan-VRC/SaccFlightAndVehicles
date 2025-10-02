@@ -276,6 +276,7 @@ namespace SaccFlightAndVehicles
             bool DisableRot = !DisableRotCalibration.isOn;
             foreach (SaccEntity SE in Vehicles)
             {
+                if (!SE.Initialized) SE.Init();
                 foreach (SaccVehicleSeat seat in SE.VehicleSeats)
                 {
                     if (seat)
