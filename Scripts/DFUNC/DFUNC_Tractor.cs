@@ -62,8 +62,6 @@ namespace SaccFlightAndVehicles
             }
             get => _TractorOn;
         }
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart() { Init(); }
         public void SFEXT_O_PilotEnter() { UserEnter(); }
         public void SFEXT_O_PilotExit() { UserExit(); }
@@ -121,7 +119,7 @@ namespace SaccFlightAndVehicles
             if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -218,7 +216,6 @@ namespace SaccFlightAndVehicles
             HoldingTrigger = false;
         }
         private bool TriggerLastFrame;
-        private bool UseLeftTrigger;
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
             if (player.isLocal)
