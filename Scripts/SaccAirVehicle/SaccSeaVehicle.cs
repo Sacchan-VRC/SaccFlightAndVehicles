@@ -1292,7 +1292,7 @@ namespace SaccFlightAndVehicles
             if (Fuel < LowFuel)
             {
                 //max throttle scales down with amount of fuel below LowFuel
-                ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
+                ThrottleInput = PlayerThrottle = ThrottleInput * Fuel * LowFuelDivider;
                 if (!LowFuelLastFrame)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));

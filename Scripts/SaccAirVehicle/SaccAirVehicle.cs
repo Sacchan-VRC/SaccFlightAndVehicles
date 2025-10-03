@@ -1335,7 +1335,7 @@ namespace SaccFlightAndVehicles
                     {
                         //this should allow remote piloting using extensions
                         if (_ThrottleOverridden)
-                        { ThrottleInput = PlayerThrottle = ThrottleOverride; }
+                        { ThrottleInput = PlayerThrottle = Mathf.Min(ThrottleOverride, Fuel * LowFuelDivider); }
                         FuelEvents();
                     }
                     DoRepeatingWorld();
@@ -1376,10 +1376,6 @@ namespace SaccFlightAndVehicles
                 }
                 if (!_DisablePhysicsAndInputs)
                 {
-                    if (_ThrottleOverridden)
-                    {
-                        ThrottleInput = PlayerThrottle = ThrottleOverride;
-                    }
                     if (_JoystickOverridden)
                     {
                         RotationInputs = JoystickOverride;
@@ -1921,7 +1917,7 @@ namespace SaccFlightAndVehicles
             if (Fuel < LowFuel)
             {
                 //max throttle scales down with amount of fuel below LowFuel
-                ThrottleInput = Mathf.Min(ThrottleInput, Fuel * LowFuelDivider);
+                ThrottleInput = PlayerThrottle = Mathf.Min(ThrottleInput, Fuel * LowFuelDivider);
                 if (!LowFuelLastFrame)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
