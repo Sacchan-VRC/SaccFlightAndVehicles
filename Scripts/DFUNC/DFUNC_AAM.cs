@@ -152,6 +152,8 @@ namespace SaccFlightAndVehicles
             if (HUDText_AAM_ammo_TMP) { HUDText_AAM_ammo_TMP.text = NumAAM.ToString("F0"); }
             if (HUDText_AAM_ammo_TMPUGUI) { HUDText_AAM_ammo_TMPUGUI.text = NumAAM.ToString("F0"); }
 
+            UpdateAmmoVisuals();
+
             NumChildrenStart = transform.childCount;
             if (AAM)
             {
