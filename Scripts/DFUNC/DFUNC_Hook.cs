@@ -43,6 +43,10 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             SetHookUp();
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", HookDown); }
+        }
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
@@ -183,13 +187,13 @@ namespace SaccFlightAndVehicles
         }
         public void SetHooked()
         {
-            VehicleAnimator.SetTrigger("hooked");
+            if (VehicleAnimator) { VehicleAnimator.SetTrigger("hooked"); }
         }
         public void SetHookDown()
         {
             if (HookDown) return;
             HookDown = true;
-            VehicleAnimator.SetBool("hookdown", true);
+            if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", true); }
 
             if (EntityControl.IsOwner)
             {
@@ -200,7 +204,7 @@ namespace SaccFlightAndVehicles
         {
             if (!HookDown) return;
             HookDown = false;
-            VehicleAnimator.SetBool("hookdown", false);
+            if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", false); }
             Hooked = false;
 
             if (EntityControl.IsOwner)

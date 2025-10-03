@@ -57,7 +57,11 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             CanopyDragMulti -= 1;
             //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
-            SendCustomEventDelayedFrames(nameof(CanopyOpening), 1);
+            SendCustomEventDelayedSeconds(nameof(CanopyOpening), 10);
+        }
+        public void SFEXT_L_OnEnable()
+        {
+            if (CanopyAnimator) { { CanopyAnimator.SetBool(AnimCanopyBool, CanopyOpen); } }
         }
         public void DFUNC_Selected()
         {
@@ -98,7 +102,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             CanopyBroken = false;
-            CanopyAnimator.SetBool(AnimCanopyBroken, false);
+            if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, false); }
             if (!CanopyOpen) CanopyOpening();
         }
         public void SFEXT_G_ReSupply()
@@ -115,7 +119,7 @@ namespace SaccFlightAndVehicles
         public void RepairCanopy()
         {
             CanopyBroken = false;
-            CanopyAnimator.SetBool(AnimCanopyBroken, false);
+            if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, false); }
             if (EntityControl.IsOwner) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
             if (CanopyOpen) { CanopyClosing(); }
         }
@@ -161,11 +165,7 @@ namespace SaccFlightAndVehicles
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             CanopyOpen = true;
-            CanopyAnimator.SetBool(AnimCanopyBool, true);
-            if (EntityControl.IsOwner)
-            {
-                SendCustomEventDelayedFrames(nameof(SendCanopyOpened), 1);
-            }
+            if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBool, true); }
 
             if (!DragApplied && DoCanopyOpenDrag)
             {
@@ -188,6 +188,7 @@ namespace SaccFlightAndVehicles
                 }
             }
             SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
+            if (EntityControl.IsOwner) { SendCanopyOpened(); }
         }
         public void CanopyClosing()
         {
@@ -195,14 +196,11 @@ namespace SaccFlightAndVehicles
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             CanopyOpen = false;
-            CanopyAnimator.SetBool(AnimCanopyBool, false);
+            if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBool, false); }
             CanopyTransitioning = true;
             SoundControl.SendCustomEventDelayedSeconds("DoorClose", CanopyCloseTime);
             SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
-            if (EntityControl.IsOwner)
-            {
-                SendCustomEventDelayedFrames(nameof(SendCanopyClosed), 1);
-            }
+
             if (DragApplied)
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - CanopyDragMulti);
@@ -223,6 +221,7 @@ namespace SaccFlightAndVehicles
                 }
             }
             SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyCloseTime);
+            if (EntityControl.IsOwner) { SendCanopyClosed(); }
         }
         //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
         public void SendCanopyClosed()
@@ -251,7 +250,7 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
             CanopyOpen = true;
             CanopyBroken = true;
-            CanopyAnimator.SetBool(AnimCanopyBroken, true);
+            if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, true); }
             if (EntityControl.IsOwner)
             {
                 SendCustomEventDelayedFrames(nameof(SendCanopyBreak), 1);

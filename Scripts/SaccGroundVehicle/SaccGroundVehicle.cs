@@ -447,12 +447,22 @@ namespace SaccFlightAndVehicles
             }
             VehicleTransform.position += CoMOffset;
             VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
-            SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
             EntityControl.Spawnposition = VehicleTransform.localPosition;
             EntityControl.Spawnrotation = VehicleTransform.localRotation;
+            // inertia tensor wont be set properly if object is disabled
+            if (SetCoM_ITR_initialized || !EntityControl.gameObject.activeInHierarchy) return;
+            SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (!SetCoM_ITR_initialized)
+                if (Initialized) // don't set ITR if not initialized because the call in SetCoMMeshOffset() will do it
+                    SetCoMMeshOffset();
+        }
+        bool SetCoM_ITR_initialized;
         public void SetCoM_ITR()
         {
+            SetCoM_ITR_initialized = true;
             VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
             EntityControl.CoMSet = true;
             VehicleRigidbody.inertiaTensor = VehicleRigidbody.inertiaTensor;

@@ -35,6 +35,11 @@ namespace SaccFlightAndVehicles
             wrecked = EntityControl.wrecked;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (DoEngineStartupAnimBool)
+            { EngineAnimator.SetBool(AnimEngineStartupAnimBool, (bool)SAVControl.GetProgramVariable("_EngineOn")); }
+        }
         private void Update()
         {
             float Trigger;

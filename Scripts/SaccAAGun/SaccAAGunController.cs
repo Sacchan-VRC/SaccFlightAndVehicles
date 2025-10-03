@@ -231,6 +231,15 @@ namespace SaccFlightAndVehicles
                 InstantiateWeapon();
             }
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (!EntityControl.Initialized) return;
+            if (AAGunAnimator)
+            {
+                AAGunAnimator.SetBool("inside", Manning);
+                AAGunAnimator.SetBool("owner", IsOwner);
+            }
+        }
         private GameObject InstantiateWeapon()
         {
             GameObject NewWeap = Instantiate(AAM);
@@ -965,7 +974,6 @@ namespace SaccFlightAndVehicles
             AI_GUN_RUNNINGLOCAL = true;
             RotationSpeedX = 0;
             RotationSpeedY = 0;
-            if (AAGunAnimator) AAGunAnimator.SetBool("inside", true);
             if (HUDControl) { HUDControl.GUN_TargetSpeedLerper = 0; }
 
             //Make sure AAMCurrentTargetSAVControl is correct
@@ -980,7 +988,6 @@ namespace SaccFlightAndVehicles
         {
             AI_GUN_RUNNINGLOCAL = false;
             AAMHasTarget = false;
-            if (AAGunAnimator) AAGunAnimator.SetBool("inside", false);
             RequestSerialization();
         }
         public void SFEXT_O_PilotEnter()

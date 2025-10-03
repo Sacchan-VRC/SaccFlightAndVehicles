@@ -51,7 +51,10 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             IsOwner = EntityControl.IsOwner;
-
+        }
+        public void SFEXT_L_OnEnable()
+        {
+            if (GearAnimator) { GearAnimator.SetBool("gearup", GearUp); }
         }
         public void DFUNC_Selected()
         {
@@ -89,7 +92,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             SetGearDown();
-            GearAnimator.SetTrigger("instantgeardown");
+            if (GearAnimator) { GearAnimator.SetTrigger("instantgeardown"); }
         }
         public void KeyboardInput()
         {
@@ -134,7 +137,7 @@ namespace SaccFlightAndVehicles
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             GearUp = true;
-            GearAnimator.SetBool("gearup", true);
+            if (GearAnimator) { GearAnimator.SetBool("gearup", true); }
             if (DragApplied)
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LandingGearDragMulti);
@@ -155,7 +158,7 @@ namespace SaccFlightAndVehicles
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             GearUp = false;
-            GearAnimator.SetBool("gearup", false);
+            if (GearAnimator) { GearAnimator.SetBool("gearup", false); }
             if (!DragApplied)
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + LandingGearDragMulti);

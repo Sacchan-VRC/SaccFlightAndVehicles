@@ -71,6 +71,10 @@ namespace SaccFlightAndVehicles
             if (DefaultFlapsOff) { SetFlapsOff(); }
             else { SetFlapsOn(); }
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, Flaps); }
+        }
         public void SFEXT_O_PilotEnter()
         {
             InVR = EntityControl.InVR;
@@ -166,7 +170,7 @@ namespace SaccFlightAndVehicles
             if (!Flaps) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             Flaps = false;
-            FlapsAnimator.SetBool(AnimatorBool, false);
+            if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, false); }
 
             if (DragApplied)
             {
@@ -205,7 +209,7 @@ namespace SaccFlightAndVehicles
         {
             if (Flaps) { return; }
             Flaps = true;
-            FlapsAnimator.SetBool(AnimatorBool, true);
+            if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, true); }
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
 
             if (!DragApplied)

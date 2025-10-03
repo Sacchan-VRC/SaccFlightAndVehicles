@@ -98,6 +98,10 @@ namespace SaccFlightAndVehicles
                 { funcon.SetActive(InvertFuncon ? !OnDefault : OnDefault); }
             }
         }
+        public void SFEXT_L_OnEnable()
+        {
+            if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, AnimOn); }
+        }
         public void SFEXT_O_OnPlayerJoined()
         {
             if (!IsSecondary)
