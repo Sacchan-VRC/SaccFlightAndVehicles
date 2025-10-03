@@ -172,7 +172,6 @@ namespace SaccFlightAndVehicles
         public float Clutch;
         public byte CurrentGear = 0;
         private bool LimitingRev = false;
-        public Vector3 VehicleVel;
         public float debugSpeedSteeringMulti = 0f;
         public bool InVR;
         public bool Sleeping = false;
@@ -582,7 +581,7 @@ namespace SaccFlightAndVehicles
                 if (!Sleeping)
                 {
                     DoRepeatingWorld();
-                    VehicleSpeed = VehicleVel.magnitude;
+                    VehicleSpeed = CurrentVel.magnitude;
                     NumGroundedWheels = 0;
                     NumGroundedSteerWheels = 0;
                     for (int i = 0; i < SteerWheels.Length; i++)
@@ -883,7 +882,7 @@ namespace SaccFlightAndVehicles
                             LastTouchedTransform_Speed += (Vector3)DriveWheels[i].GetProgramVariable("LastTouchedTransform_Speed");
                         }
                         LastTouchedTransform_Speed = LastTouchedTransform_Speed / (SteerWheels.Length + DriveWheels.Length);
-                        float AutoSteer = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel - LastTouchedTransform_Speed, VehicleTransform.up), VehicleTransform.up);
+                        float AutoSteer = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(CurrentVel - LastTouchedTransform_Speed, VehicleTransform.up), VehicleTransform.up);
                         if (Mathf.Abs(AutoSteer) > 110)
                         { AutoSteer = 0; }
 
@@ -1054,10 +1053,9 @@ namespace SaccFlightAndVehicles
             }
             else //TODO: Move this to an effects script / Have a timer to not do it while empty for more than 10s
             {
-                VehicleVel = (VehicleTransform.position - VehiclePosLastFrame) / DeltaTime;
-                VehicleSpeed = VehicleVel.magnitude;
+                VehicleSpeed = CurrentVel.magnitude;
                 VehiclePosLastFrame = VehicleTransform.position;
-                MovingForward = Vector3.Dot(VehicleTransform.forward, VehicleVel) < 0f;
+                MovingForward = Vector3.Dot(VehicleTransform.forward, CurrentVel) < 0f;
             }
         }
         public void UpdateGearRatio()
@@ -1076,11 +1074,11 @@ namespace SaccFlightAndVehicles
             if (!IsOwner) { return; }
             float DeltaTime = Time.fixedDeltaTime;
             Vector3 absVel = VehicleRigidbody.velocity;
-            VehicleVel = absVel - LastTouchedTransform_Speed;
+            CurrentVel = absVel - LastTouchedTransform_Speed;
             //calc Gs
             float gravity = 9.81f * DeltaTime;
             LastFrameVel.y -= gravity;
-            Vector3 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
+            Vector3 Gs3 = VehicleTransform.InverseTransformDirection(CurrentVel - LastFrameVel);
             Vector3 thisFrameGs = Gs3 / gravity;
             Gs_all -= FrameGs[GsFrameCheck];
             Gs_all += thisFrameGs;
@@ -1088,7 +1086,7 @@ namespace SaccFlightAndVehicles
             GsFrameCheck++;
             if (GsFrameCheck >= NumFUinAvgTime) { GsFrameCheck = 0; }
             AllGs = Gs_all.magnitude / NumFUinAvgTime;
-            LastFrameVel = VehicleVel;
+            LastFrameVel = CurrentVel;
 
             if (Piloting)
             {
