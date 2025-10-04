@@ -2188,7 +2188,7 @@ namespace SaccFlightAndVehicles
         float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
+            if (IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             if (Time.time - EntityControl.LastResupplyTime < 2) return;//disable prediction if vehicle has recently been healing
             if (PredictExplosion)
             {

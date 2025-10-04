@@ -681,7 +681,7 @@ namespace SaccFlightAndVehicles
         float LastHitTime = -100, PredictedHealth;
         public void SFEXT_L_BulletHit()
         {
-            if (!IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
+            if (IsOwner || EntityControl.dead || EntityControl.invincible) { return; }
             if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
