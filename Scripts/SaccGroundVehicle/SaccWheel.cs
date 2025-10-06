@@ -491,6 +491,12 @@ namespace SaccFlightAndVehicles
                     GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
                     SkidVectorFX = SideSkid + ForwardSkid - ForwardSkid * gripPc;
                 }
+                if (PointVelocity.sqrMagnitude > 0)
+                {
+                    float gripclamp = PointVelocity.magnitude / SGVControl.NumWheels;
+                    if (GripForce3.magnitude > gripclamp)
+                        GripForce3 = Vector3.ClampMagnitude(GripForce3, gripclamp);
+                }
                 CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
                 ForceUsed = Vector3.Dot(WheelForwardSpeed.normalized, GripForce3);
 #if UNITY_EDITOR
