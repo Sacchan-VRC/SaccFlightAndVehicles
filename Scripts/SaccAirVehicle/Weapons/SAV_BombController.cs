@@ -56,6 +56,8 @@ namespace SaccFlightAndVehicles
         [SerializeField] float KnockbackStrength_players_vert = 2f;
         [SerializeField] private bool ExpandingShockwave = false;
         [SerializeField] private float ExpandingShockwave_Speed = 343f;
+        [Tooltip("Sound to play when shockwave hits the player")]
+        [SerializeField] AudioSource[] ShockwaveHitMe_Sound;
         [Tooltip("Maximum number of rigidboes that can be blasted, to save performance")]
         [SerializeField] private int Shockwave_max_targets = 30;
         [SerializeField] private Transform shockWaveSphere;
@@ -521,6 +523,11 @@ namespace SaccFlightAndVehicles
                         Networking.LocalPlayer.SetVelocity(Networking.LocalPlayer.GetVelocity() + (KnockbackStrength_players * knockback * explosionDir.normalized) +
                         KnockbackStrength_players_vert * knockback * Vector3.up
                         );
+                    }
+                    if (ShockwaveHitMe_Sound.Length > 0)
+                    {
+                        int rand = Random.Range(0, ShockwaveHitMe_Sound.Length);
+                        ShockwaveHitMe_Sound[rand].Play();
                     }
                     ShockwaveHitMe = true;
                 }
