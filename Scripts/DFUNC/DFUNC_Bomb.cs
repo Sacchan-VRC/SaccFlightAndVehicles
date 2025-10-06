@@ -33,7 +33,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
         public Transform[] BombLaunchPoints;
         public AudioSource LaunchSound;
+        public AudioClip[] LaunchSound_Clips;
         public AudioSource LaunchSound_Interior;
+        public AudioClip[] LaunchSound_Interior_Clips;
         public AudioSource ReloadSound;
         [Tooltip("Play the Reload sound after BombDelay + this (negative values encouraged)")]
         public float ReloadSound_offset = 0f;
@@ -417,13 +419,32 @@ namespace SaccFlightAndVehicles
             }
             if (LaunchSound_Interior)
             {
-                if (SoundControl && (bool)SoundControl.GetProgramVariable("AllDoorsClosed"))
+                bool allDoorsClosed = SoundControl && (bool)SoundControl.GetProgramVariable("AllDoorsClosed");
+                AudioSource source = allDoorsClosed ? LaunchSound_Interior : LaunchSound;
+                AudioClip[] clips = allDoorsClosed ? LaunchSound_Interior_Clips : LaunchSound_Clips;
+
+                if (source && clips.Length > 0)
                 {
-                    LaunchSound_Interior.PlayOneShot(LaunchSound_Interior.clip);
+                    int rand = Random.Range(0, clips.Length);
+                    source.PlayOneShot(clips[rand]);
                 }
-                else if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
+                else if (source && source.clip)
+                {
+                    source.PlayOneShot(source.clip);
+                }
             }
-            else if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
+            else if (LaunchSound)
+            {
+                if (LaunchSound_Clips.Length > 0)
+                {
+                    int rand = Random.Range(0, LaunchSound_Clips.Length);
+                    LaunchSound.PlayOneShot(LaunchSound_Clips[rand]);
+                }
+                else if (LaunchSound.clip)
+                {
+                    LaunchSound.PlayOneShot(LaunchSound.clip);
+                }
+            }
             if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_num); }
 
             UpdateAmmoVisuals();
