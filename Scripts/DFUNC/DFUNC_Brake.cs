@@ -43,7 +43,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float BrakeStrength;
         private int BRAKE_STRING = Animator.StringToHash("brake");
         private bool Braking;

@@ -14,7 +14,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         void Update()
         {
             float Trigger;

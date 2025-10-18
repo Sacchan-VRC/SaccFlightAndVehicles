@@ -71,7 +71,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [Header("Syncmode can be set to None if using DelegateFireCallback")]
         [System.NonSerialized] public UdonSharpBehaviour DelegateFireCallback;
         private float InputXKeyb;

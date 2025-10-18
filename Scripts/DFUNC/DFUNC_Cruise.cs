@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] UdonSharpBehaviour SAVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public bool AllowCruiseGrounded;
         public Text HUDText_knotstarget;
         [Tooltip("Conversion from meters/s")]
@@ -30,7 +31,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private Transform VehicleTransform;
         private VRCPlayerApi localPlayer;
@@ -57,6 +57,7 @@ namespace SaccFlightAndVehicles
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         public void DFUNC_Selected()
         {
@@ -72,6 +73,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(Cruise);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Cruise); }
             Piloting = true;
             if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
             InVR = EntityControl.InVR;
@@ -79,6 +81,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(Cruise);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Cruise); }
             if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
         }
         public void SFEXT_O_PilotExit()
@@ -254,6 +257,7 @@ namespace SaccFlightAndVehicles
             SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
             Cruise = true;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
         }
         public void SetCruiseOff()
@@ -273,6 +277,7 @@ namespace SaccFlightAndVehicles
             SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
             Cruise = false;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
             EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
         }

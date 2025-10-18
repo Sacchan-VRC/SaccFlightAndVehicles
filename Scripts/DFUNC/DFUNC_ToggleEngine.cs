@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         public float ToggleMinDelay = 6f;
         public float StartUpTime = 5f;
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Space(10)]
         [Tooltip("AnimEngineStartupAnimBool is true when engine is starting, and remains true until engine is turned off")]
         public bool DoEngineStartupAnimBool;
@@ -22,7 +23,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool NoFuel;
         private bool wrecked;
         private int EngineStartCount;
@@ -34,6 +34,7 @@ namespace SaccFlightAndVehicles
         {
             wrecked = EntityControl.wrecked;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         public void SFEXT_L_OnEnable()
         {
@@ -104,6 +105,7 @@ namespace SaccFlightAndVehicles
             EngineStartCount++;
             ToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
@@ -135,6 +137,7 @@ namespace SaccFlightAndVehicles
         {
             EngineStartCancelCount++;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, false); }
             EntityControl.SendEventToExtensions("SFEXT_G_EngineStartupCancel");
@@ -180,12 +183,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_EngineOff()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, false); }
         }
         public void SFEXT_G_EngineOn()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
         }

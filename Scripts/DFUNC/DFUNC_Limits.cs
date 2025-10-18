@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         public bool DefaultLimitsOn = true;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Tooltip("Below this number of positive Gs, G Limiter has zero effect")]
         public float GLimiter_Begin_Pos = 35f;
         [Tooltip("Linearly decrease control limit up to this many positive Gs")]
@@ -31,7 +32,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool InVR;
         private bool Piloting;
@@ -72,6 +72,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             InVR = EntityControl.InVR;
             if (Dial_Funcon) Dial_Funcon.SetActive(FlightLimitsEnabled);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(FlightLimitsEnabled); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -99,6 +100,7 @@ namespace SaccFlightAndVehicles
             FlightLimitsEnabled = true;
             if (HudLimit) { HudLimit.SetActive(true); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_O_LimitsOn");
         }
         public void SetLimitsOff()
@@ -108,12 +110,14 @@ namespace SaccFlightAndVehicles
             FlightLimitsEnabled = false;
             if (HudLimit) { HudLimit.SetActive(false); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             SAVControl.SetProgramVariable("Limits", 1f);
             EntityControl.SendEventToExtensions("SFEXT_O_LimitsOff");
         }
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(FlightLimitsEnabled); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(FlightLimitsEnabled); }
         }
         public void SFEXT_G_RespawnButton()
         {

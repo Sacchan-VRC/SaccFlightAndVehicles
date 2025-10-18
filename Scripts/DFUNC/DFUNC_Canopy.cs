@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SoundControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public Animator CanopyAnimator;
         [Tooltip("How long to wait before telling the sound controller to change the sounds to outside vehicle sounds when opening")]
         public float CanopyOpenTime = 0f;
@@ -37,7 +38,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private Transform VehicleTransform;
         private VRCPlayerApi localPlayer;
@@ -76,6 +76,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(true);
             if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(CanopyOpen); }
             InVR = EntityControl.InVR;
         }
         public void SFEXT_O_PilotExit()
@@ -86,6 +87,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerEnter()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(CanopyOpen); }
         }
         public void SFEXT_G_Explode()
         {
@@ -164,6 +166,7 @@ namespace SaccFlightAndVehicles
             if (CanopyOpen || CanopyBroken) { return; }
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             CanopyOpen = true;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBool, true); }
 
@@ -195,6 +198,7 @@ namespace SaccFlightAndVehicles
             if (!CanopyOpen || CanopyBroken) { return; }//don't bother when not necessary (OnPlayerJoined() wasn't you)
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             CanopyOpen = false;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBool, false); }
             CanopyTransitioning = true;
@@ -248,6 +252,7 @@ namespace SaccFlightAndVehicles
         {
             if (CanopyBroken) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             CanopyOpen = true;
             CanopyBroken = true;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, true); }

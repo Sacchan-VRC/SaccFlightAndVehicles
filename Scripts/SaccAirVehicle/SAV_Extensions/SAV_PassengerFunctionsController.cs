@@ -99,7 +99,6 @@ namespace SaccFlightAndVehicles
             {
                 if (usb)
                 {
-                    usb.SetProgramVariable("PassengerFunctionsControl", this);
                     usb.SetProgramVariable("EntityControl", EntityControl);
                 }
                 u++;
@@ -110,7 +109,6 @@ namespace SaccFlightAndVehicles
                 if (!usb) { LStickNULL[u] = true; }
                 else
                 {
-                    usb.SetProgramVariable("PassengerFunctionsControl", this);
                     usb.SetProgramVariable("EntityControl", EntityControl);
                 }
                 u++;
@@ -121,7 +119,6 @@ namespace SaccFlightAndVehicles
                 if (!usb) { RStickNULL[u] = true; }
                 else
                 {
-                    usb.SetProgramVariable("PassengerFunctionsControl", this);
                     usb.SetProgramVariable("EntityControl", EntityControl);
                 }
                 u++;
@@ -158,8 +155,6 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = RAngle.z;
                 }
             }
-
-            TellDFUNCsLR();
 
             SendEventToExtensions_Gunner("SFEXT_L_EntityStart");
         }
@@ -209,6 +204,8 @@ namespace SaccFlightAndVehicles
                     {
                         if (Dial_Functions_L[LStickSelection] != null)
                         {
+                            Dial_Functions_L[LStickSelection].SetProgramVariable("LeftDial", true);
+                            Dial_Functions_L[LStickSelection].SetProgramVariable("DialPosition", LStickSelection);
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
@@ -250,6 +247,8 @@ namespace SaccFlightAndVehicles
                     {
                         if (Dial_Functions_R[RStickSelection])
                         {
+                            Dial_Functions_R[RStickSelection].SetProgramVariable("LeftDial", false);
+                            Dial_Functions_R[RStickSelection].SetProgramVariable("DialPosition", RStickSelection);
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
@@ -264,26 +263,6 @@ namespace SaccFlightAndVehicles
                         }
                     }
                     RStickSelectionLastFrame = RStickSelection;
-                }
-            }
-        }
-
-        public void TellDFUNCsLR()
-        {
-            for (int i = 0; i < Dial_Functions_L.Length; i++)
-            {
-                if (Dial_Functions_L[i])
-                {
-                    Dial_Functions_L[i].SetProgramVariable("LeftDial", true);
-                    Dial_Functions_L[i].SetProgramVariable("DialPosition", i);
-                }
-            }
-            for (int i = 0; i < Dial_Functions_R.Length; i++)
-            {
-                if (Dial_Functions_R[i])
-                {
-                    Dial_Functions_R[i].SetProgramVariable("LeftDial", false);
-                    Dial_Functions_R[i].SetProgramVariable("DialPosition", i);
                 }
             }
         }
@@ -325,11 +304,15 @@ namespace SaccFlightAndVehicles
             if (LStickNumFuncs == 1)
             {
                 LStickSelection = 0;
+                Dial_Functions_L[LStickSelection].SetProgramVariable("LeftDial", true);
+                Dial_Functions_L[LStickSelection].SetProgramVariable("DialPosition", 0);
                 Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
             if (RStickNumFuncs == 1)
             {
                 LStickSelection = 0;
+                Dial_Functions_R[LStickSelection].SetProgramVariable("LeftDial", false);
+                Dial_Functions_R[LStickSelection].SetProgramVariable("DialPosition", 0);
                 Dial_Functions_R[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
             if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
@@ -379,34 +362,41 @@ namespace SaccFlightAndVehicles
                 IsOwner = true; SendEventToExtensions_Gunner("SFEXT_O_TakeOwnership");
             }
         }
-
-        public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
+        public void ToggleStickSelection(UdonSharpBehaviour dfunc)
         {
             var index = Array.IndexOf(Dial_Functions_L, dfunc);
-            if (LStickSelection == index)
+            bool isLeft = index > -1;
+            if (isLeft)
             {
-                LStickSelection = -1;
-                dfunc.SendCustomEvent("DFUNC_Deselected");
+                if (LStickSelection == index)
+                {
+                    LStickSelection = -1;
+                    dfunc.SendCustomEvent("DFUNC_Deselected");
+                }
+                else
+                {
+                    LStickSelection = index;
+                    dfunc.SetProgramVariable("LeftDial", true);
+                    dfunc.SetProgramVariable("DialPosition", index);
+                    dfunc.SendCustomEvent("DFUNC_Selected");
+                }
             }
-            else
+            index = Array.IndexOf(Dial_Functions_R, dfunc);
+            bool isRight = index > -1;
+            if (isRight)
             {
-                LStickSelection = index;
-                dfunc.SendCustomEvent("DFUNC_Selected");
-            }
-        }
-
-        public void ToggleStickSelectionRight(UdonSharpBehaviour dfunc)
-        {
-            var index = Array.IndexOf(Dial_Functions_R, dfunc);
-            if (RStickSelection == index)
-            {
-                RStickSelection = -1;
-                dfunc.SendCustomEvent("DFUNC_Deselected");
-            }
-            else
-            {
-                RStickSelection = index;
-                dfunc.SendCustomEvent("DFUNC_Selected");
+                if (RStickSelection == index)
+                {
+                    RStickSelection = -1;
+                    dfunc.SendCustomEvent("DFUNC_Deselected");
+                }
+                else
+                {
+                    RStickSelection = index;
+                    dfunc.SetProgramVariable("LeftDial", false);
+                    dfunc.SetProgramVariable("DialPosition", index);
+                    dfunc.SendCustomEvent("DFUNC_Selected");
+                }
             }
         }
     }

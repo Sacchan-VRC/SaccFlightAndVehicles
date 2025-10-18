@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public AudioSource CableSnap;
         public Transform HookDetector;
         [Tooltip("Strength of force slowing down the vehicle when it's snagged on a cable")]
@@ -23,7 +24,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public LayerMask HookCableLayer;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool Hooked = false;
@@ -38,6 +38,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             VehicleTransform = EntityControl.transform;
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
@@ -61,6 +62,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(HookDown); }
             if (HookDown) { gameObject.SetActive(true); }
         }
         public void SFEXT_O_PilotExit()
@@ -86,6 +88,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(HookDown); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(HookDown); }
         }
         public void KeyboardInput()
         {
@@ -175,12 +178,14 @@ namespace SaccFlightAndVehicles
                 {
                     if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(true); }
                     if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                    for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Dial_Funcon); }
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHookDown));
                 }
                 else
                 {
                     if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(false); }
                     if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+                    for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHookUp));
                 }
             }

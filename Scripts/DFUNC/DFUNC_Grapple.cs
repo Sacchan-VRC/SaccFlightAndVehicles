@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         public Transform HookRopePoint;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public float HookSpeed = 300f;
         public float SwingStrength = 20f;
         private Rigidbody VehicleRB;
@@ -86,7 +87,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float AprHookFlyTime;
         private bool DoHitPrediction;
         private Vector3 HookStartPos;
@@ -161,6 +161,7 @@ namespace SaccFlightAndVehicles
                     if (hitlen > 0)
                     {
                         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                        for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
                         foreach (RaycastHit hit in hits)
                         {
                             hitSelf = false;
@@ -379,6 +380,7 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InVR = EntityControl.InVR;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(DisableThis), 10f);
@@ -502,6 +504,7 @@ namespace SaccFlightAndVehicles
         public void ResetHook()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             Rope_Line.gameObject.SetActive(false);
             Hook.parent = HookParentStart;
             if (HookAttached)
@@ -779,8 +782,8 @@ namespace SaccFlightAndVehicles
         {
             if (KeyboardSelectMode)
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
+
             }
             else
             {

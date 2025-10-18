@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Tooltip("Oneshot sound played when attaching to catapult")]
         public AudioSource CatapultLock;
         [Tooltip("Maximum angular difference between vehicle and catapult allowed when attaching")]
@@ -33,7 +34,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool Selected;
         [System.NonSerializedAttribute] public bool OnCatapult;
@@ -63,6 +63,7 @@ namespace SaccFlightAndVehicles
         {
             InEditor = Networking.LocalPlayer == null;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             VehicleAnimator = EntityControl.GetComponent<Animator>();
@@ -121,6 +122,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(OnCatapult);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(OnCatapult); }
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -144,6 +146,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         bool enabledToFindAnimator;
         private void EnableToFindAnimator()
@@ -415,6 +418,7 @@ namespace SaccFlightAndVehicles
             { CatapultAnimator.SetTrigger("launch"); }
             CatapultAnimator = null;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             EntityControl.SendEventToExtensions("SFEXT_G_LaunchFromCatapult");
         }
         public void CatapultLockIn()
@@ -427,6 +431,7 @@ namespace SaccFlightAndVehicles
             if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", true); }
             if (CatapultLock) { CatapultLock.Play(); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockIn");
         }
         public void CatapultLockOff()

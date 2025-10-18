@@ -40,7 +40,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void SFEXT_L_EntityStart()
         {
             if (!ControlsRoot) { ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot"); }
@@ -63,12 +62,19 @@ namespace SaccFlightAndVehicles
         {
             UpdatingVar = false;
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             gameObject.SetActive(true);
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             gameObject.SetActive(false);
         }
         public void DFUNC_Selected()

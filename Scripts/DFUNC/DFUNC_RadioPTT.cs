@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] SAV_Radio Radio;
         [SerializeField] KeyCode PTT_Key;
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
         [SerializeField] bool ToggleMode = false;
         [SerializeField] bool Toggle_DefaultOn = true;
@@ -21,7 +22,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool InVR;
         private bool Piloting;
@@ -31,6 +31,7 @@ namespace SaccFlightAndVehicles
             Radio.PTT_MODE = true;
             Radio.PTTControl = this;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         bool Selected;
         private void Update()
@@ -101,6 +102,7 @@ namespace SaccFlightAndVehicles
                 { Radio.Channel -= 200; }
                 Radio.NewChannel();
                 if (Dial_Funcon) Dial_Funcon.SetActive(true);
+                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             }
         }
         void PTT_OFF()
@@ -112,6 +114,7 @@ namespace SaccFlightAndVehicles
                 { Radio.Channel += 200; }
                 Radio.NewChannel();
                 if (Dial_Funcon) Dial_Funcon.SetActive(false);
+                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             }
         }
         public void SFEXT_O_PilotEnter()

@@ -87,7 +87,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [System.NonSerializedAttribute] public int FullAAMs;
         private int NumAAMTargets;
         private float AAMLockTimer = 0;
@@ -191,12 +190,19 @@ namespace SaccFlightAndVehicles
                 AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             gameObject.SetActive(true);
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             gameObject.SetActive(false);
             AAMLocked = false;
             PickupTrigger = 0;
@@ -206,7 +212,6 @@ namespace SaccFlightAndVehicles
             Pilot = false;
             AAMLockTimer = 0;
             AAMHasTarget = false;
-            AAMLocked = false;
             func_active = false;
             if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
             if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
@@ -675,15 +680,13 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
             {
-                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
             }
             else
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
             }
         }
         private void LaunchAAM_Owner()

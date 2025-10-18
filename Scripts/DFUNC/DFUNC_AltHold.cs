@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SAVControl;
         public GameObject HudHold;
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Tooltip("Limit Gs that can be pulled by the altitude hold auto pilot")]
         public float GLimiter = 12f;
         [Tooltip("Limit AoA that can be pulled by the altitude hold auto pilot")]
@@ -52,7 +53,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool AltHold;
         private Rigidbody VehicleRigidbody;
@@ -70,6 +70,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             IsOwner = EntityControl.IsOwner;
         }
         public void DFUNC_Selected()
@@ -89,6 +90,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             if (!AltHold) { gameObject.SetActive(false); }
             if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(AltHold); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -99,6 +101,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(AltHold); }
         }
         public void SFEXT_G_EngineOn()
         {
@@ -159,6 +162,7 @@ namespace SaccFlightAndVehicles
                 JoyStickOveridden = true;
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(AltHold); }
             if (HudHold) { HudHold.SetActive(AltHold); }
             EntityControl.SendEventToExtensions("SFEXT_G_AltHoldOn");
             if (HelicopterMode)
@@ -170,6 +174,7 @@ namespace SaccFlightAndVehicles
             if (!InVR || !Selected) { gameObject.SetActive(false); }
             AltHold = false;
             if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(AltHold); }
             if (HudHold) { HudHold.SetActive(AltHold); }
             if (JoyStickOveridden)
             {
@@ -334,6 +339,7 @@ namespace SaccFlightAndVehicles
             SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
             Cruise = true;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
         }
         public void SetCruiseOff()
@@ -347,6 +353,7 @@ namespace SaccFlightAndVehicles
             SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
             Cruise = false;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
         }
         public void SFEXT_O_ThrottleDropped()

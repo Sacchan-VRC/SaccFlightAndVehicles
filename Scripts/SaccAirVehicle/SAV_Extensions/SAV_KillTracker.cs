@@ -11,7 +11,6 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         [System.NonSerialized] public SaccEntity EntityControl;
-        [Tooltip("Leave empty if you just want to use the SFEXT_O_GotKilled and SFEXT_O_GotAKill events for something else")]
         public SaccScoreboard_Kills KillsBoard;
         private bool InEditor;
         private VRCPlayerApi localPlayer;

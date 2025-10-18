@@ -120,7 +120,6 @@ namespace SaccFlightAndVehicles
         [SerializeField] bool use_OnPickupUseDown = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         bool controlsActive = false;
         public void SFEXT_L_EntityStart() { Initialize(); }

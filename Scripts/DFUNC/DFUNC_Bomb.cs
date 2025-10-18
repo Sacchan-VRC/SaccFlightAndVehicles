@@ -82,7 +82,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float Trigger;
         private bool TriggerLastFrame;
         private int BombPoint = 0;
@@ -150,8 +149,12 @@ namespace SaccFlightAndVehicles
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             gameObject.SetActive(true);
             if (EntityControl.EntityPickup)
             {
@@ -170,6 +173,9 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             DisableThisObject();
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
             { SetBoolOff(); }
@@ -475,15 +481,13 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                if (PassengerFunctionsControl)
+                if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
                 {
-                    if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                    else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                    EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
                 }
                 else
                 {
-                    if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                    else EntityControl.ToggleStickSelectionRight(this);
+                    EntityControl.ToggleStickSelection(this);
                 }
             }
         }

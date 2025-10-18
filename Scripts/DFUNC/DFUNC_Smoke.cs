@@ -3,10 +3,11 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_Smoke : UdonSharpBehaviour
     {
         [SerializeField] UdonSharpBehaviour SAVControl;
@@ -17,8 +18,9 @@ namespace SaccFlightAndVehicles
         public GameObject HUD_SmokeOnIndicator;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public bool AllowChangeColor = true;
-        [UdonSynced, FieldChangeCallback(nameof(SmokeOn))] private bool _smokeon;
+        [FieldChangeCallback(nameof(SmokeOn))] private bool _smokeon;
         public bool SmokeOn
         {
             set
@@ -31,14 +33,13 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private VRCPlayerApi localPlayer;
         private bool TriggerLastFrame;
         private float SmokeHoldTime;
         private bool SetSmokeLastFrame;
         private Vector3 SmokeZeroPoint;
         private ParticleSystem.EmissionModule[] DisplaySmokeem;
-        [UdonSynced, System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
+        [System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
         [System.NonSerializedAttribute] private Vector3 SmokeColorLast = Vector3.one;
         [System.NonSerializedAttribute] public bool localSmoking = false;
         [System.NonSerializedAttribute] public Color SmokeColor_Color;
@@ -54,6 +55,7 @@ namespace SaccFlightAndVehicles
             InEditor = localPlayer == null;
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             int NumSmokes = DisplaySmoke.Length;
             DisplaySmokeem = new ParticleSystem.EmissionModule[NumSmokes];
 
@@ -65,20 +67,18 @@ namespace SaccFlightAndVehicles
             TriggerLastFrame = true;
             SmokeHoldTime = 0;
             Selected = true;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
+            gameObject.SetActive(true);
         }
         public void DFUNC_Deselected()
         {
-            if (!localSmoking)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
-            }
+            gameObject.SetActive(false);
             Selected = false;
         }
         public void SFEXT_O_PilotEnter()
         {
             Pilot = true;
             if (Dial_Funcon) { Dial_Funcon.SetActive(localSmoking); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(localSmoking); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -86,13 +86,23 @@ namespace SaccFlightAndVehicles
             Selected = false;
             gameObject.SetActive(false);
         }
+        byte numUsers;
+        public void SFEXT_G_PilotEnter()
+        {
+            numUsers++;
+            if (numUsers > 1) return;
+        }
         public void SFEXT_G_PilotExit()
         {
-            SetNotActive();
+            numUsers--;
+            if (numUsers != 0) return;
+
+            SmokeOn = false;
         }
         public void SFEXT_P_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(localSmoking);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(localSmoking); }
         }
         public void SFEXT_G_Explode()
         {
@@ -102,14 +112,9 @@ namespace SaccFlightAndVehicles
         {
             SetNotActive();
         }
-        public void SetActive()
-        {
-            gameObject.SetActive(true);
-        }
         public void SetNotActive()
         {
             SmokeOn = false;
-            gameObject.SetActive(false);
         }
         private void LateUpdate()
         {
@@ -134,7 +139,8 @@ namespace SaccFlightAndVehicles
                             TempSmokeCol = SmokeColor;
 
                             SmokeOn = !SmokeOn;
-                            RequestSerialization();
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), SmokeOn, SmokeColor);
+                            LastSerialization = Time.time;
                             SmokeHoldTime = 0;
                         }
                         SmokeHoldTime += Time.deltaTime;
@@ -165,7 +171,7 @@ namespace SaccFlightAndVehicles
                         SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
                         if (SmokeColor != SmokeColorLast && (Time.time - LastSerialization > .5f))
                         {
-                            RequestSerialization();
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), true, SmokeColor);
                             LastSerialization = Time.time;
                         }
                         SmokeColorLast = SmokeColor;
@@ -174,28 +180,36 @@ namespace SaccFlightAndVehicles
                     if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
                 }
             }
-            if (localSmoking && AllowChangeColor)
+        }
+        [NetworkCallable]
+        public void NetworkUpdateSmoke(bool smokeon, Vector3 newcolor)
+        {
+            if (SmokeOn != smokeon)
             {
+                SmokeOn = smokeon;
+            }
+            if (SmokeColor != newcolor)
+            {
+                SmokeColor = newcolor;
                 //everyone does this while smoke is active
-                SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
+                SmokeColor_Color = new Color(newcolor.x, newcolor.y, newcolor.z);
                 foreach (ParticleSystem smoke in DisplaySmoke)
                 {
                     var main = smoke.main;
                     main.startColor = new ParticleSystem.MinMaxGradient(SmokeColor_Color, SmokeColor_Color * .8f);
                 }
+                if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
             }
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
             {
-                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
             }
             else
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
             }
         }
         public void SetSmoking(bool smoking)
@@ -205,6 +219,7 @@ namespace SaccFlightAndVehicles
             for (int x = 0; x < DisplaySmokeem.Length; x++)
             { DisplaySmokeem[x].enabled = smoking; }
             if (Dial_Funcon) Dial_Funcon.SetActive(smoking);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(smoking); }
             if (EntityControl.IsOwner)
             {
                 if (smoking)
@@ -213,20 +228,13 @@ namespace SaccFlightAndVehicles
                 { EntityControl.SendEventToExtensions("SFEXT_G_SmokeOff"); }
             }
         }
-        public void SFEXT_O_TakeOwnership()
-        {
-            if (localSmoking)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
-            }
-        }
         public void SFEXT_O_OnPlayerJoined()
         {
-            if (EntityControl.IsOwner)
+            if (Pilot)
             {
                 if (localSmoking)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), SmokeOn, SmokeColor);
                 }
             }
         }

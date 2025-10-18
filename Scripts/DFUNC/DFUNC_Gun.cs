@@ -52,7 +52,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool AnimOn;
         private int AnimBool_STRING;
         [System.NonSerializedAttribute] public float FullGunAmmoInSeconds;
@@ -159,12 +158,19 @@ namespace SaccFlightAndVehicles
             RequestSerialization();
             OnDeserialization();
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             Set_Active();
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             Set_Inactive();
             Set_Unselected();
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
@@ -611,15 +617,13 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
             {
-                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
             }
             else
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
             }
         }
     }

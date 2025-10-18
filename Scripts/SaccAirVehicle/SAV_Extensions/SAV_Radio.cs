@@ -92,7 +92,7 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateChannel()
         {
-            if (!(PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using))
+            if (!(EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions ? EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.Using : EntityControl.Using))
             {
                 ChannelSwapped = true;
                 RadioBase.SetProgramVariable("CurrentChannel", Channel);
@@ -131,7 +131,7 @@ namespace SaccFlightAndVehicles
                 RadioBase.SetProgramVariable("MyRadioSetTimes", (int)RadioBase.GetProgramVariable("MyRadioSetTimes") + 1);
                 RadioBase.SetProgramVariable("MyRadio", this);
                 //if not pilot, set my channel on radiobase to vehicle's and set back on exit
-                if (ForceChannel_b && (PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using))
+                if (ForceChannel_b && (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions ? EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.Using : EntityControl.Using))
                 {
                     myPrevChannel = RadioBase.MyChannel;
                     ForceChannel_swapped = true;
@@ -148,7 +148,7 @@ namespace SaccFlightAndVehicles
         }
         public void NewChannel()
         {
-            if (PassengerFunctionsControl ? PassengerFunctionsControl.Using : EntityControl.Using)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions ? EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.Using : EntityControl.Using)
             {
                 // PTT_MODE requires DFUNC_RadioPTT
                 // PTT_MODE has your radiobase channel set to what is selected as normal so that you hear that channel
@@ -241,7 +241,6 @@ namespace SaccFlightAndVehicles
         bool controlsRunning;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void Controls()
         {
             if (!controlsRunning) return;

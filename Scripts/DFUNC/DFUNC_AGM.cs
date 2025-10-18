@@ -29,11 +29,13 @@ namespace SaccFlightAndVehicles
         public Camera AtGCam;
         [Tooltip("Screen that displays target, that is enabled when selected")]
         public GameObject AtGScreen;
+        public GameObject[] AtGScreen_Array;
         [Tooltip("Lower = slower response")]
         public float CamTurnSmoothness = 100f;
         public float CamZoomScale = 100f;
         public float CamZoomScale_Locked = 60f;
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
         public float FullReloadTimeSec = 8;
         [Tooltip("Sound that plays when the AGM locks")]
@@ -69,9 +71,10 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [System.NonSerializedAttribute] public bool AGMLocked;
         [System.NonSerializedAttribute] public bool IsOwner;
+        [System.NonSerializedAttribute] public Transform TrackedTransform_Local;
+        [System.NonSerializedAttribute] public Vector3 TrackedObjectOffset_Local;
         [System.NonSerializedAttribute] public Transform TrackedTransform;
         [System.NonSerializedAttribute] public Vector3 TrackedObjectOffset;
         private int AGMUnlocking = 0;
@@ -83,10 +86,7 @@ namespace SaccFlightAndVehicles
         private float FullAGMsDivider;
         private int NumChildrenStart;
         // public Transform Debug_LockPointRaw, Debug_TransformLock;
-        [System.NonSerializedAttribute] public Vector3 AGMTarget;
-
-        [NetworkCallable]
-        public void SetTarget(Vector3 inputLocation)
+        public void SetTarget(Vector3 inputLocation, bool local)
         {
             // if (Debug_LockPointRaw) Debug_LockPointRaw.position = value;
             RaycastHit[] hits = Physics.SphereCastAll(inputLocation, 150, Vector3.up, 0, LockableLayermask, QueryTriggerInteraction.Ignore);
@@ -106,18 +106,33 @@ namespace SaccFlightAndVehicles
                         if (tempdist < NearestDist)
                         {
                             NearestDist = tempdist;
-                            TrackedTransform = hit.collider.transform;
-                            TrackedObjectOffset = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
+                            if (local)
+                            {
+                                TrackedTransform_Local = hit.collider.transform;
+                                TrackedObjectOffset_Local = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
+                            }
+                            else
+                            {
+                                TrackedTransform = hit.collider.transform;
+                                TrackedObjectOffset = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
+                            }
                         }
                     }
                 }
             }
             else
             {//extreme lag/late joiners if object targeted was in air/sea/not near anything (or if trying to lock terrain apparently)
-                TrackedTransform = transform.root;//hopefully a non-moving object
-                TrackedObjectOffset = TrackedTransform.InverseTransformPoint(inputLocation);
+                if (local)
+                {
+                    TrackedTransform_Local = transform.root;//hopefully a non-moving object
+                    TrackedObjectOffset_Local = TrackedTransform.InverseTransformPoint(inputLocation);
+                }
+                else
+                {
+                    TrackedTransform = transform.root;
+                    TrackedObjectOffset = TrackedTransform.InverseTransformPoint(inputLocation);
+                }
             }
-            AGMTarget = inputLocation;
         }
         private VRCPlayerApi localPlayer;
         private bool InVR;
@@ -143,7 +158,9 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             if (AtGScreen) AtGScreen.SetActive(false);
+            for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(false); }
             InVR = EntityControl.InVR;
 
             UpdateAmmoVisuals();
@@ -183,12 +200,19 @@ namespace SaccFlightAndVehicles
         {
             UpdateAmmoVisuals();
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             gameObject.SetActive(true);
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             gameObject.SetActive(false);
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
             { SetBoolOff(); }
@@ -197,12 +221,13 @@ namespace SaccFlightAndVehicles
         {
             AGMLocked = false;
             if (AtGScreen) AtGScreen.SetActive(false);
+            for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(false); }
             AtGCam.gameObject.SetActive(false);
-            gameObject.SetActive(false);
             func_active = false;
             Piloting = false;
             PickupTrigger = 0;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -245,6 +270,7 @@ namespace SaccFlightAndVehicles
             TriggerLastFrame = true;
             func_active = true;
             if (AtGScreen) AtGScreen.SetActive(true);
+            for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(true); }
             AtGCam.gameObject.SetActive(true);
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -254,6 +280,7 @@ namespace SaccFlightAndVehicles
             func_active = false;
             PickupTrigger = 0;
             if (AtGScreen) AtGScreen.SetActive(false);
+            for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(false); }
             AtGCam.gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
@@ -267,11 +294,11 @@ namespace SaccFlightAndVehicles
             layerm &= ~(1 << EntityControl.OnboardVehicleLayer);// remove your own vehicle from the raycast layers
             if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, layerm, QueryTriggerInteraction.Ignore))
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetTarget), lockpoint.point);
+                SetTarget(lockpoint.point, true);
                 AGMLocked = true;
                 AGMUnlocking = 0;
-                RequestSerialization();
                 if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             }
         }
         private void Update()
@@ -299,6 +326,7 @@ namespace SaccFlightAndVehicles
                     AGMUnlockTimer = 0;
                     AGMUnlocking = 0;
                     if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+                    for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
                     if (AGMUnlock)
                     { AGMUnlock.Play(); }
                 }
@@ -347,7 +375,7 @@ namespace SaccFlightAndVehicles
                                     if (angle < targetangle)
                                     {
                                         targetangle = angle;
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetTarget), target.collider.transform.position);
+                                        SetTarget(target.collider.transform.position, true);
                                     }
                                 }
                                 //the spherecastall should really be a cone but this works for now
@@ -358,7 +386,7 @@ namespace SaccFlightAndVehicles
                                     AGMLocked = true;
                                     AGMUnlocking = 0;
                                     if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-                                    RequestSerialization();
+                                    for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
                                 }
                                 if (AGMLocked && AGMLock)
                                 { AGMLock.Play(); }
@@ -451,8 +479,9 @@ namespace SaccFlightAndVehicles
             }
         }
         [NetworkCallable]
-        public void LaunchAGMs_Event()
+        public void LaunchAGMs_Event(Vector3 inputLocation)
         {
+            SetTarget(inputLocation, false);
             LaunchAGM();
         }
         void LaunchAGM()
@@ -522,15 +551,13 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
             {
-                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
             }
             else
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
             }
         }
         public void SFEXT_O_OnDrop()
@@ -552,19 +579,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAGM_Owner()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event));
-        }
-        public void UpdateLaterJoiner(Vector3 inputLocation, int playerID)
-        {
-            if (!Utilities.IsValid(localPlayer)) return;
-            if (localPlayer.playerId != playerID) return;
-            SetTarget(inputLocation);
-        }
-        public override void OnPlayerJoined(VRCPlayerApi player)
-        {
-            if (!Piloting) return;
-            int playerID = player.playerId;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(UpdateLaterJoiner), TrackedTransform.TransformPoint(TrackedObjectOffset), playerID);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event), TrackedTransform.TransformPoint(TrackedObjectOffset));
         }
     }
 }

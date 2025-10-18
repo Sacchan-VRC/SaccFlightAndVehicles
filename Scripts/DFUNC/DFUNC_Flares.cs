@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_Flares : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
@@ -36,9 +37,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float FlareLaunchTime;
-        [UdonSynced] private bool FlareFireNow;
         public void DFUNC_Selected()
         {
             Selected = true;
@@ -47,7 +46,6 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
-            FlareFireNow = false;
             RequestSerialization();
         }
         public void SFEXT_L_EntityStart()
@@ -63,20 +61,24 @@ namespace SaccFlightAndVehicles
             reloadspeed = FullFlares / FullReloadTimeSec;
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
-            OnEnableDeserializationBlocker = true;
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
+            numUsers++;
+            if (numUsers > 1) return;
+
             gameObject.SetActive(true);
         }
-        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
-        { gameObject.SetActive(false); }
+        {
+            numUsers--;
+            if (numUsers != 0) return;
+
+            gameObject.SetActive(false);
+        }
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            FlareFireNow = false;
-            RequestSerialization();
             InVR = EntityControl.InVR;
         }
         public void SFEXT_O_PilotExit()
@@ -119,12 +121,12 @@ namespace SaccFlightAndVehicles
                     {
                         if (NumFlares > 0)
                         {
-                            LaunchFlare_Owner();
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchFlare_Owner));
                         }
                     }
                     else if (NumFlares > 0 && ((Time.time - FlareLaunchTime) > FlareHoldDelay))
                     {///launch every FlareHoldDelay
-                        LaunchFlare_Owner();
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchFlare_Owner));
                     }
                     TriggerLastFrame = true;
                 }
@@ -187,38 +189,12 @@ namespace SaccFlightAndVehicles
         {
             { SAVControl.SetProgramVariable(CMTypes[FlareType], (int)SAVControl.GetProgramVariable(CMTypes[FlareType]) - 1); }
         }
-        private void LaunchFlare_Owner()
+        [NetworkCallable]
+        public void LaunchFlare_Owner()
         {
-            FireNextSerialization = true;
-            RequestSerialization();
             for (int i = 0; i < NumFlare_PerShot; i++)
             {
                 LaunchFlare();
-            }
-        }
-        private bool FireNextSerialization = false;
-        public override void OnPreSerialization()
-        {
-            if (FireNextSerialization)
-            {
-                FireNextSerialization = false;
-                FlareFireNow = true;
-            }
-        }
-        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
-        {
-            FlareFireNow = false;
-        }
-        bool OnEnableDeserializationBlocker;
-        public override void OnDeserialization()
-        {
-            if (OnEnableDeserializationBlocker) { return; }
-            if (FlareFireNow)
-            {
-                for (int i = 0; i < NumFlare_PerShot; i++)
-                {
-                    LaunchFlare();
-                }
             }
         }
     }

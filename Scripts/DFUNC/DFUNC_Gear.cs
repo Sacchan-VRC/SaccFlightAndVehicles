@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public Animator GearAnimator;
         [Tooltip("Multiply drag by this amount while gear is down")]
         public float LandingGearDragMulti = 1.3f;
@@ -25,7 +26,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool GearUp = true;
         private bool DragApplied = false;
@@ -49,6 +49,7 @@ namespace SaccFlightAndVehicles
             LandingGearDragMulti -= 1;//to match how the old values worked
             SetGearDown();
             if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(!GearUp); }
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             IsOwner = EntityControl.IsOwner;
         }
@@ -68,6 +69,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(!GearUp); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -76,6 +78,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(!GearUp); }
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -136,6 +139,7 @@ namespace SaccFlightAndVehicles
                 DisableGroundDetector = true;
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             GearUp = true;
             if (GearAnimator) { GearAnimator.SetBool("gearup", true); }
             if (DragApplied)
@@ -157,6 +161,7 @@ namespace SaccFlightAndVehicles
                 DisableGroundDetector = false;
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
             GearUp = false;
             if (GearAnimator) { GearAnimator.SetBool("gearup", false); }
             if (!DragApplied)

@@ -50,7 +50,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
         [System.NonSerializedAttribute] public bool IsOwner;
         private float AGMRotDif;
@@ -103,8 +102,12 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(true); }
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             OnEnableDeserializationBlocker = true;
             SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
@@ -113,7 +116,6 @@ namespace SaccFlightAndVehicles
         {
             AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
-            gameObject.SetActive(false);
             func_active = false;
             IsOwner = Using = false;
             if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(false); }
@@ -122,6 +124,9 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             gameObject.SetActive(false);
         }
         public void SFEXT_G_Explode()
@@ -320,15 +325,13 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions)
             {
-                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+                EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.ToggleStickSelection(this);
             }
             else
             {
-                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
-                else EntityControl.ToggleStickSelectionRight(this);
+                EntityControl.ToggleStickSelection(this);
             }
         }
         private bool FireNextSerialization = false;

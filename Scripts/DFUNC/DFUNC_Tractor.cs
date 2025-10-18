@@ -23,6 +23,7 @@ namespace SaccFlightAndVehicles
         public GameObject TractorFX;
         public float LaunchStrength;
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public Transform AtGCam;
         public GameObject AtGScreen;
         [SerializeField] private LayerMask TractorRaycastLayers = 2065;
@@ -32,7 +33,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [SerializeField] Animator BoolAnimator;
         private bool DoAnimBoolWhenOn;
         private bool HoldingTrigger = false;
@@ -43,6 +43,7 @@ namespace SaccFlightAndVehicles
             set
             {
                 if (Dial_Funcon) { Dial_Funcon.SetActive(value); }
+                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(value); }
                 if (!InVR)
                 {
                     if (AtGCam) { AtGCam.gameObject.SetActive(value); }
@@ -70,6 +71,7 @@ namespace SaccFlightAndVehicles
         private void Init()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             InVR = EntityControl.InVR;
             if (AnimBool != string.Empty) { DoAnimBoolWhenOn = true; }
         }
@@ -95,12 +97,19 @@ namespace SaccFlightAndVehicles
         {
             SFEXT_G_PilotEnter();
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             EnableForOthers();
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             DisableForOthers();
         }
         public void EnableForOthers()

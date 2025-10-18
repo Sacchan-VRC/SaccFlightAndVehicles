@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         public Animator FlapsAnimator;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        public GameObject[] Dial_Funcon_Array;
         public string AnimatorBool = "flaps";
         public bool DefaultFlapsOff = false;
         [Tooltip("Multiply Vehicle's drag by this amount while flaps are enabled")]
@@ -30,7 +31,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [System.NonSerializedAttribute] public bool Flaps = false;
         private bool TriggerLastFrame;
         private bool DragApplied;
@@ -68,6 +68,7 @@ namespace SaccFlightAndVehicles
             StraightenStartValue_Yaw = (float)SAVControl.GetProgramVariable("VelStraightenStrYaw");
 
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Flaps); }
             if (DefaultFlapsOff) { SetFlapsOff(); }
             else { SetFlapsOn(); }
         }
@@ -80,6 +81,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             if (Flaps) { gameObject.SetActive(true); }
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Flaps); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -88,6 +90,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_PassengerEnter()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Flaps); }
         }
         public void SFEXT_G_Explode()
         {
@@ -169,6 +172,7 @@ namespace SaccFlightAndVehicles
         {
             if (!Flaps) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             Flaps = false;
             if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, false); }
 
@@ -211,6 +215,7 @@ namespace SaccFlightAndVehicles
             Flaps = true;
             if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, true); }
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
+            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
 
             if (!DragApplied)
             {

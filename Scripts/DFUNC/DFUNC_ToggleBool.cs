@@ -66,7 +66,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
-        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private ParticleSystem.EmissionModule[] ToggleEmission_em;
         private int ParticleLength;
         private bool ToggleAllowed = true;
@@ -135,8 +134,12 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        byte numUsers;
         public void SFEXT_G_PilotEnter()
         {
+            numUsers++;
+            if (numUsers > 1) return;
+
             if (!IsSecondary)
             {
                 if (PilotEnterTurnOff)
@@ -166,6 +169,9 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
+            numUsers--;
+            if (numUsers != 0) return;
+
             if (!IsSecondary)
             {
                 if (PilotExitTurnOn)
@@ -179,7 +185,6 @@ namespace SaccFlightAndVehicles
                     { SetBoolOff(); }
                 }
             }
-            gameObject.SetActive(false);
         }
         public void SFEXT_G_Explode()
         {
