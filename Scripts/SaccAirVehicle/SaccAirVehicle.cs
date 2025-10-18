@@ -1667,8 +1667,11 @@ namespace SaccFlightAndVehicles
                     killerWeaponType = EntityControl.LastHitWeaponType;
                 }
             }
-            if (SendKillEvents && IsOwner && EntityControl.Occupied && killerID > -1)
-            { SendKillEvent(killerID, killerWeaponType); }
+            if (SendKillEvents && IsOwner && (EntityControl.Using || (Time.time - EntityControl.PilotExitTime < 3)) && killerID > -1)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
+                SendKillEvent(killerID, killerWeaponType);
+            }
         }
         public void SFEXT_G_NotWrecked()
         {
