@@ -263,13 +263,13 @@ namespace SaccFlightAndVehicles
                     EntityControl.SendEventToExtensions("SFEXT_O_DisableJoystickControl_Activated");
                     if (WheelGripLastFrameL)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedL");
                         WheelGripLastFrameL = false;
+                        EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedL");
                     }
                     if (WheelGripLastFrameR)
                     {
-                        EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedR");
                         WheelGripLastFrameR = false;
+                        EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedR");
                     }
                 }
                 else if (value == 0 && DisableJoystickControl > 0)
@@ -1685,12 +1685,12 @@ namespace SaccFlightAndVehicles
                 VRJoystickPosR = 0f;
                 if (WheelGripLastFrameR)//first frame you let go of wheel
                 {
+                    WheelGripLastFrameR = false;
                     EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedR");
                     WheelGripLastFrameL = false;
                     //LHandSteeringWheel hasn't run yet so don't need to do anything else
                     localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                 }
-                WheelGripLastFrameR = false;
             }
         }
         void LHandSteeringWheel(float LGrip)
@@ -1758,6 +1758,7 @@ namespace SaccFlightAndVehicles
                 VRJoystickPosL = 0f;
                 if (WheelGripLastFrameL)//first frame you let go of wheel
                 {
+                    WheelGripLastFrameL = false;
                     EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedL");
                     localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
                     if (WheelGripLastFrameR)
@@ -1768,7 +1769,6 @@ namespace SaccFlightAndVehicles
                         HandsOnWheel--;//remove one because we ran R twice
                     }
                 }
-                WheelGripLastFrameL = false;
             }
         }
         private bool RepeatingWorldCheckAxis;
