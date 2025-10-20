@@ -109,7 +109,7 @@ namespace SaccFlightAndVehicles
                             if (local)
                             {
                                 TrackedTransform_Local = hit.collider.transform;
-                                TrackedObjectOffset_Local = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
+                                TrackedObjectOffset_Local = TrackedTransform_Local.InverseTransformPoint(hit.collider.ClosestPoint(inputLocation));
                             }
                             else
                             {
@@ -125,7 +125,7 @@ namespace SaccFlightAndVehicles
                 if (local)
                 {
                     TrackedTransform_Local = transform.root;//hopefully a non-moving object
-                    TrackedObjectOffset_Local = TrackedTransform.InverseTransformPoint(inputLocation);
+                    TrackedObjectOffset_Local = TrackedTransform_Local.InverseTransformPoint(inputLocation);
                 }
                 else
                 {
@@ -303,7 +303,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            // if (Debug_TransformLock) Debug_TransformLock.position = TrackedTransform.TransformPoint(TrackedObjectOffset);
+            // if (Debug_TransformLock && TrackedTransform) { Debug_TransformLock.position = TrackedTransform.TransformPoint(TrackedObjectOffset); }
             if (func_active)
             {
                 float DeltaTime = Time.deltaTime;
@@ -470,7 +470,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    AtGCam.transform.LookAt(TrackedTransform.TransformPoint(TrackedObjectOffset), EntityControl.transform.up);
+                    AtGCam.transform.LookAt(TrackedTransform_Local.TransformPoint(TrackedObjectOffset_Local), EntityControl.transform.up);
                     RaycastHit camhit;
                     Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     //dolly zoom //Mathf.Atan(60 <--the 60 is the height of the camera frustrum at the target distance
@@ -579,7 +579,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAGM_Owner()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event), TrackedTransform.TransformPoint(TrackedObjectOffset));
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event), TrackedTransform_Local.TransformPoint(TrackedObjectOffset_Local));
         }
     }
 }
