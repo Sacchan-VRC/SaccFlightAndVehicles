@@ -1376,6 +1376,10 @@ namespace SaccFlightAndVehicles
                 }
                 if (!_DisablePhysicsAndInputs)
                 {
+                    if (_ThrottleOverridden)
+                    {
+                        ThrottleInput = PlayerThrottle = Mathf.Min(ThrottleOverride, Fuel * LowFuelDivider);
+                    }
                     if (_JoystickOverridden)
                     {
                         RotationInputs = JoystickOverride;
