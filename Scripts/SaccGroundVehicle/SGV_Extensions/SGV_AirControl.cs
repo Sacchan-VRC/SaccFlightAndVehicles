@@ -54,7 +54,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (!Grounded && AirControlReady || HoldingJoyStick)
+            if (!Grounded && (AirControlReady || HoldingJoyStick))
             {
                 int Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
                 int Si = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
