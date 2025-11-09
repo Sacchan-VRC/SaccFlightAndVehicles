@@ -41,6 +41,7 @@ namespace SaccFlightAndVehicles
         private ParticleSystem.EmissionModule[] DisplaySmokeem;
         [System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
         [System.NonSerializedAttribute] private Vector3 SmokeColorLast = Vector3.one;
+        [System.NonSerializedAttribute] private Vector3 SmokeColorLastSent = Vector3.one;
         [System.NonSerializedAttribute] public bool localSmoking = false;
         [System.NonSerializedAttribute] public Color SmokeColor_Color;
         private Vector3 TempSmokeCol = Vector3.zero;
@@ -140,6 +141,7 @@ namespace SaccFlightAndVehicles
 
                             SmokeOn = !SmokeOn;
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), SmokeOn, SmokeColor);
+                            SmokeColorLastSent = SmokeColor;
                             LastSerialization = Time.time;
                             SmokeHoldTime = 0;
                         }
@@ -169,15 +171,25 @@ namespace SaccFlightAndVehicles
                         SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
                         SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
                         SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
-                        if (SmokeColor != SmokeColorLast && (Time.time - LastSerialization > .5f))
+                        if (SmokeColor != SmokeColorLast)
+                        {
+                            SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
+                            foreach (ParticleSystem smoke in DisplaySmoke)
+                            {
+                                var main = smoke.main;
+                                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColor_Color, SmokeColor_Color * .8f);
+                            }
+                            //Smoke Color Indicator
+                            if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
+                            SmokeColorLast = SmokeColor;
+                        }
+                        if (SmokeColor != SmokeColorLastSent && Time.time - LastSerialization > .5f)
                         {
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), true, SmokeColor);
                             LastSerialization = Time.time;
+                            SmokeColorLastSent = SmokeColor;
                         }
-                        SmokeColorLast = SmokeColor;
                     }
-                    //Smoke Color Indicator
-                    if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
                 }
             }
         }
