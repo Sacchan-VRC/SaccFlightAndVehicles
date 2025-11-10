@@ -115,7 +115,7 @@ namespace SaccFlightAndVehicles
         float LastHitTime = -100, PredictedHealth;
         void DamagePrediction()
         {
-            if (!localPlayer.IsOwner(gameObject)) return;
+            if (localPlayer.IsOwner(gameObject)) return;
             if (PredictExplosion)
             {
                 if (Time.time - LastHitTime > 2)
@@ -124,7 +124,7 @@ namespace SaccFlightAndVehicles
                     PredictedHealth = Mathf.Min(Health - LastHitDamage, FullHealth);
                     if (!dead && PredictedHealth <= 0)
                     {
-                        Explode();
+                        PredictExplode();
                     }
                 }
                 else
@@ -133,7 +133,7 @@ namespace SaccFlightAndVehicles
                     PredictedHealth = Mathf.Min(PredictedHealth - LastHitDamage, FullHealth);
                     if (!dead && PredictedHealth <= 0)
                     {
-                        Explode();
+                        PredictExplode();
                     }
                 }
             }
@@ -149,6 +149,7 @@ namespace SaccFlightAndVehicles
             if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                LastDamageSentTime = Time.time;
                 QueuedDamage = 0;
             }
             else
@@ -163,6 +164,7 @@ namespace SaccFlightAndVehicles
                 if (QueuedDamage > 0)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    LastDamageSentTime = Time.time;
                     QueuedDamage = 0;
                 }
             }
@@ -180,7 +182,6 @@ namespace SaccFlightAndVehicles
             LastHitByPlayer = NetworkCalling.CallingPlayer;
             LastHitDamage = dmg;
             LastHitWeaponType = weaponType;
-            LastDamageSentTime = Time.time;
             if (!localPlayer.IsOwner(gameObject)) return;
             Health = Mathf.Min(Health - dmg, FullHealth);
             int killerID = -1;
@@ -273,8 +274,22 @@ namespace SaccFlightAndVehicles
         }
         float HPlast;
         bool deadlast;
+        float PredictExplode_Time;
+        void PredictExplode()
+        {
+            Health = 0;
+            OnDeserialization();
+            PredictExplode_Time = Time.time;
+            SendCustomEventDelayedSeconds(nameof(ConfirmExploded), 1.01f);
+        }
+        public void ConfirmExploded()
+        {
+            if (Health == 0) return;
+            else OnDeserialization();
+        }
         public override void OnDeserialization()
         {
+            if (Time.time - PredictExplode_Time < 1) return;
             lastUpdateTime = Time.time;
             if (Health < HPlast)
                 TargetAnimator.SetTrigger("hit");
@@ -287,7 +302,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (Exploder)
                     {
-                        Exploder.SendCustomEvent(nameof(Explode));
+                        Exploder.SendCustomEvent("Explode");
                     }
                 }
             }

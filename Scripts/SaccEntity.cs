@@ -482,6 +482,7 @@ namespace SaccFlightAndVehicles
             if (Time.time - LastDamageSentTime > DAMAGESENDINTERVAL)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, weaponType);
+                LastDamageSentTime = Time.time;
                 QueuedDamage = 0;
             }
             else
@@ -496,6 +497,7 @@ namespace SaccFlightAndVehicles
                 if (QueuedDamage > 0)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendDamageEvent), QueuedDamage, QueuedWeaponType);
+                    LastDamageSentTime = Time.time;
                     QueuedDamage = 0;
                 }
             }
@@ -519,7 +521,6 @@ namespace SaccFlightAndVehicles
                 if (attackersVehicle)
                     LastAttacker = attackersVehicle.GetComponent<SaccEntity>();
             }
-            LastDamageSentTime = Time.time;
             LastHitDamage = dmg;
             LastHitWeaponType = weaponType;
             SendEventToExtensions("SFEXT_G_BulletHit");
