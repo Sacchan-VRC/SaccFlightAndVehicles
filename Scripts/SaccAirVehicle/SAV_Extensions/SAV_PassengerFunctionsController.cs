@@ -155,6 +155,7 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = RAngle.z;
                 }
             }
+            TellDFUNCsLR();
 
             SendEventToExtensions_Gunner("SFEXT_L_EntityStart");
         }
@@ -266,6 +267,26 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void TellDFUNCsLR()
+        {
+            for (int i = 0; i < Dial_Functions_L.Length; i++)
+            {
+                if (Dial_Functions_L[i])
+                {
+                    Dial_Functions_L[i].SetProgramVariable("LeftDial", true);
+                    Dial_Functions_L[i].SetProgramVariable("DialPosition", i);
+                }
+            }
+            for (int i = 0; i < Dial_Functions_R.Length; i++)
+            {
+                if (Dial_Functions_R[i])
+                {
+                    Dial_Functions_R[i].SetProgramVariable("LeftDial", false);
+                    Dial_Functions_R[i].SetProgramVariable("DialPosition", i);
+                }
+            }
+        }
+
         public void TakeOwnerShipOfExtensions()
         {
             if (!InEditor)

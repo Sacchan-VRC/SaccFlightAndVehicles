@@ -387,6 +387,7 @@ namespace SaccFlightAndVehicles
                 if (EXT) EXT.SetProgramVariable("EntityControl", this);
             }
             hasPassengerFunctions = PassengerFunctionControllers.Length > 0;
+            TellDFUNCsLR();
             OwnerAPI = Networking.GetOwner(gameObject);
 
             HierarchyName = gameObject.name;
@@ -1114,6 +1115,26 @@ namespace SaccFlightAndVehicles
             LastTriggerExit = Trig;
             SendEventToExtensions("SFEXT_L_OnTriggerExit");
         }
+        public void TellDFUNCsLR()
+        {
+            for (int i = 0; i < Dial_Functions_L.Length; i++)
+            {
+                if (Dial_Functions_L[i])
+                {
+                    Dial_Functions_L[i].SetProgramVariable("LeftDial", true);
+                    Dial_Functions_L[i].SetProgramVariable("DialPosition", i);
+                }
+            }
+            for (int i = 0; i < Dial_Functions_R.Length; i++)
+            {
+                if (Dial_Functions_R[i])
+                {
+                    Dial_Functions_R[i].SetProgramVariable("LeftDial", false);
+                    Dial_Functions_R[i].SetProgramVariable("DialPosition", i);
+                }
+            }
+        }
+
         public void TakeOwnerShipOfExtensions()
         {
             if (!InEditor)
