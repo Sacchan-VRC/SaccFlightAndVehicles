@@ -848,7 +848,7 @@ namespace SaccFlightAndVehicles
                         if (!_DisableJoystickControl)
                         {
                             if (SteeringHand_Right)
-                            { RHandSteeringWheel(RGrip); }
+                            { RHandSteeringWheel(RGrip, false); }
                             if (SteeringHand_Left)
                             { LHandSteeringWheel(LGrip); }
                             if (InVR)
@@ -1619,7 +1619,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        void RHandSteeringWheel(float RGrip)
+        void RHandSteeringWheel(float RGrip, bool isReGrab)
         {
             bool GrabbingR = RGrip > GripSensitivity;
             if (GrabbingR)
@@ -1657,7 +1657,7 @@ namespace SaccFlightAndVehicles
                 JoystickZeroPointR = VehicleRotDif * JoystickZeroPointR;//zero point rotates with the vehicle so it appears still to the pilot
                 if (!WheelGripLastFrameR)//first frame you gripped joystick
                 {
-                    EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbedR");
+                    if (!isReGrab) { EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbedR"); }
                     VehicleRotDif = Quaternion.identity;
                     JoystickZeroPointR = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
                     if (Drift_AutoSteer) { JoyStickValueR = 0; }
@@ -1765,7 +1765,7 @@ namespace SaccFlightAndVehicles
                     {
                         WheelGripLastFrameR = false;
                         //regrab the right hand to stop the wheel position teleporting
-                        RHandSteeringWheel(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger"));
+                        RHandSteeringWheel(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger"), true);
                         HandsOnWheel--;//remove one because we ran R twice
                     }
                 }
