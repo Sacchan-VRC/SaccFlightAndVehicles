@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -95,10 +96,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
         private Vector3 LastForward_HOR;
         private Vector3 LastForward_VERT;
-        [UdonSynced] private short O_RotationX;
-        [UdonSynced] private short O_RotationY;
-        [UdonSynced] private short O_RotationZ;
-        [UdonSynced] private bool TeleportAndFire;
         private Quaternion L_GunRotation;
         private Quaternion L_LastGunRotation;
         private float SND_RotLerper;
@@ -132,21 +129,7 @@ namespace SaccFlightAndVehicles
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
             Stabilize_ = Stabilize;
             //enable for 5 seconds to sync turret rotation to late joiners
-            gameObject.SetActive(true);
-            SetSyncedVariables(); OnDeserialization(); // set values if owner or no serialization has been recieved
-            SendCustomEventDelayedSeconds(nameof(InitalSyncDisable), 5f);
-        }
-        public void InitalSyncDisable()
-        {
-            if (!Manned)
-            {
-                gameObject.SetActive(false);
-                Extrapolation_Smooth = L_GunRotation;
-                Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
-                Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
-                HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
-                VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
-            }
+            OwnerSend(true, false, false); // set values if owner or no serialization has been recieved
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -161,7 +144,6 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_PilotEnter()
         {
             Manned = true;
-            justEnabled = true;
             GunRotationSpeed = Quaternion.identity;
             SND_RotLerper = 0;
             gameObject.SetActive(true);
@@ -318,8 +300,7 @@ namespace SaccFlightAndVehicles
 
                 if (time > nextUpdateTime)
                 {
-                    TeleportAndFire = false;
-                    OwnerSend();
+                    OwnerSend(false, false, false);
                 }
                 if (RotatingSound)
                 {
@@ -340,23 +321,37 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
         public bool NetTestMode;
 #endif
-        void SetSyncedVariables()
+        public void OwnerSend(bool NoNetwork, bool TeleportAndFire, bool LateJoiner)
         {
             Quaternion sendrot = TurretRotatorVert.rotation;
             if (sendrot.w < 0)
-            { sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
+            { sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w component is positive
             float smv = short.MaxValue;
-            O_RotationX = (short)(sendrot.x * smv);
-            O_RotationY = (short)(sendrot.y * smv);
-            O_RotationZ = (short)(sendrot.z * smv);
-        }
-        public void OwnerSend()
-        {
-            SetSyncedVariables();
-            RequestSerialization();
+            short rX = (short)(sendrot.x * smv);
+            short rY = (short)(sendrot.y * smv);
+            short rZ = (short)(sendrot.z * smv);
+            if (LateJoiner)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateTurret_Instant), rX, rY, rZ, false);
+            }
+            else
+            {
+                if (TeleportAndFire)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateTurret_Instant), rX, rY, rZ, true);
+                }
+                else
+                {
+                    if (NoNetwork)
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, nameof(NetworkUpdateTurret), rX, rY, rZ);
+                    else
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateTurret), rX, rY, rZ);
+                }
+            }
             nextUpdateTime = Time.time + updateInterval;
 #if UNITY_EDITOR
-            if (NetTestMode) { OnDeserialization(); }
+            if (NetTestMode && !NoNetwork)
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, nameof(NetworkUpdateTurret), rX, rY, rZ);
 #endif
         }
         Quaternion RotExtrapolation_Raw;
@@ -412,16 +407,50 @@ namespace SaccFlightAndVehicles
                 RotatingSound.pitch = Mathf.Min(turnvol, RotatingSound_maxpitch);
             }
         }
-        bool justEnabled;
         float GunRotationSpeed_angle;
         Quaternion L_LastVehicleRotation;
-        public override void OnDeserialization()
+        [NetworkCallable]
+        public void NetworkUpdateTurret_Instant(short O_RotationX, short O_RotationY, short O_RotationZ, bool Fire)
         {
             float uDelta = Time.time - L_LastUpdateTime;
-            if (uDelta < 0.0001f || justEnabled)
+            if (uDelta < 0.0001f)
             {
                 L_LastUpdateTime = Time.time;
-                justEnabled = false;
+                return;
+            }
+            updateDelta = uDelta;
+            L_UpdateTime = Time.time;
+
+            L_LastGunRotation = L_GunRotation;
+            float smv = short.MaxValue;
+            Vector3 quatParts = new Vector3(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv); //undo short compression
+            float quatW = Mathf.Sqrt(1 - (quatParts.x * quatParts.x + quatParts.y * quatParts.y + quatParts.z * quatParts.z));// re calculate w
+            L_GunRotation = new Quaternion(quatParts.x, quatParts.y, quatParts.z, quatW);
+            RotExtrapolation_Raw = L_GunRotation;
+
+            GunRotationSpeed = Quaternion.identity;
+            L_LastUpdateTime = L_UpdateTime;
+
+            L_LastVehicleRotation = TurretForwardEmpty.rotation;
+
+            Extrapolation_Smooth = L_GunRotation;
+            Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
+            Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
+            HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
+            VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
+
+            if (Fire)
+            {
+                DelegateFireCallback.SendCustomEvent("DelegatedFire");
+            }
+        }
+        [NetworkCallable]
+        public void NetworkUpdateTurret(short O_RotationX, short O_RotationY, short O_RotationZ)
+        {
+            float uDelta = Time.time - L_LastUpdateTime;
+            if (uDelta < 0.0001f)
+            {
+                L_LastUpdateTime = Time.time;
                 return;
             }
             updateDelta = uDelta;
@@ -455,21 +484,17 @@ namespace SaccFlightAndVehicles
             }
             GunRotationSpeed_angle = GunRotationSpeed_angley + GunRotationSpeed_anglex;
             GunRotationSpeed_angle *= speednormalizer;
-
-            if (TeleportAndFire)
+        }
+        public void SFEXT_O_OnPlayerJoined()
+        {
+            if (localPlayer.IsOwner(gameObject))
             {
-                Extrapolation_Smooth = L_GunRotation;
-                Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
-                Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
-                HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
-                VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
-                DelegateFireCallback.SendCustomEvent("DelegatedFire");
+                OwnerSend(false, false, true);
             }
         }
         public void DelegateFire()
         {
-            TeleportAndFire = true;
-            OwnerSend();
+            OwnerSend(false, true, false);
 #if UNITY_EDITOR
             if (!NetTestMode)
             {
