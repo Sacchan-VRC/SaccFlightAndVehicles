@@ -6,6 +6,7 @@ using VRC.SDKBase;
 using SaccFlightAndVehicles;
 using VRC.Udon;
 using TMPro;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -21,9 +22,10 @@ namespace SaccFlightAndVehicles
         byte myPrevChannel;
         bool ForceChannel_swapped = false;
         bool DFUNCMODE = false;
+        public GameObject[] Dial_Funcons;
         [System.NonSerialized] public SaccRadioBase RadioBase;
         [System.NonSerialized] public bool PTT_MODE; // set true if DFUNC_RadioPTT is in use
-        [System.NonSerialized] public DFUNC_RadioPTT PTTControl; // set true if DFUNC_RadioPTT is in use
+        [System.NonSerialized] public bool PTT_ACTIVE;
         // public bool RadioOn = true;
         [Header("Debug")]
         [UdonSynced, FieldChangeCallback(nameof(Channel))] public byte _Channel;
@@ -31,12 +33,15 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                _Channel = value;
                 if (ImOnRadio)
                 {
                     UpdateChannel();
-                    RadioBase.SetAllVoiceVolumesDefault();
+                    if ((Mathf.Abs(value - _Channel) < 50) || value == 0) // don't reset volumes if enabling/disabling PTT, reset if switching channel
+                    {
+                        RadioBase.SetAllVoiceVolumesDefault();
+                    }
                 }
+                _Channel = value;
                 RadioBase.SetVehicleVolumeDefault(this);
                 RadioBase.UpdateVehicle(this);
                 if (inVehicle)
@@ -74,6 +79,8 @@ namespace SaccFlightAndVehicles
                 RadioSeats = EntityControl.VehicleSeats;
             }
             if (DialPosition != -999) { DFUNCMODE = true; }
+
+            for (int i = 0; i < Dial_Funcons.Length; i++) { Dial_Funcons[i].SetActive(false); }
         }
         public void SFEXT_L_EntityStart()
         {
@@ -92,7 +99,7 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateChannel()
         {
-            if (!(EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions ? EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.Using : EntityControl.Using))
+            if (!localPlayer.IsOwner(gameObject))
             {
                 ChannelSwapped = true;
                 RadioBase.SetProgramVariable("CurrentChannel", Channel);
@@ -148,15 +155,15 @@ namespace SaccFlightAndVehicles
         }
         public void NewChannel()
         {
-            if (EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions ? EntityControl.VehicleSeats[EntityControl.MySeat].PassengerFunctions.Using : EntityControl.Using)
+            if (localPlayer.IsOwner(gameObject))
             {
                 // PTT_MODE requires DFUNC_RadioPTT
                 // PTT_MODE has your radiobase channel set to what is selected as normal so that you hear that channel
                 // but sets your synced radio channel to +200 when you're not talking so that others see you as not on their channel and don't hear you
                 // it sets it back -200 to the 'real' value while you are holding PTT so that everyone in the channel can hear you
                 byte newChannel = (byte)RadioBase.GetProgramVariable("MyChannel");
-                if (PTT_MODE && newChannel != 0 && !PTTControl.PTT_ACTIVE) newChannel += 200;
-                Channel = newChannel;
+                if (PTT_MODE && newChannel != 0 && !PTT_ACTIVE) newChannel += 200;
+                if (newChannel != Channel) Channel = newChannel;
                 RequestSerialization();
             }
         }
@@ -185,6 +192,38 @@ namespace SaccFlightAndVehicles
                     RadioBase.SetProgramVariable("MyRadio", null);
                 }
             }
+        }
+        public void PTT_ON()
+        {
+            if (!PTT_ACTIVE)
+            {
+                PTT_ACTIVE = true;
+                if (Channel >= 200)
+                { Channel -= 200; }
+                NewChannel();
+            }
+        }
+        void PTT_OFF()
+        {
+            if (PTT_ACTIVE)
+            {
+                PTT_ACTIVE = false;
+                if (Channel <= 55)
+                { Channel += 200; }
+                NewChannel();
+            }
+        }
+        [NetworkCallable]
+        public void Call_PTT_ON()
+        {
+            if (localPlayer.IsOwner(gameObject))
+                PTT_ON();
+        }
+        [NetworkCallable]
+        public void Call_PTT_OFF()
+        {
+            if (localPlayer.IsOwner(gameObject))
+                PTT_OFF();
         }
         public void SFEXT_L_OwnershipTransfer()
         {
@@ -294,15 +333,15 @@ namespace SaccFlightAndVehicles
                     JoyStickValue -= (Vector3.SignedAngle(CompareAngleLastFrame, CompareAngle, Vector3.forward));
                     CompareAngleLastFrame = CompareAngle;
                     int channelIncreaseAmount = (int)Mathf.Clamp(JoyStickValue / 15f, int.MinValue, int.MaxValue);
-                    int NewChannel = ChannelOnGrab + channelIncreaseAmount;
-                    if (CurChannel != NewChannel)
+                    int newChannel = ChannelOnGrab + channelIncreaseAmount;
+                    if (CurChannel != newChannel)
                     {
                         if (LeftDial)
                         { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                         else
                         { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
-                        RadioBase.SetChannel(NewChannel);
-                        CurChannel = NewChannel;
+                        RadioBase.SetChannel(newChannel);
+                        CurChannel = newChannel;
                     }
                 }
                 else { TriggerLastFrame = false; }
@@ -319,6 +358,8 @@ namespace SaccFlightAndVehicles
 
             if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = channeltxt; }
             if (ChannelNumber) { ChannelNumber.text = channeltxt; }
+            bool PTT_Active = Channel < 55 && Channel != 0;
+            for (int i = 0; i < Dial_Funcons.Length; i++) { Dial_Funcons[i].SetActive(PTT_Active); }
         }
         public void DFUNC_Selected()
         {

@@ -12,13 +12,13 @@ namespace SaccFlightAndVehicles
         [Header("PTT Can only be used by the owner of the SAV_Radio\nIf you want more than one person to be able to use PTT\n you must have another SAV_Radio in their PassengerFunctions")]
         [SerializeField] SAV_Radio Radio;
         [SerializeField] KeyCode PTT_Key;
-        public GameObject Dial_Funcon;
-        public GameObject[] Dial_Funcon_Array;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
         [SerializeField] bool ToggleMode = false;
         [SerializeField] bool Toggle_DefaultOn = true;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
+        [Header("FUNCONs are controlled by SAV_Radio")]
+        [System.NonSerializedAttribute] public GameObject Dial_Funcon;// here so that the function dial generator makes a funcon for it
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -29,9 +29,6 @@ namespace SaccFlightAndVehicles
         {
             InVR = EntityControl.InVR;
             Radio.PTT_MODE = true;
-            Radio.PTTControl = this;
-            if (Dial_Funcon) Dial_Funcon.SetActive(false);
-            for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
         }
         bool Selected;
         private void Update()
@@ -57,16 +54,16 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        PTT_ON();
+                        SET_PTT_ON();
                     }
+                    TriggerLastFrame = true;
                 }
-                TriggerLastFrame = true;
             }
             else
             {
                 if (!ToggleMode && TriggerLastFrame)
                 {
-                    PTT_OFF();
+                    SET_PTT_OFF();
                 }
                 TriggerLastFrame = false;
             }
@@ -81,41 +78,30 @@ namespace SaccFlightAndVehicles
             PickupTrigger = 0;
             Selected = false;
         }
-        [System.NonSerialized] public bool PTT_ACTIVE;
         void PTT_Toggle()
         {
-            if (!PTT_ACTIVE)
+            if (!Radio.PTT_ACTIVE)
             {
-                PTT_ON();
+                SET_PTT_ON();
             }
             else
             {
-                PTT_OFF();
+                SET_PTT_OFF();
             }
         }
-        public void PTT_ON()
+        public void SET_PTT_ON()
         {
-            if (!PTT_ACTIVE)
-            {
-                PTT_ACTIVE = true;
-                if (Radio.Channel >= 200)
-                { Radio.Channel -= 200; }
-                Radio.NewChannel();
-                if (Dial_Funcon) Dial_Funcon.SetActive(true);
-                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
-            }
+            if (Networking.LocalPlayer.IsOwner(Radio.gameObject))
+                Radio.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, "Call_PTT_ON");
+            else
+                Radio.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Call_PTT_ON");
         }
-        void PTT_OFF()
+        void SET_PTT_OFF()
         {
-            if (PTT_ACTIVE)
-            {
-                PTT_ACTIVE = false;
-                if (Radio.Channel <= 55)
-                { Radio.Channel += 200; }
-                Radio.NewChannel();
-                if (Dial_Funcon) Dial_Funcon.SetActive(false);
-                for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
-            }
+            if (Networking.LocalPlayer.IsOwner(Radio.gameObject))
+                Radio.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, "Call_PTT_OFF");
+            else
+                Radio.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Call_PTT_OFF");
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -123,14 +109,14 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             Piloting = true;
             if (ToggleMode && Toggle_DefaultOn)
-            { SendCustomEventDelayedFrames(nameof(PTT_ON), 15); }//ensure SAV_Radio's SFEXT_O_PilotEnter() has run first
+            { SendCustomEventDelayedFrames(nameof(SET_PTT_ON), 15); }//ensure SAV_Radio's SFEXT_O_PilotEnter() has run first
         }
         public void SFEXT_O_PilotExit()
         {
             gameObject.SetActive(false);
             PickupTrigger = 0;
             Piloting = false;
-            PTT_OFF();
+            SET_PTT_OFF();
         }
         public void SFEXT_O_OnPickup()
         {
