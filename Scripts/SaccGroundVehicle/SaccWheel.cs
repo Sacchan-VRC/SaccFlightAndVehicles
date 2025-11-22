@@ -16,6 +16,8 @@ namespace SaccFlightAndVehicles
         public SaccGroundVehicle SGVControl;
         public float SyncInterval = 0.3f;
         public Transform WheelPoint;
+        [Tooltip("Position to apply forces on the rigidbody at. Leave empty to use wheel-ground contact point")]
+        public Transform WheelForceApplyPoint;
         public Transform WheelVisual;
         public Transform WheelVisual_Ground;
         [Tooltip("For if wheel is part of a caterpillar track, so wheels can match rotation with each other, prevent (visual) wheelspinning")]
@@ -497,7 +499,10 @@ namespace SaccFlightAndVehicles
                     if (GripForce3.magnitude > gripclamp)
                         GripForce3 = Vector3.ClampMagnitude(GripForce3, gripclamp);
                 }
-                CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
+                if (WheelForceApplyPoint)
+                    CarRigid.AddForceAtPosition(GripForce3, WheelForceApplyPoint.position, ForceMode.VelocityChange);
+                else
+                    CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
                 ForceUsed = Vector3.Dot(WheelForwardSpeed.normalized, GripForce3);
 #if UNITY_EDITOR
                 ForceVector = GripForce3;
@@ -832,6 +837,11 @@ namespace SaccFlightAndVehicles
             Gizmos.DrawWireCube(Vector3.up * ExtraRayCastDistance * .5f, new Vector3(.01f, ExtraRayCastDistance, .01f));
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireCube(-Vector3.up * SuspensionDistance * .5f, new Vector3(.01f, SuspensionDistance, .01f));
+            if (WheelForceApplyPoint)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(transform.InverseTransformDirection(WheelForceApplyPoint.position - transform.position), .04f);
+            }
             Gizmos.color = Color.white;
             //flatten matrix and draw a sphere to draw a circle for the wheel
             newmatrix = transform.localToWorldMatrix;
