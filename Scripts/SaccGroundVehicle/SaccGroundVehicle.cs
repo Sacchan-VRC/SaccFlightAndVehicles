@@ -160,6 +160,8 @@ namespace SaccFlightAndVehicles
         public bool TankMode;
         [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
+        [Tooltip("Sensitivity of the steering for tanks when UseStickSteering is enabled")]
+        public float TANK_StickMode_SteeringSens = 2;
         [Tooltip("Make tank slower by this ratio when reversing")]
         public float TANK_ReverseSpeed = 0.75f;
         [Tooltip("Multiply how much the VR throttle moves from hand movement, for DFUNCS and TankMode")]
@@ -687,9 +689,35 @@ namespace SaccFlightAndVehicles
                                 RightTrackF = Input.GetKey(KeyCode.E) ? 1 : 0;
                                 RightTrackB = Input.GetKey(KeyCode.D) ? -1 : 0;
                             }
+                            if (InVR || UseStickSteering)
+                            {
+                                Vector2 LStickPos;
+                                LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                                LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                                float stickangle = Vector2.SignedAngle(Vector2.up, LStickPos);
+                                float forwardamount = LStickPos.y;
+                                if (stickangle < 100 && stickangle > -100)
+                                {
+                                    //going forward
+                                    stickangle = (stickangle / 90) * LStickPos.magnitude * TANK_StickMode_SteeringSens;
+                                    forwardamount = Mathf.Max(forwardamount, 0);
+                                }
+                                else
+                                {
+                                    //going backward
+                                    stickangle = ((180 * Mathf.Sign(stickangle)) - stickangle);// flip 100 - 180 to 0-80 (incl neg. case)
+                                    stickangle = (-stickangle / 80) * LStickPos.magnitude * TANK_StickMode_SteeringSens;
+                                    forwardamount = Mathf.Min(forwardamount, 0);
+                                }
+                                LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + -stickangle + forwardamount, -1, 1);
+                                RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + stickangle + forwardamount, -1, 1);
 
-                            LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
-                            RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
+                            }
+                            else
+                            {
+                                LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
+                                RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
+                            }
                             if (TANK_Cruising)
                             {
                                 if (RightThrottle != 0 || LeftThrottle != 0)
