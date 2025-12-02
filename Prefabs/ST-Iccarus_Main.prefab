@@ -5954,6 +5954,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &8371397292631183520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27693,6 +27694,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1803049918173235745}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -68992,6 +68995,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2687378976475800917}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -69191,13 +69196,14 @@ MonoBehaviour:
   UseStickSteering: 0
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  PredictExplosion: 1
+  SendKillEvents: 0
   Crash_Damage_Speed: 10
   Crash_Death_Speed: 100
   BulletDamageTaken: 10
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  PredictDamage: 1
   RepairTime: 30
   RefuelTime: 25
   DistantRange: 400
@@ -69212,13 +69218,13 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_StickMode_SteeringSens: 2
   TANK_ReverseSpeed: 0.75
   TANK_CruiseKey: 283
   ThrottleSensitivity: 6
   Revs: 0
   Clutch: 0
   CurrentGear: 1
-  VehicleVel: {x: 0, y: 0, z: 0}
   debugSpeedSteeringMulti: 0
   InVR: 0
   Sleeping: 0
@@ -69467,6 +69473,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3243243056396766826}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -69769,7 +69777,8 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 6741418170646384416}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -69801,6 +69810,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!95 &3243243057054021814
 Animator:
   serializedVersion: 5
@@ -70345,7 +70355,7 @@ MonoBehaviour:
   UseMainFuel: 0
   MainFuelUsePerSecond: 30
   BoostOverheatMode: 0
-  OverheadMode_replenishSpeed: 0.75
+  OverheatMode_replenishSpeed: 0.75
   _Boosting: 0
   _BoostRemaining: 0
 --- !u!114 &1152787862393203574
@@ -76501,6 +76511,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7031151205847888667}
   SAVControl: {fileID: 3243243056628280734}
   Dial_Funcon: {fileID: 3989104544049902087}
+  Dial_Funcon_Array: []
   CatapultLock: {fileID: 6551117085911350323}
   MaxAttachAngle: 15
   CatapultLayer: 24
@@ -94393,6 +94404,7 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   SyncInterval: 0.3
   WheelPoint: {fileID: 2761721634057394951}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 2703221266798502703}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -94615,7 +94627,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
     type: 2}
   programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
@@ -94786,6 +94798,7 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   SyncInterval: 0.3
   WheelPoint: {fileID: 4886155250086924051}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 8352925030646313776}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -95008,7 +95021,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
     type: 2}
   programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
@@ -95053,6 +95066,7 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   SyncInterval: 0.3
   WheelPoint: {fileID: 2238173970049878364}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 6967507324787926425}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -95275,7 +95289,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
     type: 2}
   programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
@@ -95326,6 +95340,7 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   SyncInterval: 0.3
   WheelPoint: {fileID: 2529092753668389799}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 3195356805053255610}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -95548,7 +95563,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
+  _syncMethod: 3
   serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
     type: 2}
   programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
