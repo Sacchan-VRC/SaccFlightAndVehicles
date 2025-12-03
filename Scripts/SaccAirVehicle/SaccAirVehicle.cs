@@ -220,11 +220,11 @@ namespace SaccFlightAndVehicles
         [Header("Realism:")]
         [Tooltip("Use square instead of cubic lift? (may be useful for making more realistic aircraft)")]
         public bool AlternateLift = false;
-        [Tooltip("Point where the drag force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        [Tooltip("Point where the drag force is applied. Leave empty for old behaviour.")]
         public Transform CenterOfDrag;
-        [Tooltip("Point where the thrust force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        [Tooltip("Point where the thrust force is applied. Also applies rotation, (adds to VTOL's rotation) Leave empty for old behaviour.")]
         public Transform CenterOfThrust;
-        [Tooltip("Point where the lift force is applied. Leave empty for old behaviour. Only recommended for advanced users")]
+        [Tooltip("Point where the lift force is applied. Leave empty for old behaviour.")]
         public Transform CenterOfLift;
         [Tooltip("Always apply thrust in the world space up direction? (Balloon?)")]
         public bool Thrust_AlwaysWorldUp;
@@ -1612,7 +1612,11 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         if (CenterOfThrust)
+                        {
+                            Quaternion CoT_dif = Quaternion.Inverse(VehicleTransform.rotation) * CenterOfThrust.rotation;
+                            ThrustAcc = CoT_dif * ThrustAcc;
                             VehicleRigidbody.AddForceAtPosition(VehicleTransform.rotation * ThrustAcc * RBMass, CenterOfThrust.position, ForceMode.Force);
+                        }
                         else
                             VehicleRigidbody.AddRelativeForce(ThrustAcc * RBMass, ForceMode.Force);
                         if (CenterOfLift)
