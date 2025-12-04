@@ -49,7 +49,11 @@ namespace SaccFlightAndVehicles
         [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
         public int SkidRatioMode = 0;
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
-        public float EngineInfluence = 80000f;
+        public float EngineInfluence = 20000f;
+        [Tooltip("Only effects DriveWheels. How much (extra) the engine slows down when braking.")]
+        public float EngineBrakeStrength = 200f;
+        [Tooltip("Only effects DriveWheels. Brakes are weaker when not pressing the clutch because you have to slow down the engine too.\n\nLess than 2 will make braking FASTER when clutch ISNT pressed.")]
+        public float Brake_EngineWeight = 2.5f;
         [Tooltip("Max angle of ground at which vehicle can park on without sliding down")]
         [SerializeField] float MaxParkingIncline = 30;
         public LayerMask WheelLayers;
@@ -70,7 +74,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("How quickly pitch increases as skid speed increases")]
         public float SkidSound_PitchIncrease = 0.02f;
         public float SkidSound_Pitch = 1f;
-        [Tooltip("Reduce volume of skid swhilst in the car")]
+        [Tooltip("Reduce volume of skid swhilst i   n the car")]
         public float SkidVolInVehicleMulti = .4f;
         [Header("Debug")]
         public Transform LastTouchedTransform;
@@ -517,11 +521,23 @@ namespace SaccFlightAndVehicles
                 WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, 1 - Mathf.Pow(0.5f, CurrentWheelSlowDown));
             }
             //brake
-            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, BrakeStrength * Brake);
-            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, HandBrake);
+            if (Brake + HandBrake > 0)
+            {
+                float prevSurf = WheelRotationSpeedSurf;
+                float engineWeight = Mathf.Lerp(Brake_EngineWeight, 1, Clutch);
+                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (BrakeStrength * Brake) / engineWeight);
+                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, HandBrake / engineWeight);
+                if (IsDriveWheel)
+                {
+                    float prevRPM = (prevSurf / WheelCircumference) * 60f;
+                    float curRPM = (WheelRotationSpeedSurf / WheelCircumference) * 60f;
+                    float brakeUsedForce = prevRPM - curRPM;
+                    bool reversing = _GearRatio < 0;
+                    SGVControl.SetProgramVariable("EngineForceUsed", (float)SGVControl.GetProgramVariable("EngineForceUsed") + DeltaTime * brakeUsedForce * EngineBrakeStrength * (reversing ? -1f : 1f) * (1f - Clutch));
+                }
+            }
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
             // adjust engine speed
             if (IsDriveWheel && !GearNeutral)
             {

@@ -21121,7 +21121,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 697468752649592548}
   SGVControl: {fileID: 6141758679994110546}
   BrakeAnimator: {fileID: 6141758680382097274}
-  BrakeWheels_Front: []
+  BrakeWheels_Front:
+  - {fileID: 648356966}
+  - {fileID: 927353063}
   BrakeWheels_Back:
   - {fileID: 1823797713}
   - {fileID: 895312535}
@@ -21242,6 +21244,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &928038714535486169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57963,13 +57966,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6141758679900960112}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 6141758680382097273}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -58232,13 +58235,14 @@ MonoBehaviour:
   UseStickSteering: 0
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  PredictExplosion: 1
+  SendKillEvents: 0
   Crash_Damage_Speed: 10
   Crash_Death_Speed: 100
   BulletDamageTaken: 10
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  PredictDamage: 1
   RepairTime: 30
   RefuelTime: 25
   DistantRange: 400
@@ -58253,13 +58257,13 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_StickMode_SteeringSens: 2
   TANK_ReverseSpeed: 0.75
   TANK_CruiseKey: 283
   ThrottleSensitivity: 6
   Revs: 0
   Clutch: 0
   CurrentGear: 1
-  VehicleVel: {x: 0, y: 0, z: 0}
   debugSpeedSteeringMulti: 0
   InVR: 0
   Sleeping: 0
@@ -58406,6 +58410,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6733660352721803929}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -58577,6 +58583,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6141758679963414950}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 1
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -58841,11 +58849,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 9052383265541724133}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -58872,6 +58882,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!95 &6141758680382097274
 Animator:
   serializedVersion: 5
@@ -59195,6 +59206,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6733660353092015039}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -59367,6 +59380,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6733660353753921584}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -76512,8 +76527,10 @@ MonoBehaviour:
   BrakeWheels_Front:
   - {fileID: 648356966}
   - {fileID: 927353063}
-  BrakeWheels_Back: []
-  BrakeStrength: 10.5644
+  BrakeWheels_Back:
+  - {fileID: 1823797713}
+  - {fileID: 895312535}
+  BrakeStrength: 6
   Brake_FrontStrengthMulti: 1
   Brake_BackStrengthMulti: 1
   KeyboardBrakeMulti: 1
@@ -77871,22 +77888,22 @@ PrefabInstance:
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5984326
+      value: 0.59842813
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.000011645726
+      value: -0.0000033005088
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.000008815584
+      value: -0.000002465271
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.8011732
+      value: 0.80117655
       objectReference: {fileID: 0}
     - target: {fileID: -5491882240545318371, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77966,22 +77983,22 @@ PrefabInstance:
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5984322
+      value: 0.59843045
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000021003157
+      value: -0.0000034505242
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000015688194
+      value: 0.0000025773386
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.80117345
+      value: -0.8011748
       objectReference: {fileID: 0}
     - target: {fileID: -1551168584785544901, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78191,22 +78208,22 @@ PrefabInstance:
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.65434855
+      value: 0.6543481
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000072215903
+      value: -0.0000031859977
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000062489826
+      value: 0.000002756902
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.7561931
+      value: -0.7561935
       objectReference: {fileID: 0}
     - target: {fileID: 3783353238668546013, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78216,22 +78233,22 @@ PrefabInstance:
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6543477
+      value: 0.65434813
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.000001921135
+      value: 0.0000031151974
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000017862046
+      value: 0.0000026956377
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.7561939
+      value: 0.75619346
       objectReference: {fileID: 0}
     - target: {fileID: 5419709599708206005, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78523,6 +78540,7 @@ MonoBehaviour:
   SGVControl: {fileID: 6141758679994110546}
   SyncInterval: 0.3
   WheelPoint: {fileID: 5235027013741521781}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 5910489168914116605}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -78642,6 +78660,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 24000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -78872,6 +78892,7 @@ MonoBehaviour:
   SGVControl: {fileID: 6141758679994110546}
   SyncInterval: 0.3
   WheelPoint: {fileID: 2652361264034778016}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 4575407254928553814}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -78991,6 +79012,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 24000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -79133,6 +79156,7 @@ MonoBehaviour:
   SGVControl: {fileID: 6141758679994110546}
   SyncInterval: 0.3
   WheelPoint: {fileID: 1964122673162561279}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 6005323304930896397}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -79252,6 +79276,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 24000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -79412,6 +79438,7 @@ MonoBehaviour:
   SGVControl: {fileID: 6141758679994110546}
   SyncInterval: 0.3
   WheelPoint: {fileID: 2155946338269525905}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 1953323024443111551}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -79531,6 +79558,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 24000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2

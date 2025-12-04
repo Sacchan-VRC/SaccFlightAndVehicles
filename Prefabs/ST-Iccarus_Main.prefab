@@ -5438,8 +5438,10 @@ MonoBehaviour:
   BrakeWheels_Front:
   - {fileID: 1797096874751953804}
   - {fileID: 6179711882378480744}
-  BrakeWheels_Back: []
-  BrakeStrength: 10.5644
+  BrakeWheels_Back:
+  - {fileID: 2206475191247900564}
+  - {fileID: 8151639108715177087}
+  BrakeStrength: 4
   Brake_FrontStrengthMulti: 1
   Brake_BackStrengthMulti: 1
   KeyboardBrakeMulti: 1
@@ -92378,7 +92380,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8184255175589962024}
   SGVControl: {fileID: 3243243056628280734}
   BrakeAnimator: {fileID: 3243243057054021814}
-  BrakeWheels_Front: []
+  BrakeWheels_Front:
+  - {fileID: 1797096874751953804}
+  - {fileID: 6179711882378480744}
   BrakeWheels_Back:
   - {fileID: 2206475191247900564}
   - {fileID: 8151639108715177087}
@@ -94524,6 +94528,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -94918,6 +94924,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -95186,6 +95194,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -95460,6 +95470,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2

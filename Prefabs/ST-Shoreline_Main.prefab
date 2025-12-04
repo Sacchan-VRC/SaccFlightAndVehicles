@@ -512,7 +512,7 @@ MonoBehaviour:
   UseMainFuel: 0
   MainFuelUsePerSecond: 30
   BoostOverheatMode: 0
-  OverheadMode_replenishSpeed: 0.75
+  OverheatMode_replenishSpeed: 0.75
   _Boosting: 0
   _BoostRemaining: 0
 --- !u!114 &3610486576073583546
@@ -1324,6 +1324,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2157473486041951852}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -1463,6 +1465,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1984273371186020958}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -1656,13 +1660,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1217889975052110448}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 1217889975573313657}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -1866,6 +1870,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1217889975122693798}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -2132,11 +2138,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 5507597191322025560}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -2163,6 +2171,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!95 &1217889975573313658
 Animator:
   serializedVersion: 5
@@ -2515,13 +2524,14 @@ MonoBehaviour:
   UseStickSteering: 0
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
+  PredictExplosion: 1
+  SendKillEvents: 0
   Crash_Damage_Speed: 10
   Crash_Death_Speed: 60
   BulletDamageTaken: 10
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  PredictDamage: 1
   RepairTime: 30
   RefuelTime: 25
   DistantRange: 400
@@ -2536,13 +2546,13 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_StickMode_SteeringSens: 2
   TANK_ReverseSpeed: 0.75
   TANK_CruiseKey: 283
   ThrottleSensitivity: 6
   Revs: 0
   Clutch: 0
   CurrentGear: 1
-  VehicleVel: {x: 0, y: 0, z: 0}
   debugSpeedSteeringMulti: 0
   InVR: 0
   Sleeping: 0
@@ -2689,6 +2699,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 438235633857787712}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -14073,6 +14085,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &5316971469266767980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19313,7 +19326,7 @@ MonoBehaviour:
   BrakeWheels_Back:
   - {fileID: 7211299479356292543}
   - {fileID: 4193423723041413652}
-  BrakeStrength: 10.5644
+  BrakeStrength: 8
   Brake_FrontStrengthMulti: 1
   Brake_BackStrengthMulti: 0.6666667
   KeyboardBrakeMulti: 1
@@ -19321,7 +19334,7 @@ MonoBehaviour:
   _AnimFloatName: brake
   IsHandBrake: 0
   EnableBrakeOnExit: 0
-  AutoClutch: 1
+  AutoClutch: 0
   GearBox: {fileID: 5189103349800228469}
 --- !u!114 &1352371536933324669
 MonoBehaviour:
@@ -45796,6 +45809,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6740292223294590818}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -62207,7 +62222,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 5508131741871350244}
   SGVControl: {fileID: 1217889975697026386}
   BrakeAnimator: {fileID: 1217889975573313658}
-  BrakeWheels_Front: []
+  BrakeWheels_Front:
+  - {fileID: 6392917590679912788}
+  - {fileID: 8204297190439482269}
   BrakeWheels_Back:
   - {fileID: 7211299479356292543}
   - {fileID: 4193423723041413652}
@@ -67732,6 +67749,14 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8545612082989612879}
   SGVControl: {fileID: 1217889975697026386}
+  ObjectAlwaysEnabled: 0
+  EnableInteract: 0
+  NoFuelTurnOff: 0
+  WreckedTurnOff: 0
+  PilotExitTurnOff: 0
+  KeepAwakeWhileOn: 0
+  ToggleAnimator: {fileID: 0}
+  ToggleAnimator_boolname: HandlingToggle
   Dial_Funcon: {fileID: 1114825329709879429}
   Funcon_Invert: 0
   ToggledCoMPos: {fileID: 0}
@@ -84241,6 +84266,7 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   SyncInterval: 0.3
   WheelPoint: {fileID: 3731056625559623309}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 126663418511229904}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -84360,6 +84386,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -84520,6 +84548,7 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   SyncInterval: 0.3
   WheelPoint: {fileID: 7597664762943680424}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 2883316143006554622}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -84639,6 +84668,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -84853,6 +84884,7 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   SyncInterval: 0.3
   WheelPoint: {fileID: 5635687635756386850}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 6297078974878207425}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -84972,6 +85004,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
@@ -85132,6 +85166,7 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   SyncInterval: 0.3
   WheelPoint: {fileID: 887899305417962517}
+  WheelForceApplyPoint: {fileID: 0}
   WheelVisual: {fileID: 6222540144188693721}
   WheelVisual_Ground: {fileID: 0}
   WheelVisual_RotationSource: {fileID: 0}
@@ -85251,6 +85286,8 @@ MonoBehaviour:
   WheelRollGrip_Power: 1
   SkidRatioMode: 0
   EngineInfluence: 20000
+  EngineBrakeStrength: 200
+  Brake_EngineWeight: 2.5
   MaxParkingIncline: 30
   WheelLayers:
     serializedVersion: 2
