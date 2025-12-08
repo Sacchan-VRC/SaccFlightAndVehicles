@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         public Transform Gun;
         [Tooltip("OPTIONAL: Use a separate transform for the pitch rotation")]
         public Transform GunPitch;
+        public bool UseLeftHand;
         [Tooltip("Just use the direction that hand is pointing to aim?")]
         public bool Aim_HandDirection;
         [Tooltip("Use look direction for aiming, even in VR")]
@@ -72,7 +73,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (Aim_HandDirection)
                     {
-                        if (LeftDial)
+                        if (UseLeftHand)
                         { Gun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
                         else
                         { Gun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
@@ -80,7 +81,7 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         Vector3 lookpoint;
-                        if (LeftDial)
+                        if (UseLeftHand)
                         {
                             lookpoint = ((Gun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position) * 500) + Gun.position;
                         }
