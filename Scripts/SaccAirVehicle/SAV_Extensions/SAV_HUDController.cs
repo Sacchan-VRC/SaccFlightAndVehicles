@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(10000)]
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SAV_HUDController : UdonSharpBehaviour
     {
