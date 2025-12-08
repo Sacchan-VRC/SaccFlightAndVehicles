@@ -728,7 +728,7 @@ namespace SaccFlightAndVehicles
                 if (_HookLaunched)
                 { ResetHook(); }
             }
-            if (!InVR && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
+            foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
         }
         public void SFEXT_O_TakeOwnership()
         {
