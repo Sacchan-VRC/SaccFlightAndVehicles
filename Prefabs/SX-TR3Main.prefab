@@ -5630,6 +5630,7 @@ MonoBehaviour:
   SeaLevel: -1080
   AtmosphereThinningStart: 12192
   AtmosphereThinningEnd: 19812
+  PredictExplosion: 1
   SendKillEvents: 0
   SquareJoyInput: 1
   EngineOnOnEnter: 1
@@ -17083,6 +17084,7 @@ MonoBehaviour:
   TractorFX: {fileID: 1739456737923714109}
   LaunchStrength: 0
   Dial_Funcon: {fileID: 4212742734466792017}
+  Dial_Funcon_Array: []
   AtGCam: {fileID: 1739456737567687841}
   AtGScreen: {fileID: 1739456737568908572}
   TractorRaycastLayers:
@@ -32613,7 +32615,7 @@ MonoBehaviour:
   RequireEngine: 1
   DisableSAVJoystick: 0
   DisableSAVThrottle: 0
-  SyncThrust: 1
+  SyncThrust: 0
   ControlsWind: 0
   SyncWind: 1
   AllowVerticalWind: 0
@@ -39315,7 +39317,9 @@ MonoBehaviour:
   - {fileID: 272486508117751411}
   - {fileID: 4124997086164895172}
   LaunchSound: {fileID: 0}
+  LaunchSound_Clips: []
   LaunchSound_Interior: {fileID: 0}
+  LaunchSound_Interior_Clips: []
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -44914,6 +44918,7 @@ MonoBehaviour:
   ToggleMinDelay: 6
   StartUpTime: 5
   Dial_Funcon: {fileID: 3850422586605081481}
+  Dial_Funcon_Array: []
   DoEngineStartupAnimBool: 0
   EngineAnimator: {fileID: 0}
   AnimEngineStartupAnimBool: EngineStarting
@@ -64595,6 +64600,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7259475199282161197}
   SAVControl: {fileID: 7213107745132579464}
   Dial_Funcon: {fileID: 8148904989047207553}
+  Dial_Funcon_Array: []
   AllowCruiseGrounded: 0
   HUDText_knotstarget: {fileID: 7259475198299496016}
   speedMultiplier: 1.9438446
@@ -69592,6 +69598,7 @@ MonoBehaviour:
   GunFiringBoolName: gunfiring
   FireKey: 32
   FireNowKey: 0
+  TargetingTransform: {fileID: 0}
   AmmoBars:
   - {fileID: 7259475200314187051}
   GunRecoilEmpty: {fileID: 0}
@@ -85338,6 +85345,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7259475199848324845}
   SAVControl: {fileID: 7213107745132579464}
   Dial_Funcon: {fileID: 9211590282156328817}
+  Dial_Funcon_Array: []
   GearAnimator: {fileID: 7259475199590099315}
   LandingGearDragMulti: 1.3
   AllowToggleGrounded: 1
@@ -86158,6 +86166,7 @@ MonoBehaviour:
   SAVControl: {fileID: 7213107745132579464}
   SoundControl: {fileID: 3179000395971436970}
   Dial_Funcon: {fileID: 7536993752747417501}
+  Dial_Funcon_Array: []
   CanopyAnimator: {fileID: 7259475199590099315}
   CanopyOpenTime: 0
   CanopyCloseTime: 1.8
@@ -91099,6 +91108,7 @@ MonoBehaviour:
   - {fileID: 7259475199679598092}
   HUD_SmokeOnIndicator: {fileID: 7259475199580796159}
   Dial_Funcon: {fileID: 3300217329349141838}
+  Dial_Funcon_Array: []
   AllowChangeColor: 1
 --- !u!114 &7259475200120091896
 MonoBehaviour:

@@ -5080,7 +5080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 2
+    SerializedFormat: 0
     SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
@@ -5095,13 +5095,13 @@ MonoBehaviour:
   RespawnDelay: 10
   ExplodeOther: []
   DisableBulletHitEvent: 0
-  ArmorLevel: 1
+  ArmorStrength: 1
   NoDamageBelow: 0
-  SendKillMessages: 0
+  SendKillEvents: 0
   TargetKilledMessages:
   - '%KILLER% destroyed a Target'
+  PredictExplosion: 1
   KillFeed: {fileID: 0}
-  QueuedDamage: 0
 --- !u!114 &5910949226118119162
 MonoBehaviour:
   m_ObjectHideFlags: 0
