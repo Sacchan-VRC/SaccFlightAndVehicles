@@ -54,7 +54,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (!Grounded && (AirControlReady || HoldingJoyStick))
+            if ((!Grounded && AirControlReady) || HoldingJoyStick)
             {
                 int Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
                 int Si = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
@@ -130,11 +130,14 @@ namespace SaccFlightAndVehicles
                 float pitch = Mathf.Clamp(VRJoystickPos.x + Wi + Si, -1, 1);
                 float yaw = Mathf.Clamp(VRJoystickPos.y + Qi + Ei, -1, 1);
                 float roll = Mathf.Clamp(VRJoystickPos.z + Ai + Di, -1, 1);
-                RotForce = new Vector3(
-                pitch * RotationStrengthPitch
-                , yaw * RotationStrengthYaw
-                , roll * RotationStrengthRoll
-                );
+                if (Grounded)
+                    RotForce = Vector3.zero;
+                else
+                    RotForce = new Vector3(
+                    pitch * RotationStrengthPitch
+                    , yaw * RotationStrengthYaw
+                    , roll * RotationStrengthRoll
+                    );
 
                 VehicleAnimator.SetFloat(PITCH_STRING, pitch * .5f + .5f);
                 VehicleAnimator.SetFloat(YAW_STRING, yaw * .5f + .5f);
