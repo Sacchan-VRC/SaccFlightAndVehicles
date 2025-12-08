@@ -393,8 +393,7 @@ namespace SaccFlightAndVehicles
             float ForwardSideRatio = 0f;
             float ForceUsed = 0f;
             float ForwardSlip = 0f;
-            Vector3 SkidVectorFX = Vector3.zero;
-            bool slowing = false;
+            float WheelRotationSpeedSurf_prev = WheelRotationSpeedSurf;
 
             if (IsDriveWheel && !GearNeutral)
             {
@@ -441,6 +440,8 @@ namespace SaccFlightAndVehicles
                 Vector3 SideSkid = Vector3.ProjectOnPlane(PointVelocity, WheelForwardSpeed);
                 SideSkid = Vector3.ProjectOnPlane(SideSkid, SusOut.normal);
 
+                SkidLength = (WheelPoint.forward * (WheelRotationSpeedSurf_prev - ForwardSpeed) + SideSkid).magnitude;
+
                 //add both skid axis together to get total 'skid'
                 Vector3 FullSkid = SideSkid + ForwardSkid;
                 float FullSkidMag = FullSkid.magnitude;
@@ -483,7 +484,6 @@ namespace SaccFlightAndVehicles
                     Vector3 newgrip = Vector3.Slerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
                     GripForce3 = Vector3.Lerp(newgrip, GripForce3, LongLatSeparation);
                     gripPc = Mathf.Lerp(gripPc * ForwardSideRatio, gripPc, LongLatSeparation);
-                    SkidVectorFX = SideSkid + ForwardSkid - ForwardSkid * gripPc;
                 }
                 else
                 {
@@ -495,7 +495,6 @@ namespace SaccFlightAndVehicles
                     float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
                     GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat * WheelRollGrip;
                     GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
-                    SkidVectorFX = SideSkid + ForwardSkid - ForwardSkid * gripPc;
                 }
                 if (PointVelocity.sqrMagnitude > 0)
                 {
@@ -527,7 +526,7 @@ namespace SaccFlightAndVehicles
                 float engineWeight = Mathf.Lerp(Brake_EngineWeight, 1, Clutch);
                 WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (BrakeStrength * Brake) / engineWeight);
                 WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, HandBrake / engineWeight);
-                if (IsDriveWheel)
+                if (IsDriveWheel && !GearNeutral)
                 {
                     float prevRPM = (prevSurf / WheelCircumference) * 60f;
                     float curRPM = (WheelRotationSpeedSurf / WheelCircumference) * 60f;
@@ -541,14 +540,18 @@ namespace SaccFlightAndVehicles
             // adjust engine speed
             if (IsDriveWheel && !GearNeutral)
             {
-                slowing = (ForwardSlip < 0 && (_GearRatio > 0)) || ((ForwardSlip > 0) && (_GearRatio < 0));
+                bool slowing = ((ForwardSlip < 0 && (_GearRatio > 0)) || ((ForwardSlip > 0) && (_GearRatio < 0)));
+                bool gearbackwards = Mathf.Sign(ForwardSpeed) != Mathf.Sign(GearRatio);
                 // (slowing ? 1 : -(1f - Clutch)) means use clutch if speeding up the engine, but don't use clutch if slowing down the engine.
                 // because clutch was already used in the input in the slowing down case.
                 // if removed, using the clutch can give a speed boost since the engine doesn't slow down by the correct amount relative to force produced.
-                float ThisEngineForceUsed = Mathf.Abs(ForceUsed) * Mathf.Abs(_GearRatio) * EngineInfluence * (slowing ? 1 : -(1f - Clutch));
+                float ThisEngineForceUsed = Mathf.Abs(ForceUsed) * Mathf.Abs(_GearRatio) * EngineInfluence *
+                (slowing ?
+                    // gearbackwards covers an edge case - handbraking while revs are at zero while sliding backwards (without it, you can't rev up, even though clutch is pressed (drive wheels))
+                    gearbackwards ? (1f - Clutch) : 1
+                    : -(1f - Clutch));
                 SGVControl.SetProgramVariable("EngineForceUsed", (float)SGVControl.GetProgramVariable("EngineForceUsed") + ThisEngineForceUsed);
             }
-            SkidLength = SkidVectorFX.magnitude;
         }
         private void LateUpdate()
         {
