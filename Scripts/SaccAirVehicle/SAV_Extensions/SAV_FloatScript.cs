@@ -271,7 +271,11 @@ namespace SaccFlightAndVehicles
         { sleeping = false; }
         private void FixedUpdate()
         {
-            if (sleeping) return;
+            if (sleeping)
+                if (VehicleRigidbody.IsSleeping())
+                    return;
+                else
+                    sleeping = false;
             Vector3 Vel = VehicleRigidbody.velocity;
             Vector3 TopOfFloat = FloatPoints[currentfloatpoint].position + (Vector3.up * FloatRadius);
             Vector3 Waves = Vector3.zero;
