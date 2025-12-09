@@ -283,7 +283,7 @@ namespace SaccFlightAndVehicles
                     }
                     if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
                     {
-                        if (DisallowFireIfWind)
+                        if (DisallowFireIfWind && SAVControl)
                         {
                             if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).sqrMagnitude > 0f)
                             { return; }
@@ -325,7 +325,6 @@ namespace SaccFlightAndVehicles
         private SaccAirVehicle AAMCurrentTargetSAVControl;
         private int OutsideVehicleLayer;
         public float MaxTargetDistance = 6000;
-        private float AAMLockTimer;
         private int NumAAMTargets;
         private Vector3 AAMCurrentTargetDirection;
         private float AAMTargetObscuredDelay;
@@ -401,7 +400,6 @@ namespace SaccFlightAndVehicles
                             AAMTarget = AAMTargetChecker;
                             AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                             AAMCurrentTargetSAVControl = NextTargetSAVControl;
-                            AAMLockTimer = 0;
                             RelativeTargetVelLastFrame = Vector3.zero;
                             GUN_TargetSpeedLerper = 0f;
                             GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
@@ -440,7 +438,7 @@ namespace SaccFlightAndVehicles
                 else
                 { AAMTargetObscuredDelay = 0; }
 
-                if (!(bool)SAVControl.GetProgramVariable("Taxiing")
+                if ((SAVControl && !(bool)SAVControl.GetProgramVariable("Taxiing"))
                     && (AAMTargetObscuredDelay < .25f)
                         && AAMCurrentTargetDistance < MaxTargetDistance
                             && AAMTargets[AAMTarget].activeInHierarchy
@@ -449,19 +447,10 @@ namespace SaccFlightAndVehicles
                     if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
                     {
                         GUNHasTarget = true;
-                        if (AAMCurrentTargetAngle < 70)//lock angle
-                        {
-                            AAMLockTimer += DeltaTime;
-                        }
-                        else
-                        {
-                            AAMLockTimer = 0;
-                        }
                     }
                 }
                 else
                 {
-                    AAMLockTimer = 0;
                     GUNHasTarget = false;
                 }
                 /*         Debug.Log(string.Concat("AAMTarget ", AAMTarget));
