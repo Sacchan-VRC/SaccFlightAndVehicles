@@ -398,11 +398,11 @@ namespace SaccFlightAndVehicles
                 HierarchyName = VehicleNameTemp.gameObject.name + "/" + HierarchyName;
             }
 
-            SendEventToExtensions("SFEXT_L_EntityStart");
-
             if (!CoMSet)
                 SetCoM();
             if (!CenterOfMass) { CenterOfMass = transform; }
+
+            SendEventToExtensions("SFEXT_L_EntityStart");
 
             //if in editor play mode without clientsim
             if (InEditor)
