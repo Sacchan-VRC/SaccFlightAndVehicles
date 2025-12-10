@@ -508,6 +508,7 @@ namespace SaccFlightAndVehicles
             }
         }
         [System.NonSerialized] public float LastDamageSentTime;
+        [System.NonSerialized] public float LastDamageEventTime;
         [System.NonSerialized] public float LastHitDamage;
         [System.NonSerialized] public byte LastHitWeaponType;
         [System.NonSerialized] public VRCPlayerApi LastHitByPlayer;
@@ -524,8 +525,9 @@ namespace SaccFlightAndVehicles
             }
             LastHitDamage = dmg;
             LastHitWeaponType = weaponType;
-            SendEventToExtensions("SFEXT_G_BulletHit");
+            LastDamageEventTime = Time.time;
             SendEventToExtensions("SFEXT_L_WakeUp");
+            SendEventToExtensions("SFEXT_G_BulletHit");
         }
         public void InVehicleControls()
         {

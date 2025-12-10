@@ -160,6 +160,8 @@ namespace SaccFlightAndVehicles
         public bool TankMode;
         [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
+        [Tooltip("Use just the left control stick to control tank movement")]
+        public bool TANK_StickMode;
         [Tooltip("Sensitivity of the steering for tanks when UseStickSteering is enabled")]
         public float TANK_StickMode_SteeringSens = 2;
         [Tooltip("Make tank slower by this ratio when reversing")]
@@ -689,14 +691,14 @@ namespace SaccFlightAndVehicles
                                 RightTrackF = Input.GetKey(KeyCode.E) ? 1 : 0;
                                 RightTrackB = Input.GetKey(KeyCode.D) ? -1 : 0;
                             }
-                            if (InVR || UseStickSteering)
+                            if (TANK_StickMode)
                             {
                                 Vector2 LStickPos;
                                 LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                                 LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                                 float stickangle = Vector2.SignedAngle(Vector2.up, LStickPos);
                                 float forwardamount = LStickPos.y;
-                                if (stickangle < 100 && stickangle > -100)
+                                if (stickangle < 95 && stickangle > -95)
                                 {
                                     //going forward
                                     stickangle = (stickangle / 90) * LStickPos.magnitude * TANK_StickMode_SteeringSens;
@@ -705,13 +707,12 @@ namespace SaccFlightAndVehicles
                                 else
                                 {
                                     //going backward
-                                    stickangle = ((180 * Mathf.Sign(stickangle)) - stickangle);// flip 100 - 180 to 0-80 (incl neg. case)
-                                    stickangle = (-stickangle / 80) * LStickPos.magnitude * TANK_StickMode_SteeringSens;
+                                    stickangle = ((180 * Mathf.Sign(stickangle)) - stickangle);// flip 180 for backwards
+                                    stickangle = (-stickangle / 85) * LStickPos.magnitude * TANK_StickMode_SteeringSens;
                                     forwardamount = Mathf.Min(forwardamount, 0);
                                 }
                                 LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + -stickangle + forwardamount, -1, 1);
                                 RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + stickangle + forwardamount, -1, 1);
-
                             }
                             else
                             {
@@ -1187,7 +1188,7 @@ namespace SaccFlightAndVehicles
                 byte killerWeaponType = 0;
                 if (Utilities.IsValid(EntityControl.LastHitByPlayer))
                 {
-                    if (Time.time == EntityControl.LastDamageSentTime)
+                    if (Time.time == EntityControl.LastDamageEventTime)
                     {
                         killerID = EntityControl.LastHitByPlayer.playerId;
                         killerWeaponType = EntityControl.LastHitWeaponType;

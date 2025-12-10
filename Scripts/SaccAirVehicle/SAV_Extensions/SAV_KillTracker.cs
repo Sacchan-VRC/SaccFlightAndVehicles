@@ -64,15 +64,7 @@ namespace SaccFlightAndVehicles
                 }
                 if (KillsBoard.MyKills > KillsBoard.TopKills)
                 {
-                    if (InEditor)
-                    {
-                        KillsBoard.TopKiller = "Player";
-                        KillsBoard.TopKills = KillsBoard.MyKills;
-                    }
-                    else
-                    {
-                        KillsBoard.SendCustomEvent("UpdateTopKiller");
-                    }
+                    KillsBoard.SendCustomEvent("UpdateTopKiller");
                 }
                 for (int i = 0; i < Callbacks.Length; i++)
                 {
