@@ -18,6 +18,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
         public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
         public Animator VehicleAnimator;
+        public bool AllowAirControlGrounded = true;
         private SaccEntity EntityControl;
         private Transform ControlsRoot;
         [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
@@ -130,7 +131,7 @@ namespace SaccFlightAndVehicles
                 float pitch = Mathf.Clamp(VRJoystickPos.x + Wi + Si, -1, 1);
                 float yaw = Mathf.Clamp(VRJoystickPos.y + Qi + Ei, -1, 1);
                 float roll = Mathf.Clamp(VRJoystickPos.z + Ai + Di, -1, 1);
-                if (Grounded)
+                if (Grounded && !AllowAirControlGrounded)
                     RotForce = Vector3.zero;
                 else
                     RotForce = new Vector3(
