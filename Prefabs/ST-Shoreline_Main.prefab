@@ -2453,32 +2453,23 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.56
     - serializedVersion: 3
-      time: 0.30379406
-      value: 0.5381355
-      inSlope: 1.4529436
-      outSlope: 1.4529436
+      time: 0.32018688
+      value: 0.4402241
+      inSlope: 1.1257256
+      outSlope: 1.1257256
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.12464586
-      outWeight: 0.16164629
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.5053951
-      value: 0.80895156
-      inSlope: 1.1858695
-      outSlope: 1.1858695
+      time: 0.52368784
+      value: 0.72710216
+      inSlope: 2.3191965
+      outSlope: 2.3191965
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.19144788
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.6643753
-      value: 0.9285862
-      inSlope: 1.0780283
-      outSlope: 1.0780283
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.4102298
-      outWeight: 0.34515968
+      outWeight: 0.07359073
     - serializedVersion: 3
       time: 0.839495
       value: 1
@@ -2546,6 +2537,7 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_StickMode: 0
   TANK_StickMode_SteeringSens: 2
   TANK_ReverseSpeed: 0.75
   TANK_CruiseKey: 283
@@ -7860,6 +7852,12 @@ MonoBehaviour:
   GearDown: {fileID: 0}
   Wings:
   - {fileID: 264292837108118855}
+  DriverSeatMovement: {fileID: 1217889975416420966}
+  SeatMovement_MaxDist: 0.65
+  SeatMovement_ForceSTR: 0.4
+  SeatMovement_SpringSTR: 15
+  SeatMovement_LRMulti: 1
+  SeatMovement_VertMulti: 0.33
   DoCaterpillarTracks: 0
   TracksRenderer: {fileID: 0}
   TrackMaterialSlots: 
@@ -84277,7 +84275,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.5
-  Grip: 2.64
+  Grip: 3
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -84559,7 +84557,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.5
-  Grip: 2.24
+  Grip: 2.6
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -84895,7 +84893,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.5
-  Grip: 2.64
+  Grip: 3
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -85177,7 +85175,7 @@ MonoBehaviour:
   Damping_Rebound: 0.7
   MaxSusForce: 60
   ExtraRayCastDistance: 0.5
-  Grip: 2.24
+  Grip: 2.6
   GripCurve:
     serializedVersion: 2
     m_Curve:

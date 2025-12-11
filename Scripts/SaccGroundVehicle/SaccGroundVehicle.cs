@@ -1094,8 +1094,8 @@ namespace SaccFlightAndVehicles
         }
         float Steps_Error;
         [System.NonSerialized] public float GsAveragingTime = .1f;
-        private int NumFUinAvgTime = 1;
-        private Vector3 Gs_all;
+        [System.NonSerialized] public int NumFUinAvgTime = 1;
+        [System.NonSerialized] public Vector3 Gs_all;
         private Vector3[] FrameGs;
         private int GsFrameCheck;
         private void FixedUpdate()
@@ -1188,7 +1188,7 @@ namespace SaccFlightAndVehicles
                 byte killerWeaponType = 0;
                 if (Utilities.IsValid(EntityControl.LastHitByPlayer))
                 {
-                    if (Time.time == EntityControl.LastDamageEventTime)
+                    if (Time.time == EntityControl.LastDamageSentTime)
                     {
                         killerID = EntityControl.LastHitByPlayer.playerId;
                         killerWeaponType = EntityControl.LastHitWeaponType;

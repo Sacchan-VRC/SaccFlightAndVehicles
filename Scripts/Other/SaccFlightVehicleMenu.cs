@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         private SaccGroundVehicle[] SaccGroundVehicles;
         private SGV_GearBox[] SGVGearBoxs;
         private SAV_SyncScript[] SAVSyncScripts;
+        private SGV_EffectsController[] SGVEffectsControllers;
         public Slider JoystickSensitivitySlider;
         public Text JoyStickSensitivitySliderNumber;
         private float[] DefaultSteeringDegrees;
@@ -26,6 +27,7 @@ namespace SaccFlightAndVehicles
             SaccGroundVehicles = new SaccGroundVehicle[Vehicles.Length];
             SGVGearBoxs = new SGV_GearBox[Vehicles.Length];
             SAVSyncScripts = new SAV_SyncScript[Vehicles.Length];
+            SGVEffectsControllers = new SGV_EffectsController[Vehicles.Length];
             for (int i = 0; i < Vehicles.Length; i++)
             {
                 SaccAirVehicles[i] = (SaccAirVehicle)Vehicles[i].GetExtention(GetUdonTypeName<SaccAirVehicle>());
@@ -33,6 +35,7 @@ namespace SaccFlightAndVehicles
                 SaccGroundVehicles[i] = (SaccGroundVehicle)Vehicles[i].GetExtention(GetUdonTypeName<SaccGroundVehicle>());
                 SAVSyncScripts[i] = (SAV_SyncScript)Vehicles[i].GetExtention(GetUdonTypeName<SAV_SyncScript>());
                 SGVGearBoxs[i] = (SGV_GearBox)Vehicles[i].GetExtention(GetUdonTypeName<SGV_GearBox>());
+                SGVEffectsControllers[i] = (SGV_EffectsController)Vehicles[i].GetExtention(GetUdonTypeName<SGV_EffectsController>());
             }
             DefaultSteeringDegrees = new float[Vehicles.Length];
             for (int i = 0; i < Vehicles.Length; i++)
@@ -59,6 +62,7 @@ namespace SaccFlightAndVehicles
             if (JoystickSensitivitySlider) { JoyStickSensitivityDefault = JoystickSensitivitySlider.value; SetJoystickSensitivity(); }
             if (KeyboardThrottleSensitivitySlider) { KeyboardThrottleSensitivityDefault = KeyboardThrottleSensitivitySlider.value; SetKeyboardThrottleSensitivity(); }
             if (SteeringSensSlider) { SteeringSensDefault = SteeringSensSlider.value; SetSteeringSensitivity(); }
+            if (SeatMovementSlider) { SeatMovementDefault = SeatMovementSlider.value; SetSeatMovement(); }
             if (ThrottleSensitivitySlider) { ThrottleSensitivityDefault = ThrottleSensitivitySlider.value; SetThrottleSensitivity(); }
             if (SaccFlightStrengthSlider) { SaccFlightStrengthDefault = SaccFlightStrengthSlider.value; SetSaccFlightStrength(); }
         }
@@ -215,6 +219,21 @@ namespace SaccFlightAndVehicles
                 { SaccGroundVehicles[i].SetProgramVariable("SteeringWheelDegrees", DefaultSteeringDegrees[i] / SteeringSens); }
             }
         }
+        [System.NonSerialized] public float SeatMovementDefault;
+        public Slider SeatMovementSlider;
+        public Text SeatMovementSliderNumber;
+        public void SetSeatMovement()
+        {
+            float SeatMovement = SeatMovementSlider.value;
+            SeatMovementSliderNumber.text = SeatMovement.ToString("F2");
+            for (int i = 0; i < SGVEffectsControllers.Length; i++)
+            {
+                if (SGVEffectsControllers[i])
+                {
+                    SGVEffectsControllers[i].SetProgramVariable("SeatMovement_Slider", SeatMovement);
+                }
+            }
+        }
         [System.NonSerialized] public float ThrottleSensitivityDefault;
         public Slider ThrottleSensitivitySlider;
         public Text ThrottleSensitivitySliderNumber;
@@ -321,6 +340,7 @@ namespace SaccFlightAndVehicles
             if (JoystickSensitivitySlider) { JoystickSensitivitySlider.value = JoyStickSensitivityDefault; }
             if (KeyboardThrottleSensitivitySlider) { KeyboardThrottleSensitivitySlider.value = KeyboardThrottleSensitivityDefault; }
             if (SteeringSensSlider) { SteeringSensSlider.value = SteeringSensDefault; }
+            if (SeatMovementSlider) { SeatMovementSlider.value = SeatMovementDefault; }
             if (SwitchHandsToggle) { if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = SwitchHandsDefault; } }
             if (AutomaticGearsToggle) { AutomaticGearsToggle.isOn = AutomaticGearsDefault; }
             if (InvertVRGearChangeToggle) { InvertVRGearChangeToggle.isOn = InvertVRGearChangeDefault; }

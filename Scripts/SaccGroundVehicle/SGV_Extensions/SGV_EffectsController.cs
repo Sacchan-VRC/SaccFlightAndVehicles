@@ -66,6 +66,19 @@ namespace SaccFlightAndVehicles
         // public Transform testcamera;
         [Tooltip("Physics scripts that only need to be enabled if you're owner, and the vehicle is awake")]
         public GameObject[] Wings;
+        [Tooltip("Driver seat reference to move the player around with G-forces")]
+        [SerializeField] Transform DriverSeatMovement;
+        [Tooltip("Maximum distance away from default the player will be moved by Gs")]
+        public float SeatMovement_MaxDist = .65f;
+        [Tooltip("Multiplier for how strongly Gs effect the player movement")]
+        public float SeatMovement_ForceSTR = .4f;
+        [Tooltip("How quickly the seat returns to default")]
+        public float SeatMovement_SpringSTR = 15f;
+        [Tooltip("Multiplier for strength of vertical G-forces")]
+        public float SeatMovement_LRMulti = 1f;
+        [Tooltip("Multiplier for strength of vertical G-forces")]
+        public float SeatMovement_VertMulti = .33f;
+        [System.NonSerialized] float SeatMovement_Slider = 1f;
         [Header("Tank Stuff:")]
         public bool DoCaterpillarTracks;
         [Tooltip("Object with the track materials on it")]
@@ -118,6 +131,7 @@ namespace SaccFlightAndVehicles
         private UdonSharpBehaviour[] SteerWheels;
         private UdonSharpBehaviour[] OtherWheels;
         private bool InEditor;
+        private bool Piloting;
         private bool InVehicle;
         private int dopplecounter;
         private float Doppler;
@@ -154,6 +168,7 @@ namespace SaccFlightAndVehicles
         VRCPlayerApi localPlayer;
         public void SFEXT_L_EntityStart()
         {
+            if (DriverSeatMovement) GFeedback_SeatStartPos = DriverSeatMovement.localPosition;
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
@@ -243,6 +258,8 @@ namespace SaccFlightAndVehicles
         private bool KeepAwake = false;
         public void SFEXT_L_KeepAwake() { KeepAwake = true; WakeUp(); }
         public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
+        Vector3 GFeedback_SeatStartPos;
+        Vector3 Gs_Last;
         private void LateUpdate()
         {
             if (Sleeping)
@@ -356,6 +373,22 @@ namespace SaccFlightAndVehicles
             }
             if (InVehicle)
             {
+                if (Piloting && DriverSeatMovement)
+                {
+                    Vector3 gs = SGVControl.Gs_all / SGVControl.NumFUinAvgTime;
+                    gs.y -= 1; // remove gravity
+                    gs.x *= SeatMovement_LRMulti;
+                    gs.y *= SeatMovement_VertMulti;
+                    gs *= SeatMovement_Slider;
+                    DriverSeatMovement.position -= VehicleTransform.rotation * gs * Time.deltaTime * SeatMovement_ForceSTR;
+                    if ((DriverSeatMovement.localPosition - GFeedback_SeatStartPos).magnitude > SeatMovement_MaxDist)
+                    {
+                        Vector3 dif = DriverSeatMovement.localPosition - GFeedback_SeatStartPos;
+                        dif = Vector3.ClampMagnitude(dif, SeatMovement_MaxDist);
+                        DriverSeatMovement.localPosition = GFeedback_SeatStartPos + dif;
+                    }
+                    DriverSeatMovement.localPosition = Vector3.Lerp(DriverSeatMovement.localPosition, GFeedback_SeatStartPos, 1 - Mathf.Pow(0.5f, Time.deltaTime * SeatMovement_SpringSTR));
+                }
                 if (DriverHeading)
                 {
                     float heading = VehicleTransform.eulerAngles.y + HeadingOffset;
@@ -575,6 +608,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            Piloting = true;
             InVehicle = true;
             if (EntityControl.MySeat != -1)
             {
@@ -588,11 +622,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
+            Piloting = false;
             InVehicle = InVehicle_Sounds = false;
             if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("piloting", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
+            if (DriverSeatMovement) DriverSeatMovement.localPosition = GFeedback_SeatStartPos;
 
             SetSoundsOutside();
             SendWheelExit();

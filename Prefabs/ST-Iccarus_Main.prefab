@@ -11150,6 +11150,7 @@ MonoBehaviour:
   SwitchHandsJoyThrottle: 0
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   VehicleAnimator: {fileID: 3243243057054021814}
+  AllowAirControlGrounded: 1
   GripSensitivity: 0.75
 --- !u!114 &1803049916217016586
 MonoBehaviour:
@@ -68506,6 +68507,12 @@ MonoBehaviour:
   GearDown: {fileID: 0}
   Wings:
   - {fileID: 5390485614586610051}
+  DriverSeatMovement: {fileID: 3243243056892148394}
+  SeatMovement_MaxDist: 0.65
+  SeatMovement_ForceSTR: 0.4
+  SeatMovement_SpringSTR: 15
+  SeatMovement_LRMulti: 1
+  SeatMovement_VertMulti: 0.33
   DoCaterpillarTracks: 0
   TracksRenderer: {fileID: 0}
   TrackMaterialSlots: 
@@ -69220,6 +69227,7 @@ MonoBehaviour:
   Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   TANK_WASDMode: 1
+  TANK_StickMode: 0
   TANK_StickMode_SteeringSens: 2
   TANK_ReverseSpeed: 0.75
   TANK_CruiseKey: 283
