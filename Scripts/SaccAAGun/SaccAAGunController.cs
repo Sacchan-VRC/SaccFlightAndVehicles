@@ -595,7 +595,7 @@ namespace SaccFlightAndVehicles
                 byte killerWeaponType = 0;
                 if (Utilities.IsValid(EntityControl.LastHitByPlayer))
                 {
-                    if (Time.time == EntityControl.LastDamageSentTime)
+                    if (Time.time == EntityControl.LastDamageEventTime)
                     {
                         killerID = EntityControl.LastHitByPlayer.playerId;
                         killerWeaponType = EntityControl.LastHitWeaponType;
