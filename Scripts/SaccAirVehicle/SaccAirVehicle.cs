@@ -2238,7 +2238,7 @@ namespace SaccFlightAndVehicles
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairWrecked));
             }
-            else if (EntityControl.LastHitWeaponType == 2)
+            if (EntityControl.LastHitWeaponType == 2)
             {
                 //missiles cause a torque
                 Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce) * EntityControl.LastHitDamage) / FullHealth;
