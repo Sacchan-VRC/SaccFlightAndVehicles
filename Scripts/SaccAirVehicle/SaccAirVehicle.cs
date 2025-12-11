@@ -2162,7 +2162,10 @@ namespace SaccFlightAndVehicles
         public void RepairWrecked()
         {
             EntityControl.SetWreckedFalse();
-            if (EngineOnOnEnter) { SetEngineOn(); }
+            if (EntityControl.Using && EngineOnOnEnter)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn)); ;
+            }
         }
         public void SFEXT_G_RespawnButton()//called globally when using respawn button
         {
