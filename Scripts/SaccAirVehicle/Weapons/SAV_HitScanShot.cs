@@ -91,7 +91,7 @@ namespace SaccFlightAndVehicles
                                 Armor = HitVehicle.ArmorStrength;
                             }
                             float dmg = BeamDamage / Armor;
-                            if (dmg > HitVehicle.NoDamageBelow)
+                            if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                             {
                                 HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
                                 DirectHitObjectScript = HitVehicle;
@@ -130,7 +130,7 @@ namespace SaccFlightAndVehicles
                                 Armor = HitTarget.ArmorStrength;
                             }
                             float dmg = BeamDamage / Armor;
-                            if (dmg > HitTarget.NoDamageBelow)
+                            if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                             {
                                 HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
                                 DirectHitObjectScript = HitTarget;
@@ -303,7 +303,7 @@ namespace SaccFlightAndVehicles
                                     if ((UdonSharpBehaviour)hitEntity != DirectHitObjectScript)
                                     {
                                         float SplashDamage = BeamDamage * DamageFalloff;
-                                        if (SplashDamage > hitEntity.NoDamageBelow)
+                                        if (SplashDamage > hitEntity.NoDamageBelow || SplashDamage < 0)
                                         {
                                             hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl.gameObject, event_WeaponType);
                                         }
@@ -317,7 +317,7 @@ namespace SaccFlightAndVehicles
                                         if ((UdonSharpBehaviour)hitTarget != DirectHitObjectScript)
                                         {
                                             float SplashDamage = BeamDamage * DamageFalloff;
-                                            if (SplashDamage > hitTarget.NoDamageBelow)
+                                            if (SplashDamage > hitTarget.NoDamageBelow || SplashDamage < 0)
                                             {
                                                 hitTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
                                             }
@@ -357,7 +357,7 @@ namespace SaccFlightAndVehicles
                                     else
                                         DamageFalloff = 1 - (Mathf.Min(explosionDirTarget.magnitude, SplashRadius) / SplashRadius);
                                     float SplashDamage = BeamDamage * DamageFalloff;
-                                    if (SplashDamage > thisTarget.NoDamageBelow)
+                                    if (SplashDamage > thisTarget.NoDamageBelow || SplashDamage < 0)
                                     {
                                         thisTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
                                     }

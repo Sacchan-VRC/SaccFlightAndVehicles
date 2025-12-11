@@ -512,7 +512,7 @@ namespace SaccFlightAndVehicles
                                 Armor = HitVehicle.ArmorStrength;
                             }
                             dmg /= Armor;
-                            if (dmg > HitVehicle.NoDamageBelow)
+                            if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                                 HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
                         }
                         else if (HitTarget)
@@ -523,7 +523,7 @@ namespace SaccFlightAndVehicles
                                 Armor = HitTarget.ArmorStrength;
                             }
                             dmg /= Armor;
-                            if (dmg > HitTarget.NoDamageBelow)
+                            if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                                 HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
                         }
                     }
@@ -600,7 +600,7 @@ namespace SaccFlightAndVehicles
                     {
                         float Armor = TargetEntityControl.ArmorStrength;
                         float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)SAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
-                        if (dmg > TargetEntityControl.NoDamageBelow)
+                        if (dmg > TargetEntityControl.NoDamageBelow || dmg < 0)
                         { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType); }
                     }
                 }
