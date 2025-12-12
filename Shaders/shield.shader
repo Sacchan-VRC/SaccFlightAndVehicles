@@ -1,4 +1,4 @@
-Shader "Shader Forge/shield" {
+Shader "SaccFlight/shield" {
     Properties {
       _MainTex ("Texture", 2D) = "white" {}
       _Cube ("Cubemap", CUBE) = "" {}
