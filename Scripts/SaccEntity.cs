@@ -473,7 +473,7 @@ namespace SaccFlightAndVehicles
             QueueDamage(damage, weaponType);//send to others
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
-        const float DAMAGESENDINTERVAL = 0.2f;
+        const float DAMAGESENDINTERVAL = 0.1f;
         public float QueuedDamage;
         byte QueuedWeaponType;
         void QueueDamage(float dmg, byte weaponType)
