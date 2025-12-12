@@ -46,6 +46,7 @@ namespace SaccFlightAndVehicles
         public float LongLatSeparation = 1;
         [Tooltip("How quickly grip falls off with roll")]
         public float WheelRollGrip_Power = 1;
+        public AnimationCurve GripOverSusCompression = AnimationCurve.Linear(0, 0, 1, 1);
         [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
         public int SkidRatioMode = 0;
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
@@ -473,7 +474,7 @@ namespace SaccFlightAndVehicles
 
                 if (SeparateLongLatGrip)
                 {
-                    float evalskid = ForwardSkid.magnitude / MaxGrip;
+                    float evalskid = GripOverSusCompression.Evaluate(ForwardSkid.magnitude / MaxGrip);
                     float gripPc = GripCurve.Evaluate(evalskid);
                     GripForceForward = -ForwardSkid.normalized * gripPc * MaxGrip * WheelRollGrip;
 
@@ -487,7 +488,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    float evalskid = FullSkid.magnitude / MaxGrip;
+                    float evalskid = GripOverSusCompression.Evaluate(FullSkid.magnitude / MaxGrip);
                     float gripPc = GripCurve.Evaluate(evalskid);
                     GripForceForward = -FullSkid.normalized * gripPc * MaxGrip * WheelRollGrip;
 
