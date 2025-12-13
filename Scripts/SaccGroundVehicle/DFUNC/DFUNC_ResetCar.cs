@@ -16,6 +16,7 @@ namespace SaccFlightAndVehicles
         public float AllowRespawnSpeed = 9999999f;
         [Tooltip("Set vehicle's speed to zero when reset")]
         public bool StopCarOnReset = false;
+        public bool StopRotatingOnReset = false;
         [SerializeField] private float ResetMinDelay = 0;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
@@ -84,6 +85,10 @@ namespace SaccFlightAndVehicles
             if (StopCarOnReset)
             {
                 if (rb) { rb.velocity = Vector3.zero; }
+            }
+            if (StopRotatingOnReset)
+            {
+                if (rb) { rb.angularVelocity = Vector3.zero; }
             }
             Quaternion newrot = Quaternion.Euler(new Vector3(0f, VehicleTransform.rotation.eulerAngles.y, 0f));
             if (Quaternion.Dot(newrot, VehicleTransform.rotation) < 0)
