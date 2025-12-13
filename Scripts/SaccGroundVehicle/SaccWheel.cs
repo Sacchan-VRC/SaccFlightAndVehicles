@@ -36,6 +36,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
         public float ExtraRayCastDistance = .5f;
         public float Grip = 350f;
+        public float GripGain = 1f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
         [Tooltip("Multiply forward grip by this value for sideways grip")]
         public float LateralGrip = 1f;
@@ -46,7 +47,6 @@ namespace SaccFlightAndVehicles
         public float LongLatSeparation = 1;
         [Tooltip("How quickly grip falls off with roll")]
         public float WheelRollGrip_Power = 1;
-        public AnimationCurve GripOverSusCompression = AnimationCurve.Linear(0, 0, 1, 1);
         [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
         public int SkidRatioMode = 0;
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
@@ -465,8 +465,8 @@ namespace SaccFlightAndVehicles
                 }
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
-                float SusForceMag = SusForce.magnitude;
-                float MaxGrip = (SusForceMag * CurrentGrip) / DeltaTime;
+                float SusForceMag = SusForce.magnitude / DeltaTime;
+                float MaxGrip = (SusForceMag * CurrentGrip);
                 float MaxGripLat = MaxGrip * LateralGrip;
                 Vector3 GripForceForward;
                 Vector3 GripForcLat;
@@ -474,29 +474,29 @@ namespace SaccFlightAndVehicles
 
                 if (SeparateLongLatGrip)
                 {
-                    float evalskid = GripOverSusCompression.Evaluate(ForwardSkid.magnitude / MaxGrip);
+                    float evalskid = ForwardSkid.magnitude / MaxGrip;
                     float gripPc = GripCurve.Evaluate(evalskid);
-                    GripForceForward = -ForwardSkid.normalized * gripPc * MaxGrip * WheelRollGrip;
+                    GripForceForward = -ForwardSkid.normalized * gripPc * MaxGrip;
 
                     float evalskidLat = SideSkid.magnitude / MaxGripLat;
                     float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
-                    GripForcLat = -SideSkid.normalized * gripPcLat * MaxGripLat * WheelRollGrip;
+                    GripForcLat = -SideSkid.normalized * gripPcLat * MaxGripLat;
                     GripForce3 = (GripForceForward + GripForcLat) * DeltaTime;
                     Vector3 newgrip = Vector3.Slerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
-                    GripForce3 = Vector3.Lerp(newgrip, GripForce3, LongLatSeparation);
-                    gripPc = Mathf.Lerp(gripPc * ForwardSideRatio, gripPc, LongLatSeparation);
+                    GripForce3 = Vector3.Lerp(newgrip, GripForce3, LongLatSeparation) * WheelRollGrip;
                 }
                 else
                 {
-                    float evalskid = GripOverSusCompression.Evaluate(FullSkid.magnitude / MaxGrip);
+                    float evalskid = FullSkid.magnitude / MaxGrip;
                     float gripPc = GripCurve.Evaluate(evalskid);
-                    GripForceForward = -FullSkid.normalized * gripPc * MaxGrip * WheelRollGrip;
+                    GripForceForward = -FullSkid.normalized * gripPc * MaxGrip;
 
                     float evalskidLat = FullSkid.magnitude / MaxGripLat;
                     float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
-                    GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat * WheelRollGrip;
-                    GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime;
+                    GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat;
+                    GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * DeltaTime * WheelRollGrip;
                 }
+                GripForce3 *= GripGain;
                 if (PointVelocity.sqrMagnitude > 0)
                 {
                     float gripclamp = PointVelocity.magnitude / SGVControl.NumWheels;

@@ -71,7 +71,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Maximum distance away from default the player will be moved by Gs")]
         public float SeatMovement_MaxDist = .65f;
         [Tooltip("Multiplier for how strongly Gs effect the player movement")]
-        public float SeatMovement_ForceSTR = .4f;
+        public float SeatMovement_ForceSTR = .2f;
         [Tooltip("How quickly the seat returns to default")]
         public float SeatMovement_SpringSTR = 15f;
         [Tooltip("Multiplier for strength of vertical G-forces")]
