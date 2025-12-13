@@ -57,7 +57,9 @@ namespace SaccFlightAndVehicles
         // [Tooltip("How much VR users must twist their hands to reach max throttle, animation should match this")]
         // public float ThrottleDegrees = 50f;
         [Tooltip("How long keyboard turning must be held down to reach full deflection")]
-        public float SteeringKeyboardSecsToMax = 0.22222222f;
+        public float SteeringKeyboardSecsToMax = 0.5f;
+        [Tooltip("how fast steering wheel returns to neutral position in desktop mode 1 = 1 second, .2 = 5 seconds")]
+        public float SteeringReturnSpeedDT = .5f;
 
         [Tooltip("Reduce desktop max steering linearly up to this speed M/s")]
         public float SteeringMaxSpeedDT = 40f;
@@ -65,7 +67,9 @@ namespace SaccFlightAndVehicles
         public bool SteeringMaxSpeedDTDisabled = false;
         [Tooltip("Steering is reduced but to a minimum of this value")]
         public float DesktopMinSteering = .2f;
-        [Tooltip("how fast steering wheel returns to neutral position in destop mode 1 = 1 second, .2 = 5 seconds")]
+        [Tooltip("how fast throttle reaches max in desktop mode in seconds")]
+        public float ThrottleToMaxTimeDT = .0001f;
+        [Tooltip("how fast throttle reaches zero in desktop mode in seconds")]
         public float ThrottleReturnTimeDT = .0001f;
         // [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
         // public float ThrottleReturnTimeVR = .1f;
@@ -110,8 +114,6 @@ namespace SaccFlightAndVehicles
         public float SteeringDegrees = 60;
         public float AutoSteerStrength = 5f;
         [Header("AutoSteer Disabled")]
-        [Tooltip("how fast steering wheel returns to neutral position in destop mode 1 = 1 second, .2 = 5 seconds")]
-        public float SteeringReturnSpeedDT = .3f;
         [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
         public float SteeringReturnSpeedVR = 5f;
         public bool UseStickSteering;
@@ -1042,7 +1044,7 @@ namespace SaccFlightAndVehicles
                             {
                                 if (Wi != 0)
                                 {
-                                    ThrottleInput = Mathf.Clamp(VRThrottlePos + (Wi), -DriveSpeedKeyboardMax, DriveSpeedKeyboardMax);
+                                    ThrottleInput = Mathf.Clamp(Mathf.MoveTowards(ThrottleInput, VRThrottlePos + (Wi), (1 / ThrottleToMaxTimeDT) * DeltaTime), -DriveSpeedKeyboardMax, DriveSpeedKeyboardMax);
                                 }
                                 else
                                 {
