@@ -170,6 +170,10 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             controlsActive = false;
         }
+        public void SFEXT_O_OnDrop()
+        {
+            SFEXT_O_PilotExit();
+        }
         private int PickupTrigger = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
