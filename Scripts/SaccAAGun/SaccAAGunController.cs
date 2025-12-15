@@ -141,7 +141,7 @@ namespace SaccFlightAndVehicles
         private float AAMLastFiredTime;
         [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
         [System.NonSerializedAttribute] public SaccAirVehicle AAMCurrentTargetSAVControl;
-        private float AAMTargetObscuredDelay;
+        private float AAMTargetObscuredDelay = 999f;
         [System.NonSerializedAttribute] public bool InVR;
         Quaternion AAGunRotLastFrame;
         Quaternion JoystickZeroPoint;
@@ -792,7 +792,8 @@ namespace SaccFlightAndVehicles
                                         || (AAMCurrentTargetSAVControl &&//null check
                                                                     (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
                                                                     (MissileType == 1 && !AAMCurrentTargetSAVControl._EngineOn && !AAMCurrentTargetSAVControl.EntityControl.wrecked)))//switch target if heatseeker and current target's engine is off unless target is wrecked(on fire)
-                                            || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
+                                            || !AAMTargets[AAMTarget].activeInHierarchy// always switch if target inactive/destroyed
+                                            || AAMTargetObscuredDelay > .25f// always switch if target is obscured
                                             )
                     {
                         if (!LTriggerLastFrame)

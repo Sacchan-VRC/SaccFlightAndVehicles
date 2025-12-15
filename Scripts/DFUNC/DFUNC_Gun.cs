@@ -327,7 +327,7 @@ namespace SaccFlightAndVehicles
         public float MaxTargetDistance = 6000;
         private int NumAAMTargets;
         private Vector3 AAMCurrentTargetDirection;
-        private float AAMTargetObscuredDelay;
+        private float AAMTargetObscuredDelay = 999f;
         private bool GUNHasTarget;
         private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                                   //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
@@ -393,7 +393,8 @@ namespace SaccFlightAndVehicles
                                     && NextTargetAngle < AAMCurrentTargetAngle
                                         && NextTargetDistance < MaxTargetDistance
                                             || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                                || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
+                                                || !AAMTargets[AAMTarget].activeInHierarchy// always switch if target inactive/destroyed
+                                                || AAMTargetObscuredDelay > .25f))// always switch if target is obscured
                         {
                             //found new target
                             AAMCurrentTargetAngle = NextTargetAngle;

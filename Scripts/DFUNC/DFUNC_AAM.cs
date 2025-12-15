@@ -412,7 +412,7 @@ namespace SaccFlightAndVehicles
         private SaccAirVehicle AAMCurrentTargetSAVControl;
         private int OutsideVehicleLayer;
         private Vector3 AAMCurrentTargetDirection;
-        private float AAMTargetObscuredDelay;
+        private float AAMTargetObscuredDelay = 999;
         //public Transform TARGETDEBUG;
         /* everywhere that GetComponent<SaccAirVehicle>() is used should be changed to UdonSharpBehaviour for modularity's sake,
         but it seems that it's impossible until further udon/sharp updates, because it currently doesn't support checking if a variable exists before trying to get it */
@@ -476,7 +476,8 @@ namespace SaccFlightAndVehicles
                                             || (AAMCurrentTargetSAVControl &&//null check
                                                                         (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
                                                                         (MissileType == 1 && !AAMCurrentTargetSAVControl._EngineOn && !AAMCurrentTargetSAVControl.EntityControl.wrecked)))//switch target if heatseeker and current target's engine is off unless target is wrecked(on fire)
-                                                || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
+                                                || !AAMTargets[AAMTarget].activeInHierarchy// always switch if target inactive/destroyed
+                                                || (AAMTargetObscuredDelay > .25f)// always switch if target is obscured
                                                 )
                         {
                             if (!TriggerLastFrame)
