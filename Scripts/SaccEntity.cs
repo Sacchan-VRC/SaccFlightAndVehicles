@@ -417,6 +417,7 @@ namespace SaccFlightAndVehicles
             LastHitParticle = other;
             byte weaponType = 1; // default weapon type
             float damage = 10f * ArmorStrength; // default damage
+            bool CancelDamage = false;
 
             // Loop through all children to find damage and weapon type
             foreach (Transform child in other.transform)
@@ -436,9 +437,26 @@ namespace SaccFlightAndVehicles
                         weaponType = wt;
                     }
                 }
+                else if (pname.StartsWith("resupply"))
+                {
+                    ReSupply(); CancelDamage = true;
+                }
+                else if (pname.StartsWith("refuel"))
+                {
+                    ReFuel(); CancelDamage = true;
+                }
+                else if (pname.StartsWith("rearm"))
+                {
+                    ReArm(); CancelDamage = true;
+                }
+                else if (pname.StartsWith("repair"))
+                {
+                    RePair(); CancelDamage = true;
+                }
             }
-
-            if (damage > 0 && damage < NoDamageBelow) return;
+            if (damage < 0 && CancelDamage) CancelDamage = false;
+            if (CancelDamage) { SendEventToExtensions("SFEXT_L_WakeUp"); }
+            if ((damage > 0 && damage < NoDamageBelow) || CancelDamage) return;
             WeaponDamageVehicle(damage, other, weaponType);
         }
         public void WeaponDamageVehicle(float damage, GameObject damagingObject, byte weaponType)
@@ -644,7 +662,7 @@ namespace SaccFlightAndVehicles
         private float LastJumpInput = 0f;
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
         {
-            if (InVehicle && InVR && args.boolValue && !Input.GetKey(KeyCode.Space))
+            if ((InVehicle || CustomPickup_localHeld) && InVR && args.boolValue && !Input.GetKey(KeyCode.Space))
             {
                 ExitVehicleCheck();
             }
@@ -656,7 +674,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 if (Time.time - LastJumpInput < .3f)
-                { ExitStation(); return; }
+                { ExitStation(); CustomPickup_Drop(); return; }
                 LastJumpInput = Time.time;
             }
         }
@@ -900,11 +918,15 @@ namespace SaccFlightAndVehicles
             localPlayer.SetPlayerTag("SFCP_N", numHolding.ToString());
             OnPickup();
             updateDisableInteractive();
+            HoldLoopRunning = true;
             SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 2);//so we don't pick it up and instantly fire (GetMouseButtonDown)
         }
         int numHolding_last;
+        bool HoldLoopRunning;
         public void CustomPickup_HoldLoop()
         {
+            if (!HoldLoopRunning) return;
+            SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 1, VRC.Udon.Common.Enums.EventTiming.Update);
             Vector3 grabOffset = CustomPickup_GrabPosition.position - transform.position;
             if (Pickup_LeftHand)
             {
@@ -930,7 +952,7 @@ namespace SaccFlightAndVehicles
             }
 
             float RStickPosY = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-            if (Input.GetKeyDown(CustomPickup_DropKey) || !IsOwner || RStickPosY < -0.9f)
+            if (Input.GetKeyDown(CustomPickup_DropKey) || !IsOwner || (RStickPosY < -0.9f && !DoubleTapToExit))
             {
                 CustomPickup_Drop();
                 return;
@@ -952,7 +974,6 @@ namespace SaccFlightAndVehicles
                 if (Input.GetMouseButtonUp(Pickup_Hand - 1))
                 { OnPickupUseUp(); }
             }
-            SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 1, VRC.Udon.Common.Enums.EventTiming.Update);
         }
         private void CustomPickup_Drop()
         {
@@ -965,6 +986,7 @@ namespace SaccFlightAndVehicles
             numHolding = Mathf.Max(numHolding - 1, 0);
             localPlayer.SetPlayerTag("SFCP_N", numHolding.ToString());
             CustomPickup_localHeld = false;
+            HoldLoopRunning = false;
             updateDisableInteractive();
             OnDrop();
         }
