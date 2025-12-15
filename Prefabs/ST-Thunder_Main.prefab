@@ -6961,7 +6961,7 @@ MonoBehaviour:
   AddedHeight: 0
   AllowRespawnSpeed: 9999
   StopCarOnReset: 0
-  StopRotationOnReset: 0
+  StopRotatingOnReset: 0
   ResetMinDelay: 0
 --- !u!114 &2784613538655061535
 MonoBehaviour:
@@ -27674,7 +27674,7 @@ Transform:
   m_GameObject: {fileID: 2374662920338269867}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.215, z: -0.149}
+  m_LocalPosition: {x: 0, y: 0.6622, z: -0.1591}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27767,8 +27767,8 @@ Transform:
   m_GameObject: {fileID: 2374662921348105083}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.0000004172325, z: -0, w: -1}
-  m_LocalPosition: {x: 0, y: 1.389, z: -0.149}
-  m_LocalScale: {x: 0.5060378, y: 1, z: 1.9761387}
+  m_LocalPosition: {x: 0, y: 1.403, z: -0.154}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2935594653914077343}
@@ -28927,6 +28927,7 @@ MonoBehaviour:
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.5
+  SteeringReturnSpeedDT: 0.5
   SteeringMaxSpeedDT: 45
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.1
@@ -29013,7 +29014,6 @@ MonoBehaviour:
   Drift_AutoSteer: 0
   SteeringDegrees: 60
   AutoSteerStrength: 0.3
-  SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
   RespawnDelay: 10
@@ -29111,7 +29111,7 @@ Transform:
   m_GameObject: {fileID: 2935594653873934752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.215, z: -0.149}
+  m_LocalPosition: {x: 0, y: 0.6622, z: -0.1591}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -29146,7 +29146,7 @@ Transform:
   m_GameObject: {fileID: 2935594653914077408}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.0000004172325, z: -0, w: -1}
-  m_LocalPosition: {x: -0.511, y: 0.31, z: 0.1}
+  m_LocalPosition: {x: -0.511, y: 0.31, z: 0.175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -29388,7 +29388,7 @@ Transform:
   m_GameObject: {fileID: 2935594654126660742}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.0000004172325, z: -0, w: -1}
-  m_LocalPosition: {x: 0.511, y: 0.31, z: 0.1}
+  m_LocalPosition: {x: 0.511, y: 0.31, z: 0.175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -30079,7 +30079,7 @@ Transform:
   m_GameObject: {fileID: 2935594654823327814}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.0000004172325, z: -0, w: -1}
-  m_LocalPosition: {x: 0, y: 1.389, z: -0.149}
+  m_LocalPosition: {x: 0, y: 1.403, z: -0.154}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
