@@ -1105,7 +1105,7 @@ Transform:
   m_GameObject: {fileID: 1115753882196402716}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.34, y: 0.49, z: 9.83}
+  m_LocalPosition: {x: 3.34, y: 0.49, z: 5.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17017,6 +17017,7 @@ MonoBehaviour:
   SAVControl: {fileID: 3387892265773476547}
   HudHold: {fileID: 6624684636905425145}
   Dial_Funcon: {fileID: 8076700762406790995}
+  Dial_Funcon_Array: []
   GLimiter: 999
   AoALimiter: 999
   AltHoldPitchProportional: 0.028
@@ -34950,7 +34951,7 @@ Transform:
   m_GameObject: {fileID: 5244294377627352818}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.354, y: 0.817, z: 4.588}
+  m_LocalPosition: {x: -1.35, y: 0.817, z: 0.01}
   m_LocalScale: {x: 0.17205, y: 1.7205, z: 0.17205}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35519,6 +35520,7 @@ MonoBehaviour:
   ToggleMinDelay: 3
   StartUpTime: 2.5
   Dial_Funcon: {fileID: 8718772129755150060}
+  Dial_Funcon_Array: []
   DoEngineStartupAnimBool: 0
   EngineAnimator: {fileID: 0}
   AnimEngineStartupAnimBool: EngineStarting
@@ -35644,6 +35646,8 @@ MonoBehaviour:
   VehicleForwardTransform: {fileID: 0}
   DialsAnimator:
   - {fileID: 4537056850877622133}
+  Horizon_PitchAxis: {x: 1, y: 0, z: 0}
+  Horizon_RollAxis: {x: 0, y: -1, z: 0}
   AltitudeFloatName100: altitude100
   AltitudeFloatName1000: altitude1000
   AltitudeFloatName10000: altitude10000
@@ -35656,7 +35660,6 @@ MonoBehaviour:
   MaxSlip: 15
   Horizon:
   - {fileID: 3166876065751724423}
-  HorizonRotOffset: {x: -58.25, y: 0, z: 0}
   AscentFloatName: ascent
   MaxAscent: 5000
   AscentConversion: 3.28084
@@ -46976,7 +46979,9 @@ MonoBehaviour:
   BombLaunchPoints:
   - {fileID: 5026333865765023552}
   LaunchSound: {fileID: 0}
+  LaunchSound_Clips: []
   LaunchSound_Interior: {fileID: 0}
+  LaunchSound_Interior_Clips: []
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
