@@ -82,8 +82,6 @@ namespace SaccFlightAndVehicles
         private float HighAspectPreventLockAngleDot;
         const float SENDTARGETED_INTERVAL = 1;
         private float AAMTargetedTime = 2;
-        private float boolToggleTime;
-        private bool AnimOn = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -202,6 +200,7 @@ namespace SaccFlightAndVehicles
         {
             numUsers--;
             if (numUsers != 0) return;
+            else boolOnTimes = 0;
 
             gameObject.SetActive(false);
             AAMLocked = false;
@@ -221,6 +220,8 @@ namespace SaccFlightAndVehicles
                 AAMTargetIndicator.gameObject.SetActive(false);
                 AAMTargetIndicator.localRotation = Quaternion.identity;
             }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), AnimBoolStayTrueOnExit); }
         }
 
         public void SFEXT_P_PassengerEnter()
@@ -235,8 +236,8 @@ namespace SaccFlightAndVehicles
             {
                 DFUNC_Deselected();
             }
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public void SFEXT_G_ReSupply()
         {
@@ -257,8 +258,8 @@ namespace SaccFlightAndVehicles
         {
             NumAAM = FullAAMs;
             UpdateAmmoVisuals();
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public void SFEXT_G_TouchDown()
         {
@@ -290,7 +291,7 @@ namespace SaccFlightAndVehicles
             func_active = true;
             if (AAMTargetIndicator) { AAMTargetIndicator.gameObject.SetActive(true); }
 
-            if (DoAnimBool && !AnimOn)
+            if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
         public void DFUNC_Deselected()
@@ -302,8 +303,8 @@ namespace SaccFlightAndVehicles
             PickupTrigger = 0;
             AAMLockTimer = 0;
             AAMHasTarget = false;
-            if (AAMLocked)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AAMLockedFalse)); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), false); }
 
             if (AAMTargetIndicator)
             {
@@ -313,7 +314,7 @@ namespace SaccFlightAndVehicles
             }
             func_active = false;
 
-            if (DoAnimBool && AnimOn)
+            if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
         }
         void Update()
@@ -612,8 +613,10 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAAMs_Event(ushort TargetID)
         {
+            ushort lasttarget = AAMTarget;
             AAMTarget = TargetID;
             LaunchAAM();
+            AAMTarget = lasttarget;
         }
         void LaunchAAM()
         {
@@ -667,17 +670,19 @@ namespace SaccFlightAndVehicles
             }
             UpdateAmmoVisuals();
         }
+        int boolOnTimes;
         public void SetBoolOn()
         {
-            boolToggleTime = Time.time;
-            AnimOn = true;
-            if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes++;
+            if (boolOnTimes > 1) return;
+            if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, true); }
         }
-        public void SetBoolOff()
+        [NetworkCallable]
+        public void SetBoolOff(bool LeaveOn)
         {
-            boolToggleTime = Time.time;
-            AnimOn = false;
-            if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes = Mathf.Max(boolOnTimes - 1, 0);
+            if (boolOnTimes != 0 || LeaveOn) return;
+            if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, false); }
         }
         public void KeyboardInput()
         {

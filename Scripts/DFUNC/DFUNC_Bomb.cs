@@ -77,8 +77,6 @@ namespace SaccFlightAndVehicles
         [Header("")]
         [Tooltip("Delegate firing sync to EXT_Turret script to sync shoot direction properly.\nIf using FireSyncDelegate, syncmode can be set to None")]
         public UdonBehaviour FireSyncDelegate;
-        private float boolToggleTime;
-        private bool AnimOn = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -175,10 +173,9 @@ namespace SaccFlightAndVehicles
         {
             numUsers--;
             if (numUsers != 0) return;
+            else boolOnTimes = 0;
 
             DisableThisObject();
-            if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-            { SetBoolOff(); }
             if (EntityControl.EntityPickup)
             {
                 EntityControl.gameObject.layer = StartEntityLayer;
@@ -197,6 +194,8 @@ namespace SaccFlightAndVehicles
             Piloting = false;
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), AnimBoolStayTrueOnExit); }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -206,7 +205,7 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             Selected = EntityControl.InVR || !KeyboardInput_InstantFire;
-            if (DoAnimBool && !AnimOn)
+            if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(true); }
             if (AtGCam)
@@ -218,8 +217,8 @@ namespace SaccFlightAndVehicles
         {
             Selected = false;
             PickupTrigger = 0;
-            if (DoAnimBool && AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), false); }
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
         }
@@ -228,8 +227,8 @@ namespace SaccFlightAndVehicles
             BombPoint = 0;
             NumBomb = FullBombs;
             UpdateAmmoVisuals();
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
             if (DropBombOnDeath && NumBomb > 0)
             {
                 LaunchBombs_Event();
@@ -242,8 +241,8 @@ namespace SaccFlightAndVehicles
             NumBomb = FullBombs;
             UpdateAmmoVisuals();
             BombPoint = 0;
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public void SFEXT_G_ReSupply()
         {
@@ -461,17 +460,19 @@ namespace SaccFlightAndVehicles
         {
             ReloadSound.PlayOneShot(ReloadSound.clip);
         }
+        int boolOnTimes;
         public void SetBoolOn()
         {
-            boolToggleTime = Time.time;
-            AnimOn = true;
-            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes++;
+            if (boolOnTimes > 1) return;
+            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, true); }
         }
-        public void SetBoolOff()
+        [NetworkCallable]
+        public void SetBoolOff(bool LeaveOn)
         {
-            boolToggleTime = Time.time;
-            AnimOn = false;
-            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes = Mathf.Max(boolOnTimes - 1, 0);
+            if (boolOnTimes != 0 || LeaveOn) return;
+            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, false); }
         }
         public void KeyboardInput()
         {

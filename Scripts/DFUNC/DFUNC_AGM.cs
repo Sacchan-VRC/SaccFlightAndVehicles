@@ -66,8 +66,6 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         [Tooltip("If on a pickup: Use VRChat's OnPickupUseDown functionality")]
         [SerializeField] bool use_OnPickupUseDown = false;
-        private float boolToggleTime;
-        private bool AnimOn = false;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -212,10 +210,9 @@ namespace SaccFlightAndVehicles
         {
             numUsers--;
             if (numUsers != 0) return;
+            else boolOnTimes = 0;
 
             gameObject.SetActive(false);
-            if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-            { SetBoolOff(); }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -228,13 +225,15 @@ namespace SaccFlightAndVehicles
             PickupTrigger = 0;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), AnimBoolStayTrueOnExit); }
         }
         public void SFEXT_G_RespawnButton()
         {
             NumAGM = FullAGMs;
             UpdateAmmoVisuals();
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public void SFEXT_G_ReSupply()
         {
@@ -260,8 +259,8 @@ namespace SaccFlightAndVehicles
             UpdateAmmoVisuals();
             if (func_active)
             { DFUNC_Deselected(); }
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
@@ -272,7 +271,7 @@ namespace SaccFlightAndVehicles
             if (AtGScreen) AtGScreen.SetActive(true);
             for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(true); }
             AtGCam.gameObject.SetActive(true);
-            if (DoAnimBool && !AnimOn)
+            if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
         public void DFUNC_Deselected()
@@ -282,8 +281,8 @@ namespace SaccFlightAndVehicles
             if (AtGScreen) AtGScreen.SetActive(false);
             for (int i = 0; i < AtGScreen_Array.Length; i++) { AtGScreen_Array[i].SetActive(false); }
             AtGCam.gameObject.SetActive(false);
-            if (DoAnimBool && AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), false); }
             AGMUnlockTimer = 0;
             AGMUnlocking = 0;
         }
@@ -537,17 +536,19 @@ namespace SaccFlightAndVehicles
             }
             UpdateAmmoVisuals();
         }
+        int boolOnTimes;
         public void SetBoolOn()
         {
-            boolToggleTime = Time.time;
-            AnimOn = true;
-            if (AGMAnimator) { AGMAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes++;
+            if (boolOnTimes > 1) return;
+            if (AGMAnimator) { AGMAnimator.SetBool(AnimBoolName, true); }
         }
-        public void SetBoolOff()
+        [NetworkCallable]
+        public void SetBoolOff(bool LeaveOn)
         {
-            boolToggleTime = Time.time;
-            AnimOn = false;
-            if (AGMAnimator) { AGMAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes = Mathf.Max(boolOnTimes - 1, 0);
+            if (boolOnTimes != 0 || LeaveOn) return;
+            if (AGMAnimator) { AGMAnimator.SetBool(AnimBoolName, false); }
         }
         public void KeyboardInput()
         {

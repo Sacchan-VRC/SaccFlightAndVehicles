@@ -3,6 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.UdonNetworkCalling;
 
 namespace SaccFlightAndVehicles
 {
@@ -30,7 +31,6 @@ namespace SaccFlightAndVehicles
         public KeyCode FireKey = KeyCode.Space;
         public AudioSource LaserFireSound;
         [SerializeField] private UdonSharpBehaviour[] ToggleBoolDisabler;
-        private bool AnimOn;
 
         [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
         public bool DoAnimBool = false;
@@ -39,14 +39,13 @@ namespace SaccFlightAndVehicles
         [Tooltip("Animator trigger that is set when a missile is launched")]
         public string AnimFiredTriggerName = string.Empty;
         private bool DoAnimFiredTrigger = false;
-        /*     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
-            public bool AnimBoolStayTrueOnExit; */
+        [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
+        public bool AnimBoolStayTrueOnExit;
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         public bool StickATGScrToFace_DT = true;
         [UdonSynced(UdonSyncMode.None)] private bool LaserFireNow = false;
         public float ATGScrDist = .5f;
-        private float boolToggleTime;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -121,19 +120,22 @@ namespace SaccFlightAndVehicles
             if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(false); }
             AtGScreen.transform.localRotation = AtGscreenStartRot;
             AtGScreen.transform.localPosition = AtGscreenStartPos;
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), AnimBoolStayTrueOnExit); }
         }
         public void SFEXT_G_PilotExit()
         {
             numUsers--;
             if (numUsers != 0) return;
+            else boolOnTimes = 0;
 
             gameObject.SetActive(false);
         }
         public void SFEXT_G_Explode()
         {
             GunRotation = Vector2.zero;
-            if (DoAnimBool && AnimOn)
-            { SetBoolOff(); }
+            if (DoAnimBool)
+            { SetBoolOff(false); }
             if (func_active)
             { DFUNC_Deselected(); }
         }
@@ -146,7 +148,7 @@ namespace SaccFlightAndVehicles
             OnEnableDeserializationBlocker = true;
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
-            if (DoAnimBool && !AnimOn)
+            if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
@@ -158,13 +160,15 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             AtGScreen.transform.localRotation = AtGscreenStartRot;
             AtGScreen.transform.localPosition = AtGscreenStartPos;
-            if (DoAnimBool && AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+            if (DoAnimBool)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff), false); }
         }
         public void SFEXT_G_RespawnButton()
         {
             LaserBarrel.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
+            if (DoAnimBool)
+            { SetBoolOff(false); }
         }
         public override void PostLateUpdate()
         {
@@ -311,17 +315,19 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        int boolOnTimes;
         public void SetBoolOn()
         {
-            boolToggleTime = Time.time;
-            AnimOn = true;
-            if (LaserAnimator) { LaserAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes++;
+            if (boolOnTimes > 1) return;
+            if (LaserAnimator) { LaserAnimator.SetBool(AnimBoolName, true); }
         }
-        public void SetBoolOff()
+        [NetworkCallable]
+        public void SetBoolOff(bool LeaveOn)
         {
-            boolToggleTime = Time.time;
-            AnimOn = false;
-            if (LaserAnimator) { LaserAnimator.SetBool(AnimBoolName, AnimOn); }
+            boolOnTimes = Mathf.Max(boolOnTimes - 1, 0);
+            if (boolOnTimes != 0 || LeaveOn) return;
+            if (LaserAnimator) { LaserAnimator.SetBool(AnimBoolName, false); }
         }
         public void KeyboardInput()
         {
