@@ -22,6 +22,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Seats whos sound to change when opening canopy. Leave empty to effect all seats")]
         public SaccVehicleSeat[] EffectedSeats;
         [Tooltip("The canopy can break off? Requires animation setup")]
+        public bool CanopyCloseOnEnter = false;
+        public bool CanopyOpenOnExit = false;
         public bool CanopyCanBreakOff = false;
         [Header("Meters/s")]
         [Tooltip("Speed at which canopy will break off if it's still open")]
@@ -46,7 +48,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool CanopyOpen;
         [System.NonSerializedAttribute] public bool CanopyBroken;
         private bool Selected;
-        private float LastCanopyToggleTime = -999;
+        private float LastCanopyToggleTime = -999f;
         private bool DragApplied;
         private bool CanopyTransitioning = false;
         private bool InEditor = true;
@@ -57,7 +59,7 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             CanopyDragMulti -= 1;
             //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
-            SendCustomEventDelayedSeconds(nameof(CanopyOpening), 10);
+            SendCustomEventDelayedSeconds(nameof(CanopyOpeningStart), 10);
         }
         public void SFEXT_L_OnEnable()
         {
@@ -78,11 +80,19 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(CanopyOpen); }
             InVR = EntityControl.InVR;
+            if (CanopyCloseOnEnter)
+            {
+                if (CanopyOpen) ToggleCanopy_(true);
+            }
         }
         public void SFEXT_O_PilotExit()
         {
             gameObject.SetActive(false);
             Selected = false;
+            if (CanopyCloseOnEnter)
+            {
+                if (!CanopyOpen) ToggleCanopy_(true);
+            }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -96,6 +106,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!eventRunOnce) return;
             if (CanopyBroken)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyBreakOff)); }
             else if (!CanopyOpen)
@@ -139,7 +150,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (!TriggerLastFrame)
                     {
-                        ToggleCanopy();
+                        ToggleCanopy_(false);
                     }
                     TriggerLastFrame = true;
                 }
@@ -161,8 +172,18 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void CanopyOpeningStart()
+        {
+#if UNITY_EDITOR
+            if (!EntityControl.Occupied) // don't annoy me in editor
+#else
+            if (!eventRunOnce) // don't open if event has been recieved from other
+#endif
+                CanopyOpening();
+        }
         public void CanopyOpening()
         {
+            eventRunOnce = true;
             if (CanopyOpen || CanopyBroken) { return; }
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
@@ -193,8 +214,10 @@ namespace SaccFlightAndVehicles
             SoundControl.SendCustomEventDelayedSeconds("UpdateDoorsOpen", CanopyOpenTime);
             if (EntityControl.IsOwner) { SendCanopyOpened(); }
         }
+        bool eventRunOnce;
         public void CanopyClosing()
         {
+            eventRunOnce = true;
             if (!CanopyOpen || CanopyBroken) { return; }//don't bother when not necessary (OnPlayerJoined() wasn't you)
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
@@ -268,7 +291,11 @@ namespace SaccFlightAndVehicles
         }
         public void ToggleCanopy()
         {
-            if ((Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f && !CanopyBroken && !CanopyTransitioning && !(!CanopyCanBreakOff && (float)SAVControl.GetProgramVariable("Speed") > CanopyAutoCloseSpeed))
+            ToggleCanopy_(false);
+        }
+        public void ToggleCanopy_(bool Force)
+        {
+            if ((((Time.time - LastCanopyToggleTime) > (CanopyCloseTime + .1f) && !CanopyTransitioning) || Force) && !CanopyBroken && !(!CanopyCanBreakOff && (float)SAVControl.GetProgramVariable("Speed") > CanopyAutoCloseSpeed))
             {
                 if (CanopyOpen)
                 {
@@ -282,7 +309,7 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            ToggleCanopy();
+            ToggleCanopy_(false);
         }
     }
 }
