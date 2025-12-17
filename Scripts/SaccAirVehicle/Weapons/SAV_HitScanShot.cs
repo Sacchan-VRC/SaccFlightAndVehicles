@@ -79,16 +79,21 @@ namespace SaccFlightAndVehicles
                             HitVehicle = targetpoint.collider.gameObject.GetComponent<SaccEntity>();
                         if (HitVehicle)
                         {
-                            float Armor = -1;
-                            bool ColliderHasArmorValue = false;
-                            if (targetpoint.collider.transform.childCount > 0)
+                            float Armor = HitVehicle.ArmorStrength;
+                            foreach (Transform child in targetpoint.collider.transform)
                             {
-                                string pname = targetpoint.collider.transform.GetChild(0).name;
-                                ColliderHasArmorValue = getArmorValue(pname, ref Armor);
-                            }
-                            if (!ColliderHasArmorValue)
-                            {
-                                Armor = HitVehicle.ArmorStrength;
+                                string pname = child.name;
+                                if (pname.StartsWith("a:"))
+                                {
+                                    if (float.TryParse(pname.Substring(2), out float ar))
+                                    {
+                                        if (ar > 0)
+                                        {
+                                            Armor = ar;
+                                        }
+                                    }
+                                }
+                                // else if .. // could add a value for NoDamageBelow here
                             }
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
@@ -118,16 +123,21 @@ namespace SaccFlightAndVehicles
                         }
                         if (HitTarget)
                         {
-                            float Armor = -1;
-                            bool ColliderHasArmorValue = false;
-                            if (targetpoint.collider.transform.childCount > 0)
+                            float Armor = HitVehicle.ArmorStrength;
+                            foreach (Transform child in targetpoint.collider.transform)
                             {
-                                string pname = targetpoint.collider.transform.GetChild(0).name;
-                                ColliderHasArmorValue = getArmorValue(pname, ref Armor);
-                            }
-                            if (!ColliderHasArmorValue)
-                            {
-                                Armor = HitTarget.ArmorStrength;
+                                string pname = child.name;
+                                if (pname.StartsWith("a:"))
+                                {
+                                    if (float.TryParse(pname.Substring(2), out float ar))
+                                    {
+                                        if (ar > 0)
+                                        {
+                                            Armor = ar;
+                                        }
+                                    }
+                                }
+                                // else if .. // could add a value for NoDamageBelow here
                             }
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
@@ -194,28 +204,6 @@ namespace SaccFlightAndVehicles
                 LaserParticle_S.radius = (LaserParticle.transform.position - HitPosition).magnitude;
                 LaserParticle_P.Emit((int)LaserParticle_S.radius);
             }
-        }
-        bool getArmorValue(string name, ref float armor)
-        {
-            // Find the last colon in the string
-            int index = name.LastIndexOf(':');
-            if (index < 0 || index == name.Length - 1) // Check if colon exists and not at the end
-            {
-                return false;
-            }
-            string numberStr = name.Substring(index + 1); // Get substring after colon
-            // Check if the remaining part is a valid number
-            if (!float.TryParse(numberStr, out float parsedArmor))
-            {
-                return false;
-            }
-            // Only accept positive numbers
-            if (parsedArmor <= 0f)
-            {
-                return false;
-            }
-            armor = parsedArmor;
-            return true;
         }
         [System.NonSerializedAttribute] public bool Exploding = false;
         void Explode()

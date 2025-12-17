@@ -497,20 +497,25 @@ namespace SaccFlightAndVehicles
                     SaccTarget HitTarget = other.gameObject.GetComponent<SaccTarget>();
                     if (HitVehicle || HitTarget)
                     {
-                        float Armor = 1;
-                        bool ColliderHasArmorValue = false;
-                        if (other.collider.transform.childCount > 0)
+                        float Armor = HitVehicle.ArmorStrength;
+                        foreach (Transform child in other.collider.transform)
                         {
-                            string pname = other.collider.transform.GetChild(0).name;
-                            ColliderHasArmorValue = getArmorValue(pname, ref Armor);
+                            string pname = child.name;
+                            if (pname.StartsWith("a:"))
+                            {
+                                if (float.TryParse(pname.Substring(2), out float ar))
+                                {
+                                    if (ar > 0)
+                                    {
+                                        Armor = ar;
+                                    }
+                                }
+                            }
+                            // else if .. // could add a value for NoDamageBelow here
                         }
                         if (HitVehicle)
                         {
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
-                            if (!ColliderHasArmorValue)
-                            {
-                                Armor = HitVehicle.ArmorStrength;
-                            }
                             dmg /= Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                                 HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
@@ -518,10 +523,6 @@ namespace SaccFlightAndVehicles
                         else if (HitTarget)
                         {
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth");
-                            if (!ColliderHasArmorValue)
-                            {
-                                Armor = HitTarget.ArmorStrength;
-                            }
                             dmg /= Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                                 HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
@@ -531,28 +532,6 @@ namespace SaccFlightAndVehicles
                 hitwater = false;
                 Explode();
             }
-        }
-        bool getArmorValue(string name, ref float armor)
-        {
-            // Find the last colon in the string
-            int index = name.LastIndexOf(':');
-            if (index < 0 || index == name.Length - 1) // Check if colon exists and not at the end
-            {
-                return false;
-            }
-            string numberStr = name.Substring(index + 1); // Get substring after colon
-            // Check if the remaining part is a valid number
-            if (!float.TryParse(numberStr, out float parsedArmor))
-            {
-                return false;
-            }
-            // Only accept positive numbers
-            if (parsedArmor <= 0f)
-            {
-                return false;
-            }
-            armor = parsedArmor;
-            return true;
         }
         private void Explode()
         {

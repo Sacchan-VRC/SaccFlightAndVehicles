@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1912909809919846869}
   m_Layer: 17
-  m_Name: armor:02
+  m_Name: a:02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10718,7 +10718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1627626562900040870}
   m_Layer: 17
-  m_Name: armor:3
+  m_Name: a:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18119,7 +18119,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1609488987116646890}
   m_Layer: 17
-  m_Name: armor:01
+  m_Name: a:01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18413,7 +18413,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7531465122461034355}
   m_Layer: 17
-  m_Name: armor:0.45
+  m_Name: a:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28323,6 +28323,7 @@ MonoBehaviour:
   AddedHeight: 0
   AllowRespawnSpeed: 9999
   StopCarOnReset: 0
+  StopRotatingOnReset: 0
   ResetMinDelay: 0
 --- !u!114 &3410326317878501155
 MonoBehaviour:
@@ -38559,7 +38560,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3156683696709394759}
   m_Layer: 17
-  m_Name: armor:0.45
+  m_Name: a:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39213,7 +39214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5315569081427823937}
   m_Layer: 17
-  m_Name: armor:0.01
+  m_Name: a:0.01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45552,7 +45553,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2562443850205837607}
   m_Layer: 17
-  m_Name: armor:0.45
+  m_Name: a:0.45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45672,7 +45673,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6335632812758288014}
   m_Layer: 17
-  m_Name: armor:3
+  m_Name: a:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62825,7 +62826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1520665226732530337}
   m_Layer: 17
-  m_Name: armor:1
+  m_Name: a:1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63076,7 +63077,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2130165019174901957}
   m_Layer: 17
-  m_Name: armor:1
+  m_Name: a:1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69524,7 +69525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8170215969735883741}
   m_Layer: 17
-  m_Name: armor:03
+  m_Name: a:03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69942,9 +69943,11 @@ MonoBehaviour:
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.33333
+  SteeringReturnSpeedDT: 0.3
   SteeringMaxSpeedDT: 60
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.06
+  ThrottleToMaxTimeDT: 0.0001
   ThrottleReturnTimeDT: 0.0001
   Drag: 0.04
   ControlsRoot: {fileID: 0}
@@ -70027,7 +70030,6 @@ MonoBehaviour:
   Drift_AutoSteer: 0
   SteeringDegrees: 60
   AutoSteerStrength: 0.3
-  SteeringReturnSpeedDT: 0.3
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
   RespawnDelay: 10
@@ -71410,7 +71412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2272652774965943105}
   m_Layer: 17
-  m_Name: armor:03
+  m_Name: a:03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77594,7 +77596,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1476295721213665312}
   m_Layer: 17
-  m_Name: armor:3
+  m_Name: a:3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84981,6 +84983,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -85275,6 +85278,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -85587,6 +85591,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -85875,6 +85880,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -86151,6 +86157,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -86433,6 +86440,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -86703,6 +86711,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -87003,6 +87012,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -87273,6 +87283,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
@@ -87585,6 +87596,7 @@ MonoBehaviour:
   MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.4
+  GripGain: 1
   GripCurve:
     serializedVersion: 2
     m_Curve:
