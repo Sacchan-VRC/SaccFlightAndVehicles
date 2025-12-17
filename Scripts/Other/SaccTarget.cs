@@ -26,13 +26,13 @@ namespace SaccFlightAndVehicles
         public float ArmorStrength = 1f;
         [Tooltip("If an attack does less than this amount of damage, all damage will be discarded.")]
         public float NoDamageBelow = 0f;
+        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
+        public bool PredictExplosion = true;
         [Space]
         [Tooltip("Send event when someone gets a kill on this target")]
         public bool SendKillEvents;
-        [SerializeField] private string[] TargetKilledMessages = { "%KILLER% destroyed a Target", };
-        [Tooltip("Instantly explode locally instead of waiting for network confirmation if your client predicts target should, possible desync if target is healing when shot")]
-        public bool PredictExplosion = true;
         public UdonBehaviour KillFeed;
+        [SerializeField] private string[] TargetKilledMessages = { "%KILLER% destroyed a Target", };
         private Animator TargetAnimator;
         [System.NonSerialized] public float FullHealth;
         private VRCPlayerApi localPlayer;
@@ -47,13 +47,14 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             TargetAnimator.SetBool("dead", false);
             TargetAnimator.SetFloat("healthpc", Health / FullHealth);
+            if (ArmorStrength == 0) ArmorStrength = 0.000001f;
         }
         void OnParticleCollision(GameObject other)
         {
             if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
             byte weaponType = 1; // default weapon type
-            float damage = 10f * ArmorStrength; // default damage
+            float damage = 10f / ArmorStrength; // default damage
 
             // Loop through all children to find damage and weapon type
             foreach (Transform child in other.transform)

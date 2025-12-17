@@ -401,6 +401,7 @@ namespace SaccFlightAndVehicles
             if (!CoMSet)
                 SetCoM();
             if (!CenterOfMass) { CenterOfMass = transform; }
+            if (ArmorStrength == 0) ArmorStrength = 0.000001f;
 
             SendEventToExtensions("SFEXT_L_EntityStart");
 
@@ -416,7 +417,7 @@ namespace SaccFlightAndVehicles
             if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
             byte weaponType = 1; // default weapon type
-            float damage = 10f * ArmorStrength; // default damage
+            float damage = 10f / ArmorStrength; // default damage
             bool CancelDamage = false;
 
             // Loop through all children to find damage and weapon type
