@@ -58,7 +58,7 @@ namespace SaccFlightAndVehicles
             }
         }
         int supplyType = -1; // Default to -1 if no matching child is found
-        string[] supplyNames = { "xSUPPLY_FUEL", "xSUPPLY_AMMO", "xSUPPLY_REPAIR" };
+        string[] supplyNames = { "refuel", "rearm", "repair" };
         private void OnTriggerEnter(Collider other)
         {
             if (other && other.gameObject.layer == ResupplyLayer)
