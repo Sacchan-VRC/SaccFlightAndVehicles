@@ -462,28 +462,32 @@ namespace SaccFlightAndVehicles
         }
         public void WeaponDamageVehicle(float damage, GameObject damagingObject, byte weaponType)
         {
-            //Try to find the saccentity that shot at us
             if (dead || invincible) return;
-            GameObject EnemyObjs = damagingObject;
-            SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
-            //search up the hierarchy to find the saccentity directly
-            while (!EnemyEntityControl && EnemyObjs.transform.parent)
+            SaccEntity EnemyEntityControl = null;
+            if (damagingObject)
             {
-                EnemyObjs = EnemyObjs.transform.parent.gameObject;
-                EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
-            }
-            //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
-            if (!EnemyEntityControl)
-            {
-                EnemyObjs = damagingObject;
-                UdonBehaviour EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
-                while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
+                //Try to find the saccentity that shot at us
+                GameObject EnemyObjs = damagingObject;
+                EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
+                //search up the hierarchy to find the saccentity directly
+                while (!EnemyEntityControl && EnemyObjs.transform.parent)
                 {
                     EnemyObjs = EnemyObjs.transform.parent.gameObject;
-                    EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
                 }
-                if (EnemyUdonBehaviour)
-                { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
+                if (!EnemyEntityControl)
+                {
+                    EnemyObjs = damagingObject;
+                    UdonBehaviour EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
+                    {
+                        EnemyObjs = EnemyObjs.transform.parent.gameObject;
+                        EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    }
+                    if (EnemyUdonBehaviour)
+                    { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                }
             }
             LastAttacker = EnemyEntityControl;
             LastHitDamage = damage;
@@ -536,7 +540,7 @@ namespace SaccFlightAndVehicles
         {
             if (dead || invincible) return;
             LastHitByPlayer = NetworkCalling.CallingPlayer;
-            if (LastHitByPlayer != localPlayer)
+            if (Utilities.IsValid(LastHitByPlayer) && LastHitByPlayer != localPlayer)
             {
                 GameObject attackersVehicle = GameObject.Find(LastHitByPlayer.GetPlayerTag("SF_VehicleName"));
                 if (attackersVehicle)

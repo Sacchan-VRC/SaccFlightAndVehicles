@@ -82,46 +82,48 @@ namespace SaccFlightAndVehicles
         public void WeaponDamageTarget(float damage, GameObject damagingObject, byte weaponType)
         {
             if (dead) return;
-            //Try to find the saccentity that shot at us
-            GameObject EnemyObjs = damagingObject;
-            SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
-            //search up the hierarchy to find the saccentity directly
-            while (!EnemyEntityControl && EnemyObjs.transform.parent)
+            SaccEntity EnemyEntityControl = null;
+            if (damagingObject)
             {
-                EnemyObjs = EnemyObjs.transform.parent.gameObject;
-                EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
-            }
-            //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
-            if (!EnemyEntityControl)
-            {
-                EnemyObjs = damagingObject;
-                UdonBehaviour EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
-                while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
+                //Try to find the saccentity that shot at us
+                GameObject EnemyObjs = damagingObject;
+                EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
+                //search up the hierarchy to find the saccentity directly
+                while (!EnemyEntityControl && EnemyObjs.transform.parent)
                 {
                     EnemyObjs = EnemyObjs.transform.parent.gameObject;
-                    EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
                 }
-                if (EnemyUdonBehaviour)
-                { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
+                if (!EnemyEntityControl)
+                {
+                    EnemyObjs = damagingObject;
+                    UdonBehaviour EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
+                    {
+                        EnemyObjs = EnemyObjs.transform.parent.gameObject;
+                        EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
+                    }
+                    if (EnemyUdonBehaviour)
+                    { EnemyEntityControl = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
+                }
             }
             LastAttacker = EnemyEntityControl;
             LastHitDamage = damage;
-            // I'd like to not have to send this event if you're the owner of the target but if it didn't send then
-            // damage could be ignored in the case of a race condition when two users shoot it at the same time
             DamagePrediction();
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Self, nameof(SendDamageEvent), damage, weaponType);//local
             QueueDamage(damage, weaponType);//send to others
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
-        float LastHitTime = -100, PredictedHealth;
+        float PredictedLastHitTime = -100, PredictedHealth;
         void DamagePrediction()
         {
             if (localPlayer.IsOwner(gameObject)) return;
             if (PredictExplosion)
             {
-                if (Time.time - LastHitTime > 2)
+                if (Time.time - PredictedLastHitTime > 2)
                 {
-                    LastHitTime = Time.time;
+                    PredictedLastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(Health - LastHitDamage, FullHealth);
                     if (!dead && PredictedHealth <= 0)
                     {
@@ -130,7 +132,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    LastHitTime = Time.time;
+                    PredictedLastHitTime = Time.time;
                     PredictedHealth = Mathf.Min(PredictedHealth - LastHitDamage, FullHealth);
                     if (!dead && PredictedHealth <= 0)
                     {
@@ -180,20 +182,19 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void SendDamageEvent(float dmg, byte weaponType)
         {
+            if (dead) return;
             LastHitByPlayer = NetworkCalling.CallingPlayer;
             LastHitDamage = dmg;
             LastHitWeaponType = weaponType;
             if (!localPlayer.IsOwner(gameObject)) return;
             Health = Mathf.Min(Health - dmg, FullHealth);
-            int killerID = -1;
-            byte killerWeaponType = 0;
-            if (Utilities.IsValid(LastHitByPlayer))
+            if (SendKillEvents && Health <= 0 && Utilities.IsValid(LastHitByPlayer))
             {
-                killerID = LastHitByPlayer.playerId;
-                killerWeaponType = LastHitWeaponType;
+                int killerID = LastHitByPlayer.playerId;
+                byte killerWeaponType = LastHitWeaponType;
+                if (killerID > -1 && !dead)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType); }
             }
-            if (SendKillEvents && Health <= 0 && killerID > -1 && !dead)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(KillEvent), killerID, weaponType); }
             SendNetworkUpdate();
         }
         [NetworkCallable]
