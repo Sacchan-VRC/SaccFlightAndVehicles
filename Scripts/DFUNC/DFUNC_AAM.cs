@@ -313,9 +313,6 @@ namespace SaccFlightAndVehicles
                 AAMTargetIndicator.gameObject.SetActive(false);
             }
             func_active = false;
-
-            if (DoAnimBool)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
         }
         void Update()
         {
