@@ -12,6 +12,8 @@ namespace SaccFlightAndVehicles
     {
         public Animator GrappleAnimator;
         public Transform Hook;
+        [Tooltip("Match Hook transform's rotation to HookLaunchPoint when firing? Use if hook is not a child of the aiming transform")]
+        [SerializeField] bool AlignHookOnFire;
         public Transform HookRopePoint;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
@@ -394,6 +396,7 @@ namespace SaccFlightAndVehicles
         public void LaunchHook()
         {
             if (!Initialized) { return; }
+            if (AlignHookOnFire) Hook.rotation = HookLaunchPoint.rotation;
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
