@@ -1,5 +1,5 @@
 ﻿Sacchan's Flight and Vehicles Prefab
-FOR VRChat SDK3 WITH UDONSHARP: USE VRC'S CREATOR COMPANION APP TO CREATE YOUR PROJECT
+VERSION 1.8.0
 Changelog is at the bottom
 
 Contact:
@@ -9,61 +9,27 @@ https://x.com/Sacchan_VRC
 To install: Extract the SaccFlightAndVehicles folder into your Assets folder
 To update: Use your folder browser to delete your old SaccFlightAndVehicles folder, and replace it with the new one. Don't do it inside Unity.
 
-Migrating a 1.64 project to 1.7 info:
+Migrating a 1.7 project to 1.8 info:
+Saccflight is now using Semantic Versioning. 1.71 would be 1.7.1 in the new scheme.
 REMEMBER: IF IN DOUBT, CHECK AN EXISTING PREFAB'S VALUES
-The respawn button's setup has changed. You must now put the SaccEntity into the 'OtherScripts[]' array, and set the 'OtherScripts_Event_Name to 'EntityRespawn'
-'InVehicleOnly' and 'InSeatOnly' have been removed and replaced with the 'EnableInVehicle[]' and EnableiInSeat[]' arrays,
-The 'ConstantForce' script is no longer used. Remove it from your vehicles and missiles (It's on the same object as the RigidBody script)
-Previously damage recieved from crashing into objects was different depending on FixedUpdate rate due to the way Gs were calculated.
-	Vehicles now have 2 new variables: Crash_Damage_Speed and Crash_Death_Speed.
-Crash_Damage_Speed is the speed at which vehicle will begin to take damage when crashing
-	Crash_Death_Speed is the speed at which vehicle will die instantly when crashing
-	Damage is interpolated linearly between these values
-Vehicles with no canopy should now just tick [x] Seat Out Side Vehicle on the seats.
-The racing system has been updating, Scoreboards and racing triggers will need to be updated.
-	There is now a prefab for RacingTrigger you can use in Prefabs/Accessories
-The passenger functions system has has an overhaul.
-	Each seat's PassengerFunctionsController must now be referenced by the seat, and the reference should be removed from SaccEntity's UdonExtensionBehaviours.
-	all DFUNCP and EXTP scripts have been removed. The PassengerFunctionsController now uses regular DFUNCs.
-		For example, a turret can use EXT_Turret to turn, and DFUNC_GUN/AAM/AGM/Bomb to fire a weapon.
-		Not all DFUNCs support use with PassengerFunctionsController.
-Planes:
-Set 'Vel Lift' to same as your 'Lift' value to match the old behaviour (Or the same percentage difference
-Air Friction calculation has changed, multiply your existing value by 1.6 and then adjust again from there.
-The DFUNC_Flares script can no longer use the KeyboardInputs script, set up the controls from within the DFUNC_Flares object.
-There is a new system for vehicles being 'wrecked', this means their health is below 0 and their engines no longer work so they'll fall out of the sky.
-	The HealthSmoke animation layer's transition now uses the condition 'dead=false' instead of 'health>0' and vice versa in order to do its transitions.
-	Aircraft being on fire is done by the HealthSmoke animation, check the SF-1's HealthSmoke animation to see the difference. The particle system is called 'WreckedFire'
-	There's a new prefab in Prefabs/Effects/ called WreckedPuff that you can add to your vehicle (it's a small explosion that happens the moment the vehicle is 'wrecked').
-		Add it under EffectsController and add it to the EffectsController's WreckedParticles[] array.
-Due to underlying code changes (code being moved from Update() to FixedUpdate() and no longer using the ConstantForce script, vehicles may behave a bit differently and need some tweaking.
-Wing tip trails have been changed (now using particles instead of trail renderer). There's a new prefab in Prefabs/Effects called WingTipTrail that you can replace your existing trails with. Remember to add them to EffectsController's WingTrailsp[] array.
-The 'beeps' object (the cockpit warning sounds etc) is now disabled by default so that A: the objects are disabled when you're not in the vehicle, and B: They can be enabled per-seat in vehicles
-	Put the SoundController/AttachedSounds/beeps object into either the 'EnableInVehicle[]' array in SaccEntity OR the 'EnableInSeat[]' array on the desired seats.
-The 'Auto Adjust Values To Mass' option has been removed, I'm pretty sure no one was using it anyway
-SF-1's DFUNC_Bomb now has a CCIP system (TrajectoryPredictor), you may want to copy it in to your vehicles. It's a child of the DFUNC_Bomb object.
-	A bomb using this system should have its AirPhysicsStrength set to 0 or it'll calculate incorrectly. Rigidbody drag must not be 0, and is taken into account. SF-1's bomb is using 0.015
+The custom weapon damage system has changed to use VRChat's new NetworkEventWithParameters functionality.
+	Particle weapons(bullets) can now do any amount of damage. See the 'Particle damage system' section for details
+	Damage particles are no longer used by explosives in the base prefab, a new damage system has been added to do damage based on distance to target.
+		An expanding shockwave setting has also been added to explosive weapons, doing damage only after the shockwave hits the target (optional).
+		It is still possible to use damage particles if you wish, but the prefab setup and animations for it have been removed.
+The BulletDamageTaken variable has been removed completely and replaced with ArmorStrength on the SaccEntity script. see the 'Armor system' section below.
+Worlds with races: The RaceTimeReporter script has been removed and the race time reporting has been simplified and moved into the race script (using NetworkEventWithParameters). Delete the object/s
 Cars:
-SACCWHEEL SCRIPT NOW USES MANUAL SYNC, YOU MUST CHANGE IT MANUALLY (Synchronization Method), IF YOU DO NOT, WORLD MAY GET VERY LAGGY.
-	If you want a lot more cars(or tanks), you can set Sync Method to None, but other players will not see your skid effects.
-The engine-wheel loop has been rewritten, things will behave differently, particularly the values in SaccWheel:
-	EngineInfluence: Set it to 30,000 and adjust from there (reducing this is like increasing engine torque)
-	Grip: Reduce to a value around 1-3
-	SurfaceType_Slowdown: All values are now 0 except element 1(grass) which can be set around 0.06
-		Old vehicles may be really slow if you don't update these values
-	Clutch Strength: Set to 1~
-The 'Revs' animation has changed, I no longer bother separating interior/exterior animations (you still can if you want) (Check the new animators)
-	Please check the prefab vehicle's Revs animation or even copy it to remake your own. The new animations are also shorter in length.
-	The animation no longer controls enabling/disabling of the sound objects, that's now done by SGV_EffectsController.
-		Make sure you add the respective audio source references to the 'EngineSounds[]' and 'EngineSounds_Interior[]' arrays
-Brake animation: I've changed the brake animation and animation layer to use motion time, and added a brake input gauge to the HUD.
-You might want to update your EngineResponseCurve to match the updated vehicles (SaccGroundVehicle)
-
+SGV_Effects now has a seat movement system that moves the seat based on G forces, set the 'Driver Seat Movement' transform variable to use it.
+all vehicle wheels have a new grip curve, this grip curve works a lot better, so open the 'Grip Curve' graph on the wheels of one of the car prefabs, save it as a preset on the graph editor, and apply it to your vehicles if you wish. Do the same for 'Grip Curve Lateral'
+Tanks:
+Custom armor values are now be set up by naming your empty 'a:2' instead of 'armor:2' so just search&replace. This is to match the naming scheme of the weapon damage system and make it easier to expand.
 
 The SaccFlightMenu.cs editor script sets up some things automatically when entering play mode, or building the scene. Things like the WindController no longer need you to manually assign all vehicles to them, it's done automatically.
 I have done this with everything that requires simple lists to be filled out, or if there's only one of something in a scene that should be always be used. Things should be a little less fiddly to set up now. I plan to add more editor script stuff in future.
 If you wish to run the code that does that stuff while in the editor, the option SaccFlight->Debug_OnBuild_SetReferences runs the function.
 If you haven't set up a reference camera in your VRCWorld when you try to build the scene, It will be done automatically, matching how it's set up in Test Pilots.
+Giving a Vehicle/Target/SaccEntity the EditorOnly tag will cause the SetReferences function to add references which will become null references and cause scripts to crash, so don't do that.
 
 Explanation of some scripts:
 SaccEntity:
@@ -83,11 +49,11 @@ The custom position sync script
 KillTracker:
 Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
 DFUNC_*
-Pilot function dial scripts
+Function dial scripts
 EXT_*
 non-type specific extensions (turrets..)
 
-Function dials:
+Function Dials:
 SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
 Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input, you must make the visuals yourself)
 The order they are input into that array is the order they'll work on the dial, clockwise. (First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. The ST-Baron's function dial uses this, if you need an example, the StickDisplay mesh is rotated negatively by half of a function)
@@ -109,8 +75,8 @@ Race set up:
 There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected by the SaccRaceToggleButton script.
 The SaccRaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
 The RaceToggleButton contains a hidden reference to every race, it's set up automatically on build.
-Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
-The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard's SaccRaceTimeReporter script for the selected race when you finish.
+Each race has a script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
+The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard script for the selected race when you finish.
 Race checkpoints have an animation that enables guidance objects when the checkpoint is next or after next.
 New in 1.63: Races have a full scoreboard showing everyones times. Times are reported by taking ownership of the SaccRaceTimeReporter object when you finish a race.
 	A delayed check is run by the player reporting their time to make sure that their time was actually recieved (if for example two people tried to take ownership/report their times at the same time). Missed times are re-submitted.
@@ -127,8 +93,8 @@ and everything in between accordingly.
 
 The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to transitioning mach1.
 This variable can be used to do other things like F-14 wings moving back at a certain speed.
-
-The angle of attack variable is 0 at 0 AoA, and 1 at 180.
+The AoA variable is 0 at 0 angle of attack, and 1 at 180.
+Cars have a variable called 'speed' that is 0-1 as 0-500 m/s.
 
 Making your own vehicles:
 
@@ -222,31 +188,33 @@ You can now delete the original mesh object.
 In the SaccGroundVehicle Object, update the references for:
 Vehicle Mesh -> The mesh object you replaced the original with
 Main Object Renderer -> Place the largest Mesh renderer/SkinnedMeshRenderer on your new mesh in this slot
-Drive Wheels -> Put all wheels that are used to accelerate the car in here, usually the back wheels.
-Steer Wheels -> Put all the wheels used for steering in here
+Drive Wheels -> Put all wheels that are used to accelerate the car in here. 
+Steer Wheels -> Put all the wheels used for steering in here, for 4WD vehicles, put the front wheels in both arrays.
 Other Wheels -> Put in any other wheels
 The functions for brake and handbrake also need to reference the wheels that they used. Go to DialFunctions/L/DFUNC_Brake and DFUNC_HandBrake and fix the missing references in the 'Brake Wheels_Front' and 'Brake Wheels_Back' arrays.
 In each Wheel script, set the wheel radius to match your car's wheels. You can experiment with suspension values too. I recommend doing so in play mode. Make sure you're sitting in the driver seat so that the physics doesn't fall asleep.
-Move the CoM object to where the center of mass for your new vehicle should be. Unrealisticly fast cars need it to be very low down.
+Move the CoM object to where the center of mass for your new vehicle should be.
+	Unrealisticly fast cars need it to be very low down.
+		Alternatively, the WheelForceApplyPoint transform of each wheel can be used. Set it to an empty transform with a higher position instead of lowering the CoM. This is usually a better option especially for arcade style cars.
 If you test your vehicle now it should be able to drive forward, but the suspension may be strange, and it won't be able to steer.
 Steering is done through an animation. Duplicate the original vehicle's Animations folder and move it into your own folder.
 Rename the animation controller in that folder to the name of your vehicle, and apply it to your vehicle's animator (it's on the vehicle's main object, same object as the rigidbody).
 Go through each layer of the animator and replace each of the animation node's animations with the ones from the copied folder.
 Go through each of the animations and set them up with your new mesh. Refer to the original prefabs to see how they should be. The 'SteeringWheel' animation contains the movement of the steeringwheel and wheels.
 Go through the whole hierarchy of the vehicle, and move everything to match the position of the new mesh. The eye position of seats is the 'TargetHeight' child object.
-Car prefabs should put the vehicle in the air, above the point where the suspension visualization lines are touching the ground.
+Car prefabs should put the vehicle in the air, above the point where the suspension visualization lines are touching the ground. If the wheels are touching the ground at spawn, a bug where the vehicle is flung into the air when entering a new world can occur.
 
 Tips for adjusting car speed:
-	Set the GearRatios[] in SGV_Gearbox to define the theoretical top speed.
+	Set the GearRatios[] in SGV_Gearbox to define the theoretical top speed. The Final Drive variable can be used to effectively multiply them all at once.
 	Set SaccGroundVehicle's 'DriveSpeed' (how fast the engine speeds up)
 	Set each of the DriveWheels 'EngineInfluence', this value behaves like adjusting engine torque, lower number=more torque.
 
 Common problems with cars:
 If the ExtraRayCastDistance is set too high, the ground detection ray can hit the top of the car causing the car to flip over endlessly.
-Wheel suspension technically never actually bottoms out. If you want the suspension to bottom out at a certain point, it's probably bes to just put a small sphere collider with no friction at the bottoming out point.
+Wheel suspension technically never actually bottoms out. If you want the suspension to bottom out at a certain point, it's probably best to just put a small sphere collider with no friction at the bottoming out point.
 
 Info about surface types for SaccWheel scripts:
-There's and array called 'Surface Type_Grips[]' with 10 entries. The object that the wheel is touching's name is checked,
+There's an array called 'Surface Type_Grips[]' with 10 entries. The object that the wheel is touching's name is checked,
 and if it ends with a number, that number is read as surface type.
 The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
 By default: 0 = Tarmac, 1 = Dirt/Grass, 2 = Ice. 3-9 are for you to define, but by default have same grip as tarmac. Any object without a number will be treated as tarmac.
@@ -282,32 +250,30 @@ It's possible to create hand held weapons with a function dial, but it's not rea
 	The prefab 'SaccRifle' is an experimental example, it uses DFUNCs only in the up and down directions of the right control stick, because those inputs do not effect your movement.
 	Picking it up with your left hand does NOT change the function dial input to use the left controller, therefore picking up two makes both of them change at the same time.
 
-Particle damage system:
+Damage system:
 Guns work by having one particle system of visible bullets, and one particle system of invisible bullets that actually do damage which is only enabled for the firer. The visible one is known as Gunparticle_other, and the pilot's damage one is known as GunParticle_pilot. Make sure if you change one, you change the other!
 The 'GunParticle_pilot' is what does damage to planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 To make a gun do a different amount of damage, create a child empty game object under the 'GunParticle_pilot' particle system, and name it:
-Damage:02 (2x damage). Damage:03 (4x damage), Damage:04 (8x damage), Damage:05 (16x damage). All the way up to Damage:14 works.
-To do less damage use:
-Damage:x2 (half damage), Damage:x3 (one third damage), Damage:x4 (quarter damage), Damage:x5 (fifth damage), Up to Damage:x9 works (one ninth damage)
-The base damage is defined by the vehicle that's recieving the damage's vehicle script's variable 'BulletDamageTaken'.
+'d:20' to make it do 20 damage per particle. The default is 10 if you don't add this. Replace 20 with any number. Negative numbers work for healing.
+The Wasp-WX3's guns and and SH-2's laser are examples that use this system to do more damage.
+Particles can also be used to resupply, refuel, rearm or repair vehicles. If you instead name the child object to any of these words:
+'resupply' - everything
+'refuel' - fuel only
+'rearm' - increase weapon ammo only
+'repair' - increase health only
+You can use more than one child to do more than one thing, and you can also use it in combination with a negative d: number for extra healing.
+Projectile weapons have damage values that can be set on the respective scripts. They are found as children of the weapon DFUNC.
+There is also a weapon type system that is unused in the base package, but developers can use to determine what weapon was used for kills. This system is in use in my 'Test Pilots' world.
+For particle systems, a child object with a name like 't:3' is used. Projectile weapon scripts have their own variable for it called event_WeaponType. SaccEntity.cs has variable LastHitWeaponType where you can read what it was last hit by.
 
-Armor damage system:
-There are now two weapon damage systems, particle damage, and direct hit damage (bombs,AGM) that takes armor level into account, this system was created for tanks.
-SAV_BombController and SAV_AGMController now have a ArmorPenetrationLevel variable. When they collide directly with a vehicle, they check if the collider has a child object with name e.g "armor:03".
-	If such an object is found, the amount of damage done will be decreased like so:
-		DamageLevel is ArmorPenetrationLevel - ArmorLevel.
-			If DamageLevel < 1
-				no damage will be done.
-			else
-				the damage will increase the same way it does in the particle damage system.
-				DamageLevel:1=1xdamage, DamageLevel:2=2xdamage, DamageLevel:3=4xdamage, DamageLevel:4=8xdamage, DamageLevel:5=16xdamage, DamageLevel:6=32xdamage,
-The base damage is defined by the vehicle that's recieving the damage's vehicle script's variable 'BulletDamageTaken'.
-The SaccTank's front armor level is 3. The SaccTank's main gun's shell ArmorPenetrationLevel is 9, and the BulletDamageTaken is 10, so a SaccTank shooting another SaccTank in the front does
-		9-3=6. Damage level 6 is 32x. 10*32=320. SaccTank takes 320 damage in the front. Side armor is 2, and back armor is 1, making those 640 and 1280 respectively.
-SaccEntites also now have a base value for 'BulletArmorLevel' that prevents particles from doing damage if their damage level is below this number (This allows tanks not to take damage from small arms)
-	Unfortunately, it doesn't work the same as the armor system (armor level will not be subtracted from damage level), so the vehicle will take the full bullet damage if it does damage.
+Armor System:
+The armor system has also been rewritten as of 1.8.0. Since damage values are arbitrary now, damage can be arbitrarily reduce by armor.
+All vehicles have an 'Armor Strength' variable on the SaccEntity script (set to 1 on all prefab vehicles, which does nothing (divides)) This value is used to multiply damage from all hits unless overrieden by the collider armor system.
+Give any collider on a vehicle a child and name it like 'a:2' and this number will be used instead of the base armor value.
+This system can be seen on the SaccTank prefab, where the front colliders have 'a:3', the side colliders have 'a:2' and the rear colliders have 'a:0.45' making it stronger on the front and weaker at the rear.
+SaccEntity also has a NoDamageBelow value which is intended to prevent the vehicle from taking any damage at all from weak hits, the SaccTank has this value set to 100, making it invulnerable to any damage event that does less than 100 in one hit, making it impervious to small arms.
 
-Crash damage system:
+Crash Damage System:
 Previously the only crash damage was done by G-forces, but this system has a problem in that if done per fixedUpdate the impulse will be calculated differently based on differences in update rate (FixedUpdate is set to match HMD refresh rate in VRChat)
 This means that previously, higher refresh rate users would take more damage from crashing.
 In order to solve this, I now Smooth G-force calculation over 0.1~ seconds instead of per-frame.
@@ -317,6 +283,13 @@ Vehicles now have 2 new variables, Crash_Damage_Speed and Crash_Death_Speed.
 Crash_Damage_Speed is the speed at which vehicle will begin to take damage when crashing
 	Crash_Death_Speed is the speed at which vehicle will die instantly when crashing
 	Damage is interpolated linearly between these values
+
+Radio Setup:
+Place a RadioBase prefab into your world, and for each vehicle that you want to have a radio on add a new child object of the SaccEntity and give it a SAV_Radio script. In the SaccEntity script, add the new object to the Extension Udon behaviours array.
+Nothing in the SAV_Radio script needs to be configured. Leave the Radio Seats array empty to make it effect all seats on the vehicle, if you put in any seats, only those seats will be able to use the radio.
+The SAV_Radio script can also be used as a DFUNC, when used as a DFUNC, the radio channel can be changed by pulling the trigger and twisting your hand, text object must be set up to display current channel. See the Function Dials section for how to set up DFUNCs.
+Do not include it in Extension Udon behaviours array at the same time as a Dial_Functions array.
+There is also a DFUNC_RadioPTT (Push to talk) script, set this up to only be heard on the radio while it's activated.
 
 Custom Layers:
 Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs (By default anyway, configurable in SaccEntity(OutsideVehiclelayer), but all vehicles should have the same value.). (Raycast looks for this layer)
@@ -332,7 +305,6 @@ References to the layers will be retained by prefabs and will work, but they wil
 31:OnboardVehicleLayer
 The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
 The AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
-
 
 This package also contains a few prefabs that can be used with the vehicles. Explanations follow.
 
@@ -356,7 +328,7 @@ Catapults can be forced to launch vehicles at an exact speed by adding "speed=10
 ResupplyZone
 A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes. Remove the mesh and just use the trigger if you want.
 The trigger must be on the correct layer, the one selected in the ResupplyTrigger.
-There are 4 kinda of resupply. The default is to resupply all. To use other resupply modes, create a child gameobject of the trigger itself, and name it one of these 3 names: xSUPPLY_FUEL, xSUPPLY_AMMO, xSUPPLY_REPAIR
+There are 4 kinda of resupply. The default is to resupply all. To use other resupply modes, create a child gameobject of the trigger object and name it one of these 3 names: xSUPPLY_FUEL, xSUPPLY_AMMO, xSUPPLY_REPAIR
 
 Target
 A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc.
@@ -369,7 +341,7 @@ RaceToggleButton
 A basic menu for enabling and switching races
 
 RadioBase
-Contains the scipt for the radio system and a radio zone (stand inside to enable radio), vehicles require a SAV_Radio extension behaviour set up in their SaccEntity to work with the radio.
+Contains the scipt for the radio system and a radio zone (stand inside to talk), vehicles require a SAV_Radio extension behaviour set up in their SaccEntity to work with the radio. See the Radio Setup section
 
 SaccAirShowCam
 A camera system for desktop use only, can lock on to vehicles and zoom in
@@ -397,6 +369,15 @@ A pickup with sliders on it that allow you to control the strength and direction
 
 
 Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix update 1.8.0
+Added SF-2 and SaccBalloon
+Rewritten damage system networking to use NetworkEventsWithParameters
+Added expanding shockwaves to explosive weapons
+Improved ground vehicle handling, fixed some wheel physics issues
+Added ability to use the same weapon scripts from different function dials
+Added Center of Thrust, Center of Lift, and Center of Drag transforms
+Added rotation calibration to seats
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Hotfix update 1.71
 Fix a bug that caused ownership transfer to cause G calculation to break
