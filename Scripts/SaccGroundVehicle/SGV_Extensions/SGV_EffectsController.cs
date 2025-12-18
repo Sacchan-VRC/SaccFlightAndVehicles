@@ -937,7 +937,6 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(REVS_STRING, 0f);
 
             VehicleAnimator.SetTrigger("explode");
-            VehicleAnimator.SetInteger("missilesincoming", 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
             if (InWater && !Explosion_WaterNull)
             {
