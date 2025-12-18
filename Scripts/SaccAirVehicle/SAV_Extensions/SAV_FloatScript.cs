@@ -106,7 +106,7 @@ namespace SaccFlightAndVehicles
                 FloatTouchWaterPoint[i] = float.MinValue;
                 FloatLastRayHitHeight[i] = float.MinValue;
             }
-            if (!HoverBike && (InEditor || EntityControl.IsOwner))
+            if (!HoverBike && (InEditor || (EntityControl && EntityControl.IsOwner)))
             {
                 gameObject.SetActive(true);
             }
