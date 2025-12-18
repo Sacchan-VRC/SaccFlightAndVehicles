@@ -54,6 +54,11 @@ namespace SaccFlightAndVehicles
         [Tooltip("Maximum number of rigidboes that can be blasted, to save performance")]
         [SerializeField] private int Shockwave_max_targets = 30;
         [SerializeField] private Transform shockWaveSphere;
+        [Space]
+        [Tooltip("Tick this to use this script for something not attached to a SaccEntity.")]
+        [SerializeField] bool NoSaccEntity;
+        [Tooltip("Useful if firing from a script that doesn't track owner, ai-controlled weapons?")]
+        [SerializeField] bool OwnerAlwaysMaster;
         private Animator MissileAnimator;
         [System.NonSerialized] public SaccEntity EntityControl;
         private bool StartTrack = false;
@@ -74,11 +79,14 @@ namespace SaccFlightAndVehicles
         private void Initialize()
         {
             initialized = true;
-            EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
-            SAVControl = (UdonSharpBehaviour)AGMLauncherControl.GetProgramVariable("SAVControl");
+            if (!NoSaccEntity)
+            {
+                EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
+                SAVControl = (UdonSharpBehaviour)AGMLauncherControl.GetProgramVariable("SAVControl");
+                VehicleRigid = EntityControl.VehicleRigidbody;
+            }
             AGMCollider = gameObject.GetComponent<Collider>();
             AGMRigid = gameObject.GetComponent<Rigidbody>();
-            VehicleRigid = EntityControl.VehicleRigidbody;
             MissileAnimator = gameObject.GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
             if (ExpandingShockwave)
@@ -89,10 +97,16 @@ namespace SaccFlightAndVehicles
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner");
+            if (OwnerAlwaysMaster)
+                IsOwner = Networking.Master.isLocal;
+            else
+                IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner");
             if (ColliderAlwaysActive) { AGMCollider.enabled = true; ColliderActive = true; }
             else { AGMCollider.enabled = false; ColliderActive = false; }
-            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (!NoSaccEntity)
+                LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            else
+                LocalLaunchPoint = transform.position;
             AGMRigid.velocity += ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity);
             TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
             TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
@@ -107,7 +121,7 @@ namespace SaccFlightAndVehicles
                 LifeTimeExplodesSent++;
                 SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
 
-                if (ColliderAlwaysActive && !EntityControl.IsOwner && AGMRigid && !AGMRigid.isKinematic && SAVControl)
+                if (ColliderAlwaysActive && EntityControl && !EntityControl.IsOwner && AGMRigid && !AGMRigid.isKinematic && SAVControl)
                 {
                     // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
                     // So in the updates until then move projectile by vehiclespeed
@@ -132,7 +146,13 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.deltaTime;
             if (!ColliderActive)
             {
-                Vector3 LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                Vector3 LaunchPoint;
+                if (VehicleRigid)
+                    LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                else if (EntityControl)
+                    LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+                else
+                    LaunchPoint = LocalLaunchPoint;
                 if (Vector3.Distance(AGMRigid.position, LaunchPoint) > ColliderActiveDistance)
                 {
                     AGMCollider.enabled = true;
@@ -177,7 +197,11 @@ namespace SaccFlightAndVehicles
             AGMCollider.enabled = false;
             AGMRigid.constraints = RigidbodyConstraints.None;
             AGMRigid.angularVelocity = Vector3.zero;
-            Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            Vector3 LaunchPoint;
+            if (!NoSaccEntity)
+                LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            else
+                LaunchPoint = LocalLaunchPoint;
             transform.position = LaunchPoint;
             AGMRigid.position = LaunchPoint;
             hitwater = false;
@@ -218,7 +242,7 @@ namespace SaccFlightAndVehicles
                         float dmg = AGMDamage / Armor;
                         if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                         {
-                            HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                            HitVehicle.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                             DirectHitObjectScript = HitVehicle;
                         }
                     }
@@ -227,7 +251,7 @@ namespace SaccFlightAndVehicles
                         float dmg = AGMDamage / Armor;
                         if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                         {
-                            HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
+                            HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                             DirectHitObjectScript = HitTarget;
                         }
                     }
@@ -346,7 +370,7 @@ namespace SaccFlightAndVehicles
                                         float SplashDamage = AGMDamage * DamageFalloff;
                                         if (SplashDamage > hitEntity.NoDamageBelow || SplashDamage < 0)
                                         {
-                                            hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                            hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                         }
                                     }
                                 }
@@ -360,7 +384,7 @@ namespace SaccFlightAndVehicles
                                             float SplashDamage = AGMDamage * DamageFalloff;
                                             if (SplashDamage > hitTarget.NoDamageBelow || SplashDamage < 0)
                                             {
-                                                hitTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                                hitTarget.WeaponDamageTarget(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                             }
                                         }
                                     }
@@ -400,7 +424,7 @@ namespace SaccFlightAndVehicles
                                     float SplashDamage = AGMDamage * DamageFalloff;
                                     if (SplashDamage > thisTarget.NoDamageBelow || SplashDamage < 0)
                                     {
-                                        thisTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                        thisTarget.WeaponDamageTarget(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                     }
                                 }
                                 HitTargets[numHitTargets] = thisTarget;

@@ -82,8 +82,12 @@ namespace SaccFlightAndVehicles
 
         [Tooltip("event_WeaponType is sent with damage and kill events, but not used for anything in the base prefab.\n0=None/Suicide,1=Gun,2=AAM,3=AGM,4=Bomb,5=Rocket,6=Cannon,7=Laser,8=Beam,9=Torpedo,10=VLS,11=Javelin,12=Railgun, anything else is undefined (custom) 0-255")]
         [SerializeField] private byte event_WeaponType = 2;
+        [Space]
+        [Tooltip("Tick this to use this script for something not attached to a SaccEntity.")]
+        [SerializeField] bool NoSaccEntity;
+        [Tooltip("Useful if firing from a script that doesn't track owner, ai-controlled weapons?")]
+        [SerializeField] bool OwnerAlwaysMaster;
         [System.NonSerialized] public SaccEntity EntityControl;
-        Transform VehicleTransform;
         private int MissileType = 1;
         private SaccAirVehicle TargetSAVControl;
         private Animator TargetAnimator;
@@ -129,14 +133,16 @@ namespace SaccFlightAndVehicles
         bool isNotHeat;
         void Initialize()
         {
-            EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
-            SAVControl = (UdonSharpBehaviour)AAMLauncherControl.GetProgramVariable("SAVControl");
-            VehicleTransform = EntityControl.transform;
+            if (!NoSaccEntity)
+            {
+                EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
+                SAVControl = (UdonSharpBehaviour)AAMLauncherControl.GetProgramVariable("SAVControl");
+                VehicleRigid = EntityControl.VehicleRigidbody;
+            }
             //whatever script is launching the missiles must contain all of these variables
             InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
             MissileAnimator = GetComponent<Animator>();
             AAMRigid = GetComponent<Rigidbody>();
-            VehicleRigid = EntityControl.VehicleRigidbody;
             AAMCollider = GetComponent<Collider>();
             MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
             PitBullIndicator = (GameObject)AAMLauncherControl.GetProgramVariable("PitBullIndicator");
@@ -157,17 +163,22 @@ namespace SaccFlightAndVehicles
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            if (EntityControl.InEditor) { IsOwner = true; }
-            else { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
+            if (OwnerAlwaysMaster)
+                IsOwner = Networking.Master.isLocal;
+            else
+                IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner");
             if (ColliderAlwaysActive) { AAMCollider.enabled = true; ColliderActive = true; }
             else { AAMCollider.enabled = false; ColliderActive = false; }
-            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (!NoSaccEntity)
+                LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            else
+                LocalLaunchPoint = transform.position;
             AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
             int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
             AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
             Target = AAMTargets[aamtarg].transform;
 
-            if (ColliderAlwaysActive && !EntityControl.IsOwner && AAMRigid && !AAMRigid.isKinematic && SAVControl)
+            if (ColliderAlwaysActive && EntityControl && !EntityControl.IsOwner && AAMRigid && !AAMRigid.isKinematic && SAVControl)
             {
                 // because non-owners update position of vehicle in Update() via SyncScript, it can clip into the projectile before next physics update
                 // So in the updates until then move projectile by vehiclespeed
@@ -248,10 +259,13 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.fixedDeltaTime;
             if (!ColliderActive && Initialized)
             {
-                Vector3 LaunchPoint = VehicleRigid ?
-                    (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position :
-                    (VehicleTransform.rotation * LocalLaunchPoint) + VehicleTransform.position
-                ;
+                Vector3 LaunchPoint;
+                if (VehicleRigid)
+                    LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                else if (EntityControl)
+                    LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+                else
+                    LaunchPoint = LocalLaunchPoint;
                 if (Vector3.Distance(AAMRigid.position, LaunchPoint) > ColliderActiveDistance)
                 {
                     AAMCollider.enabled = true;
@@ -477,7 +491,11 @@ namespace SaccFlightAndVehicles
             AAMCollider.enabled = false;
             AAMRigid.constraints = RigidbodyConstraints.None;
             AAMRigid.angularVelocity = Vector3.zero;
-            Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            Vector3 LaunchPoint;
+            if (!NoSaccEntity)
+                LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            else
+                LaunchPoint = LocalLaunchPoint;
             transform.position = LaunchPoint;
             AAMRigid.position = LaunchPoint;
             TargetSAVControl = null;
@@ -518,14 +536,14 @@ namespace SaccFlightAndVehicles
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
                             dmg /= Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
-                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                         }
                         else if (HitTarget)
                         {
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth");
                             dmg /= Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
-                                HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
+                                HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                         }
                     }
                 }
@@ -580,7 +598,7 @@ namespace SaccFlightAndVehicles
                         float Armor = TargetEntityControl.ArmorStrength;
                         float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)SAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
                         if (dmg > TargetEntityControl.NoDamageBelow || dmg < 0)
-                        { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType); }
+                        { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
                     }
                 }
             }

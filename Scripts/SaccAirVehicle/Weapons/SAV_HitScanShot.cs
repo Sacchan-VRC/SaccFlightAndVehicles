@@ -39,6 +39,11 @@ namespace SaccFlightAndVehicles
         [SerializeField] private int Shockwave_max_targets = 30;
         [Tooltip("should be a default unity sphere (radius 0.5)")]
         [SerializeField] private Transform shockWaveSphere;
+        [Space]
+        [Tooltip("Tick this to use this script for something not attached to a SaccEntity.")]
+        [SerializeField] bool NoSaccEntity;
+        [Tooltip("Useful if firing from a script that doesn't track owner, ai-controlled weapons?")]
+        [SerializeField] bool OwnerAlwaysMaster;
         private UdonSharpBehaviour DirectHitObjectScript = null;
         public GameObject Explosion;
         public GameObject DamageParticles;
@@ -49,7 +54,8 @@ namespace SaccFlightAndVehicles
         private void Initialize()
         {
             initialized = true;
-            EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
+            if (!NoSaccEntity)
+                EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
             HitRBs = new Rigidbody[Shockwave_max_targets];
             HitTargets = new SaccTarget[Shockwave_max_targets];
             // if (EntityControl) { VehicleCenterOfMass = EntityControl.CenterOfMass; }
@@ -58,7 +64,10 @@ namespace SaccFlightAndVehicles
         public void EnableWeapon()
         {
             if (!initialized) { Initialize(); }
-            IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner");
+            if (OwnerAlwaysMaster)
+                IsOwner = Networking.Master.isLocal;
+            else
+                IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner");
             SendCustomEventDelayedSeconds(nameof(KillBeam), BeamLifeTime);
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), TotalLifeTime);
             RaycastHit targetpoint;
@@ -98,7 +107,7 @@ namespace SaccFlightAndVehicles
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                             {
-                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl.gameObject, event_WeaponType);
+                                HitVehicle.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                 DirectHitObjectScript = HitVehicle;
                             }
                         }
@@ -142,7 +151,7 @@ namespace SaccFlightAndVehicles
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                             {
-                                HitTarget.WeaponDamageTarget(dmg, EntityControl.gameObject, event_WeaponType);
+                                HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                 DirectHitObjectScript = HitTarget;
                             }
                         }
@@ -293,7 +302,7 @@ namespace SaccFlightAndVehicles
                                         float SplashDamage = BeamDamage * DamageFalloff;
                                         if (SplashDamage > hitEntity.NoDamageBelow || SplashDamage < 0)
                                         {
-                                            hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                            hitEntity.WeaponDamageVehicle(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                         }
                                     }
                                 }
@@ -307,7 +316,7 @@ namespace SaccFlightAndVehicles
                                             float SplashDamage = BeamDamage * DamageFalloff;
                                             if (SplashDamage > hitTarget.NoDamageBelow || SplashDamage < 0)
                                             {
-                                                hitTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                                hitTarget.WeaponDamageTarget(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                             }
                                         }
                                     }
@@ -347,7 +356,7 @@ namespace SaccFlightAndVehicles
                                     float SplashDamage = BeamDamage * DamageFalloff;
                                     if (SplashDamage > thisTarget.NoDamageBelow || SplashDamage < 0)
                                     {
-                                        thisTarget.WeaponDamageTarget(SplashDamage, EntityControl.gameObject, event_WeaponType);
+                                        thisTarget.WeaponDamageTarget(SplashDamage, EntityControl ? EntityControl.gameObject : null, event_WeaponType);
                                     }
                                 }
                                 HitTargets[numHitTargets] = thisTarget;
