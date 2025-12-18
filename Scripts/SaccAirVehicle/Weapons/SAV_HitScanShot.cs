@@ -88,7 +88,8 @@ namespace SaccFlightAndVehicles
                             HitVehicle = targetpoint.collider.gameObject.GetComponent<SaccEntity>();
                         if (HitVehicle)
                         {
-                            float Armor = HitVehicle.ArmorStrength;
+                            float Armor = 1; // initial value is never used
+                            bool customArmorValueFound = false;
                             foreach (Transform child in targetpoint.collider.transform)
                             {
                                 string pname = child.name;
@@ -99,11 +100,13 @@ namespace SaccFlightAndVehicles
                                         if (ar > 0)
                                         {
                                             Armor = ar;
+                                            customArmorValueFound = true;
                                         }
                                     }
                                 }
                                 // else if .. // could add a value for NoDamageBelow here
                             }
+                            if (!customArmorValueFound) Armor = HitVehicle.ArmorStrength;
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
                             {
@@ -132,7 +135,8 @@ namespace SaccFlightAndVehicles
                         }
                         if (HitTarget)
                         {
-                            float Armor = HitVehicle.ArmorStrength;
+                            float Armor = 1; // initial value is never used
+                            bool customArmorValueFound = false;
                             foreach (Transform child in targetpoint.collider.transform)
                             {
                                 string pname = child.name;
@@ -143,11 +147,13 @@ namespace SaccFlightAndVehicles
                                         if (ar > 0)
                                         {
                                             Armor = ar;
+                                            customArmorValueFound = true;
                                         }
                                     }
                                 }
                                 // else if .. // could add a value for NoDamageBelow here
                             }
+                            if (!customArmorValueFound) Armor = HitTarget.ArmorStrength;
                             float dmg = BeamDamage / Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
                             {

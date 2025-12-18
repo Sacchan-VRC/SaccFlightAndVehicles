@@ -515,7 +515,8 @@ namespace SaccFlightAndVehicles
                     SaccTarget HitTarget = other.gameObject.GetComponent<SaccTarget>();
                     if (HitVehicle || HitTarget)
                     {
-                        float Armor = HitVehicle.ArmorStrength;
+                        float Armor = 1; // initial value is never used
+                        bool customArmorValueFound = false;
                         foreach (Transform child in other.collider.transform)
                         {
                             string pname = child.name;
@@ -526,6 +527,7 @@ namespace SaccFlightAndVehicles
                                     if (ar > 0)
                                     {
                                         Armor = ar;
+                                        customArmorValueFound = true;
                                     }
                                 }
                             }
@@ -533,6 +535,7 @@ namespace SaccFlightAndVehicles
                         }
                         if (HitVehicle)
                         {
+                            if (!customArmorValueFound) Armor = HitVehicle.ArmorStrength;
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
                             dmg /= Armor;
                             if (dmg > HitVehicle.NoDamageBelow || dmg < 0)
@@ -540,6 +543,7 @@ namespace SaccFlightAndVehicles
                         }
                         else if (HitTarget)
                         {
+                            if (!customArmorValueFound) Armor = HitTarget.ArmorStrength;
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth");
                             dmg /= Armor;
                             if (dmg > HitTarget.NoDamageBelow || dmg < 0)
