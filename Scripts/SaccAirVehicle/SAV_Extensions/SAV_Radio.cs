@@ -58,7 +58,7 @@ namespace SaccFlightAndVehicles
         {
             Initialized = true;
             localPlayer = Networking.LocalPlayer;
-            VRCPlayerApi ownerAPI = Networking.GetOwner(EntityControl.gameObject);
+            VRCPlayerApi ownerAPI = EntityControl.OwnerAPI;
             if (Utilities.IsValid(ownerAPI))
             {
                 CurrentOwnerID = ownerAPI.playerId;
@@ -123,12 +123,16 @@ namespace SaccFlightAndVehicles
         public void EnterVehicle()
         {
             inVehicle = true;
-            for (int i = 0; i < RadioSeats.Length; i++)
+            if (RadioSeats.Length == 0) ImOnRadio = true; // pickups
+            else
             {
-                if (RadioSeats[i].SeatedPlayer == localPlayer)
+                for (int i = 0; i < RadioSeats.Length; i++)
                 {
-                    ImOnRadio = true;
-                    break;
+                    if (RadioSeats[i].SeatedPlayer == localPlayer)
+                    {
+                        ImOnRadio = true;
+                        break;
+                    }
                 }
             }
             UpdateChannelText();
@@ -233,7 +237,7 @@ namespace SaccFlightAndVehicles
             {
                 RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
             }
-            CurrentOwnerID = Networking.GetOwner(gameObject).playerId;
+            CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -245,7 +249,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnDrop()
         {
-            VRCPlayerApi ownerAPI = Networking.GetOwner(gameObject);
+            VRCPlayerApi ownerAPI = Networking.GetOwner(EntityControl.gameObject);
             if (ownerAPI == null) { return; }
             if (CurrentOwnerID == ownerAPI.playerId)
             {
