@@ -1074,15 +1074,18 @@ namespace SaccFlightAndVehicles
             }
             get => _CustomPickup_Synced_isHeld;
         }
+        [NetworkCallable]
         public void SendEvent_Pickup()
         {
             CustomPickup_Synced_isHeld = true;
             SendEventToExtensions("SFEXT_G_OnPickup");
         }
+        [NetworkCallable]
         public void SendEvent_Snatched()
         {
             SendEventToExtensions("SFEXT_G_OnSnatched");
         }
+        [NetworkCallable]
         public void SendEvent_Drop()
         {
             CustomPickup_Synced_isHeld = false;
@@ -1282,6 +1285,7 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendRespawn));
             }
         }
+        [NetworkCallable]
         public void SendRespawn() { SendEventToExtensions("SFEXT_G_RespawnButton"); }
         // ToDo: Use static to better performance on U#1.0
         // public static UdonSharpBehaviour GetExtention(SaccEntity entity, string udonTypeName)
@@ -1383,14 +1387,25 @@ namespace SaccFlightAndVehicles
         {
             wrecked = false;
         }
+        public void WakeUp()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply_Event));
+        }
+        [NetworkCallable]
+        public void WakeUp_Event()
+        {
+            SendEventToExtensions("SFEXT_L_WakeUp");//extensions increase the ReSupplied value too
+        }
         public void ReSupply()
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply_Event));
         }
         [System.NonSerialized] public uint ReSupplied;
         [System.NonSerialized] public float LastResupplyTime = 0;
+        [NetworkCallable]
         public void ReSupply_Event()
         {
+            WakeUp_Event();
             ReSupplied = 0;//used to know if other scripts resupplied
             SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
             LastResupplyTime = Time.time;
@@ -1399,8 +1414,10 @@ namespace SaccFlightAndVehicles
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReFuel_Event));
         }
+        [NetworkCallable]
         public void ReFuel_Event()
         {
+            WakeUp_Event();
             ReSupplied = 0;//used to know if other scripts resupplied
             SendEventToExtensions("SFEXT_G_ReFuel");//extensions increase the ReSupplied value too
             LastResupplyTime = Time.time;
@@ -1409,8 +1426,10 @@ namespace SaccFlightAndVehicles
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReArm_Event));
         }
+        [NetworkCallable]
         public void ReArm_Event()
         {
+            WakeUp_Event();
             ReSupplied = 0;//used to know if other scripts resupplied
             SendEventToExtensions("SFEXT_G_ReArm");//extensions increase the ReSupplied value too
             LastResupplyTime = Time.time;
@@ -1419,8 +1438,10 @@ namespace SaccFlightAndVehicles
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RePair_Event));
         }
+        [NetworkCallable]
         public void RePair_Event()
         {
+            WakeUp_Event();
             ReSupplied = 0;//used to know if other scripts resupplied
             SendEventToExtensions("SFEXT_G_RePair");//extensions increase the ReSupplied value too
             LastResupplyTime = Time.time;
