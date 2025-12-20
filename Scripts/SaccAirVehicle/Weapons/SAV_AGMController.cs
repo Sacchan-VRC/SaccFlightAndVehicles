@@ -275,7 +275,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        private void Explode()
+        public void Explode()
         {
             if (Exploding) return;
             if (AGMRigid)

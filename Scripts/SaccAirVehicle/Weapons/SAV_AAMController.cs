@@ -555,7 +555,7 @@ namespace SaccFlightAndVehicles
                 Explode();
             }
         }
-        private void Explode()
+        public void Explode()
         {
             if (AAMRigid)
             {

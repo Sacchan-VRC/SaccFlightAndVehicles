@@ -221,7 +221,7 @@ namespace SaccFlightAndVehicles
             }
         }
         [System.NonSerializedAttribute] public bool Exploding = false;
-        void Explode()
+        public void Explode()
         {
             if (Exploding) return;
             if (Explosion)
