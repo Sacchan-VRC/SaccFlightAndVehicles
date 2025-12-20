@@ -2434,6 +2434,7 @@ MonoBehaviour:
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.5
+  SteeringReturnSpeedDT: 0.5
   SteeringMaxSpeedDT: 35
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.1
@@ -2511,7 +2512,6 @@ MonoBehaviour:
   Drift_AutoSteer: 0
   SteeringDegrees: 60
   AutoSteerStrength: 5
-  SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
   RespawnDelay: 10
@@ -13462,9 +13462,10 @@ MonoBehaviour:
   GearChangeDistance: 0.7
   Automatic: 0
   AllowMenuToToggleAutomatic: 1
-  AutomaticGearChangeDelay: 1
+  AutomaticGearChangeDelay: 0.5
   GearChangeRevsUpper: 0.9
   GearChangeRevsLower: 0.4
+  GearChangeRevsUpperNeutral: 0.42
   GearsLeftController: 0
   ClutchLeftController: 1
   ClutchDisabled: 1
@@ -14232,7 +14233,7 @@ MonoBehaviour:
   AddedHeight: 0
   AllowRespawnSpeed: 9999
   StopCarOnReset: 0
-  StopRotationOnReset: 0
+  StopRotatingOnReset: 0
   ResetMinDelay: 0
 --- !u!114 &2233623721396035836
 MonoBehaviour:

@@ -26,6 +26,8 @@ namespace SaccFlightAndVehicles
         public float GearChangeRevsUpper = .9f;
         [Tooltip("In automatic mode, when revs are below this percentage, the gear will decrease")]
         public float GearChangeRevsLower = .4f;
+        [Tooltip("In automatic mode, when in neutral gear and revs are above this percentage, the gear will increase")]
+        public float GearChangeRevsUpperNeutral = .42f;
         [Tooltip("Use left controller stick to change gear instead?")]
         public bool GearsLeftController = false;
         [Tooltip("Use the left controller grip for clutch? Disable for right")]
@@ -54,17 +56,9 @@ namespace SaccFlightAndVehicles
                 SGVControl.SetProgramVariable("CurrentGear", value);
                 SGVControl.SetProgramVariable("GearRatio", GearRatios[value] * FinalDrive);
                 SGVControl.SendCustomEvent("UpdateGearRatio");
-                if (value == NeutralGear)
-                { InNeutralGear = true; }
-                else { InNeutralGear = false; }
-                if (value == GearRatios.Length - 1)
-                { InMaxGear = true; }
-                else
-                { InMaxGear = false; }
-                if (value == 0)
-                { InMinGear = true; }
-                else
-                { InMinGear = false; }
+                InNeutralGear = value == NeutralGear;
+                InMaxGear = value == GearRatios.Length - 1;
+                InMinGear = value == 0;
                 if (value > _CurrentGear)
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearUp"); }
                 else
@@ -219,22 +213,24 @@ namespace SaccFlightAndVehicles
                     {
                         AutomaticReversing = !AutomaticReversing;
                     }
-                    if (Time.time - LastGearChangeTime > AutomaticGearChangeDelay)
+                    if (Time.time - LastGearChangeTime > AutomaticGearChangeDelay || InNeutralGear)
                     {
                         float normRevs = (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
-                        if ((!AutomaticReversing && !InMaxGear && normRevs > GearChangeRevsUpper) || (AutomaticReversing && !InNeutralGear && normRevs < GearChangeRevsLower))
+                        if ((!AutomaticReversing && (!InMaxGear && (normRevs > GearChangeRevsUpper) || (InNeutralGear && normRevs > GearChangeRevsUpperNeutral)))
+                            || (AutomaticReversing && !InNeutralGear && normRevs < GearChangeRevsLower))
                         {
                             if (!_ClutchOverrideOne)
                             {
                                 GearUp();
                             }
                         }
-                        else if ((!AutomaticReversing && !InNeutralGear && !InMinGear && normRevs < GearChangeRevsLower) || (AutomaticReversing && !InMinGear && normRevs > GearChangeRevsUpper))
+                        else if ((!AutomaticReversing && !InNeutralGear && !InMinGear && normRevs < GearChangeRevsLower)
+                            || (AutomaticReversing && (!InMinGear && normRevs > GearChangeRevsUpper || (InNeutralGear && normRevs > GearChangeRevsUpperNeutral))))
                         {
                             GearDown();
                         }
                     }
-                    SGVControl.SetProgramVariable("Clutch", _ClutchOverride);
+                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(_ClutchOverride, Mathf.Min(1, AutoClutch)));
                 }
                 else
                 {
