@@ -1640,7 +1640,7 @@ namespace SaccFlightAndVehicles
                 float gravity = 9.81f * DeltaTime;
                 LastFrameVel.y -= gravity;
                 Vector3 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
-                Vector3 thisFrameGs = Gs3 / gravity;
+                Vector3 thisFrameGs = (Gs3 / gravity) * EntityControl.Do_Gs;
                 Gs_all -= FrameGs[GsFrameCheck];
                 Gs_all += thisFrameGs;
                 FrameGs[GsFrameCheck] = thisFrameGs;
@@ -2003,6 +2003,7 @@ namespace SaccFlightAndVehicles
                             vehpos.z -= RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
                             VehicleRigidbody.position = VehicleTransform.position;
+                            EntityControl.ShouldTeleport = true;
                         }
                         else
                         {
@@ -2010,6 +2011,7 @@ namespace SaccFlightAndVehicles
                             vehpos.z += RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
                             VehicleRigidbody.position = VehicleTransform.position;
+                            EntityControl.ShouldTeleport = true;
                         }
                     }
                 }
@@ -2023,6 +2025,7 @@ namespace SaccFlightAndVehicles
                             vehpos.x -= RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
                             VehicleRigidbody.position = VehicleTransform.position;
+                            EntityControl.ShouldTeleport = true;
                         }
                         else
                         {
@@ -2030,6 +2033,7 @@ namespace SaccFlightAndVehicles
                             vehpos.x += RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
                             VehicleRigidbody.position = VehicleTransform.position;
+                            EntityControl.ShouldTeleport = true;
                         }
                     }
                 }
@@ -2179,6 +2183,7 @@ namespace SaccFlightAndVehicles
                 VTOLAngle = VTOLDefaultValue;
                 VTOLAngleInput = VTOLDefaultValue;
                 VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
+                EntityControl.ShouldTeleport = true;
                 SetRespawnPos();
             }
 

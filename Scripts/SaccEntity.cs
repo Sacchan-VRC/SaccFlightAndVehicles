@@ -1254,6 +1254,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Vector3 Spawnposition;
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         private float lastRespawnTime;
+        public bool ShouldTeleport; // for syncscript
         public void EntityRespawn()//can be used by simple items to respawn
         {
             if (Time.time - lastRespawnTime < 3) { return; }
@@ -1373,12 +1374,35 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SetDeadFor(float deadtime)
+        [System.NonSerialized] public float Do_Gs = 1;
+        int Do_Gs_SetTimes = 0;
+        public void SetNoGsFor(float nogstime)
         {
-            dead = true;
-            SendCustomEventDelayedSeconds(nameof(UnsetSetDead), deadtime);
+            Do_Gs_SetTimes++;
+            SendCustomEventDelayedSeconds(nameof(UnsetSetNoGs), nogstime);
+            if (Do_Gs_SetTimes != 1) return;
+            Do_Gs = 0;
         }
-        public void UnsetSetDead() { dead = false; }
+        public void UnsetSetNoGs()
+        {
+            Do_Gs_SetTimes--;
+            if (Do_Gs_SetTimes != 0) return;
+            Do_Gs = 1;
+        }
+        int invincible_SetTimes = 0;
+        public void SetInvincibleFor(float invincetime)
+        {
+            invincible_SetTimes++;
+            SendCustomEventDelayedSeconds(nameof(UnsetSetInvincible), invincetime);
+            if (invincible_SetTimes != 1) return;
+            invincible = true;
+        }
+        public void UnsetSetInvincible()
+        {
+            invincible_SetTimes--;
+            if (invincible_SetTimes != 0) return;
+            invincible = false;
+        }
         public void SetWrecked()
         {
             wrecked = true;

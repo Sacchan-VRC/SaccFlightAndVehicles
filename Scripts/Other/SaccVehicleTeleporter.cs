@@ -21,7 +21,8 @@ namespace SaccFlightAndVehicles
             if (Time.time - LastTeleTime < 1 || !other.attachedRigidbody || !Networking.LocalPlayer.IsOwner(other.attachedRigidbody.gameObject)) { return; }
             var otherSE = other.attachedRigidbody.GetComponent<SaccEntity>();
             if (!otherSE || otherSE.Holding) { return; }
-            otherSE.SetDeadFor(Time.fixedDeltaTime * 2f);
+            otherSE.ShouldTeleport = true;
+            otherSE.SetNoGsFor(.5f);
             LastTeleTime = Time.time;
             if (OffsetTelePoint)
             {
