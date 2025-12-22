@@ -606,9 +606,28 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            else if(DirectHit || SplashHit)
+            {
+                SaccTarget HitTarget = Target.gameObject.GetComponentInParent<SaccTarget>();
+                if(HitTarget)
+                {
+                    DamageDist = Vector3.Distance(transform.position, Target.position) / ProximityExplodeDistance;
+                    if (IsOwner)
+                    {
+                        if (DamageDist < 1 && !DirectHit)
+                        {
+                            float Armor = HitTarget.ArmorStrength;
+                            float dmg = (AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth")* DamageDist) / Armor;
+                            if (dmg > HitTarget.NoDamageBelow || dmg < 0)
+                            {  HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
+                        }
+                    }
+                }
+            }
             MissileAnimator.SetTrigger("explode");
             MissileAnimator.SetBool("hitwater", hitwater);
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
         }
     }
+
 }
