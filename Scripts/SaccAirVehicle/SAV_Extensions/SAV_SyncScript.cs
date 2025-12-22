@@ -194,7 +194,7 @@ namespace SaccFlightAndVehicles
             VehicleRigid.constraints = RigidbodyConstraints.None;
             SetPhysics();
             _AntiWarp = AntiWarp; //prevent from running early as it causes vehicle to teleport 500ft in the air for some reason
-            EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+            if(!SyncRigid) {EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");} //prevent null exception for non-saccEntity
         }
         private void InitSyncValues()
         {
