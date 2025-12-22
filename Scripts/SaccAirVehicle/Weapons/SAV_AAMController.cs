@@ -304,7 +304,6 @@ namespace SaccFlightAndVehicles
                 float AspectTrack;
                 bool Dumb;
                 Vector3 Targetmovedir;
-                TargetPosLastFrame = TargetPos;
                 Vector3 MissileToTargetVector;
                 if (TargetSAVControl)
                 {
@@ -415,6 +414,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 TargDistlastframe = TargetDistance;
+                TargetPosLastFrame = TargetPos;
             }
         }
         bool CheckMotherLOS()
@@ -631,3 +631,4 @@ namespace SaccFlightAndVehicles
     }
 
 }
+
