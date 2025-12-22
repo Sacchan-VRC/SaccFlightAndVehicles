@@ -983,6 +983,7 @@ namespace SaccFlightAndVehicles
             {
                 AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
+            if (AAGunAnimator) AAGunAnimator.SetBool("inside", isOwner);
             RequestSerialization();
         }
         public void AI_GUN_Exit()
