@@ -142,7 +142,7 @@ namespace SaccFlightAndVehicles
             }
         }
         float LastDamageSentTime;
-        const float DAMAGESENDINTERVAL = 0.1f;
+        const float DAMAGESENDINTERVAL = 0.2f;
         float QueuedDamage;
         byte QueuedWeaponType;
         void QueueDamage(float dmg, byte weaponType)
