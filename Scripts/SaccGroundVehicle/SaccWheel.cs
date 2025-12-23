@@ -217,7 +217,7 @@ namespace SaccFlightAndVehicles
             SpeedResultAccel = CarRigid.velocity.magnitude;
         }
 #endif
-        void Start()
+        public void StartWheel()
         {
             TankMode = (bool)SGVControl.GetProgramVariable("TankMode");
             SkidSound_Min_THREEQUARTER = SkidSound_Min * .75f;
@@ -690,11 +690,13 @@ namespace SaccFlightAndVehicles
                 WheelVisual.localRotation = newrot;
             }
         }
+        bool firstSleep = true;
         public void FallAsleep()
         {
             SkidLength = SkidLength_Smoothed = 0;
             LastTouchedTransform_Speed = Vector3.zero;
             Sleeping = true;
+            if (!Grounded) { Suspension_VisualOnly(); } // fix for late joiners
             StopSkidSound();
             StopSkidParticle();
         }

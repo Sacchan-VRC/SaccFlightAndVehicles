@@ -349,6 +349,7 @@ namespace SaccFlightAndVehicles
             FullFuel = Fuel;
 
             IsOwner = EntityControl.IsOwner;
+            createAllWheelsArray();
             UpdateWheelIsOwner();
             InVR = EntityControl.InVR;
             localPlayer = Networking.LocalPlayer;
@@ -380,6 +381,19 @@ namespace SaccFlightAndVehicles
                     SteerWheels[i].SetProgramVariable("IsDriveWheel", true);
                 }
             }
+            for (int i = 0; i < AllWheels.Length; i++)
+            {
+                AllWheels[i].SendCustomEvent("StartWheel");
+            }
+
+            CurrentlyDistant = true;
+            SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
+            revUpDT = 1f / NumStepsSec;
+
+            SetupGCalcValues();
+        }
+        void createAllWheelsArray()
+        {
             // Create AllWheels array, making sure that any wheel that is in drivewheels and steerwheels isn't there twice
             // We assume that no one is stupid enough to put a drive or steer wheel in otherwheels at the same time as it's pointless.
             int uniqueDriveWheels = DriveWheels.Length;
@@ -417,12 +431,6 @@ namespace SaccFlightAndVehicles
             {
                 AllWheels[insertIndex++] = OtherWheels[i];
             }
-
-            CurrentlyDistant = true;
-            SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
-            revUpDT = 1f / NumStepsSec;
-
-            SetupGCalcValues();
         }
         public void SetupGCalcValues()
         {
@@ -1363,52 +1371,21 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)
             {
-                for (int i = 0; i < DriveWheels.Length; i++)
+                for (int i = 0; i < AllWheels.Length; i++)
                 {
-                    Networking.SetOwner(Networking.LocalPlayer, DriveWheels[i].gameObject);
-                }
-                for (int i = 0; i < SteerWheels.Length; i++)
-                {
-                    Networking.SetOwner(Networking.LocalPlayer, SteerWheels[i].gameObject);
-                }
-                for (int i = 0; i < OtherWheels.Length; i++)
-                {
-                    Networking.SetOwner(Networking.LocalPlayer, OtherWheels[i].gameObject);
+                    Networking.SetOwner(Networking.LocalPlayer, AllWheels[i].gameObject);
                 }
             }
-            for (int i = 0; i < DriveWheels.Length; i++)
+            for (int i = 0; i < AllWheels.Length; i++)
             {
-                DriveWheels[i].SendCustomEvent("UpdateOwner");
-            }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            {
-                SteerWheels[i].SendCustomEvent("UpdateOwner");
-            }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            {
-                OtherWheels[i].SendCustomEvent("UpdateOwner");
+                AllWheels[i].SendCustomEvent("UpdateOwner");
             }
         }
         public void SetWheelDriver()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SetProgramVariable("Piloting", Piloting); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SetProgramVariable("Piloting", Piloting); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SetProgramVariable("Piloting", Piloting); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SetProgramVariable("Piloting", Piloting); }
         }
-        /*     public void SetWheelSGV()
-            {
-                for (int i = 0; i < DriveWheels.Length; i++)
-                {
-                    DriveWheels[i].SetProgramVariable("SGVControl", this);
-                }
-                for (int i = 0; i < OtherWheels.Length; i++)
-                {
-                    OtherWheels[i].SetProgramVariable("SGVControl", this);
-                }
-            } */
         public void SFEXT_G_PilotEnter()
         {
             LimitingRev = false;

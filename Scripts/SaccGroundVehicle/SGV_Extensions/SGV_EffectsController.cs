@@ -127,9 +127,7 @@ namespace SaccFlightAndVehicles
         private bool Sleeping = true;
         private float RevLimiter = 1;
         private float DoEffects = 999f;
-        private UdonSharpBehaviour[] DriveWheels;
-        private UdonSharpBehaviour[] SteerWheels;
-        private UdonSharpBehaviour[] OtherWheels;
+        private UdonSharpBehaviour[] AllWheels;
         private bool InEditor;
         private bool Piloting;
         private bool InVehicle;
@@ -172,9 +170,7 @@ namespace SaccFlightAndVehicles
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
-            DriveWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("DriveWheels");
-            SteerWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("SteerWheels");
-            OtherWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("OtherWheels");
+            AllWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("AllWheels");
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             IsOwner = EntityControl.IsOwner;
@@ -476,12 +472,8 @@ namespace SaccFlightAndVehicles
                 VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(REVS_STRING, 0);
 
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SendCustomEvent("FallAsleep"); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SendCustomEvent("FallAsleep"); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SendCustomEvent("FallAsleep"); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("FallAsleep"); }
 
             if (IsOwner) { EnableWings(false); }
 
@@ -489,12 +481,8 @@ namespace SaccFlightAndVehicles
         }
         public void ResetGrips()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SendCustomEvent("ResetGrip"); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SendCustomEvent("ResetGrip"); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SendCustomEvent("ResetGrip"); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("ResetGrip"); }
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -533,12 +521,8 @@ namespace SaccFlightAndVehicles
 
             if (IsOwner) { EnableWings(true); }
 
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SendCustomEvent("WakeUp"); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SendCustomEvent("WakeUp"); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SendCustomEvent("WakeUp"); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("WakeUp"); }
         }
         public void WakeUp_Initial()
         {
@@ -737,21 +721,13 @@ namespace SaccFlightAndVehicles
         }
         public void SendWheelExit()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SendCustomEvent("PlayerExitVehicle"); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SendCustomEvent("PlayerExitVehicle"); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SendCustomEvent("PlayerExitVehicle"); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("PlayerExitVehicle"); }
         }
         public void SendWheelEnter()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SendCustomEvent("PlayerEnterVehicle"); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SendCustomEvent("PlayerEnterVehicle"); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SendCustomEvent("PlayerEnterVehicle"); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SendCustomEvent("PlayerEnterVehicle"); }
         }
         public void SFEXT_G_ReSupply()
         {
@@ -982,21 +958,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_NotDistant()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SetProgramVariable("CurrentlyDistant", false); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SetProgramVariable("CurrentlyDistant", false); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SetProgramVariable("CurrentlyDistant", false); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SetProgramVariable("CurrentlyDistant", false); }
         }
         public void SFEXT_L_BecomeDistant()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
-            { DriveWheels[i].SetProgramVariable("CurrentlyDistant", true); }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            { SteerWheels[i].SetProgramVariable("CurrentlyDistant", true); }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            { OtherWheels[i].SetProgramVariable("CurrentlyDistant", true); }
+            for (int i = 0; i < AllWheels.Length; i++)
+            { AllWheels[i].SetProgramVariable("CurrentlyDistant", true); }
         }
         public void SFEXT_L_DamageFeedback()
         {
