@@ -173,7 +173,7 @@ namespace SaccFlightAndVehicles
                 LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
             else
                 LocalLaunchPoint = transform.position;
-            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
+            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle&&!NoSaccEntity ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
             int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
             AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
             Target = AAMTargets[aamtarg].transform;
@@ -446,7 +446,7 @@ namespace SaccFlightAndVehicles
                 targdir = Target.position - transform.position;
             if (Physics.Raycast(transform.position, targdir, out rayHit, targdir.magnitude, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
             {
-                if (rayHit.collider && (rayHit.collider.gameObject.layer == OutsideVehicleLayer || rayHit.collider.gameObject.layer == EntityControl.OnboardVehicleLayer))
+                if (rayHit.collider && (rayHit.collider.gameObject.layer == OutsideVehicleLayer || rayHit.collider.gameObject.layer == (EntityControl? EntityControl.OnboardVehicleLayer: 31)))
                 { return true; }
                 else
                 { return false; }
@@ -631,4 +631,5 @@ namespace SaccFlightAndVehicles
     }
 
 }
+
 
