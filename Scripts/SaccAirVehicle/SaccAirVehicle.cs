@@ -267,8 +267,6 @@ namespace SaccFlightAndVehicles
         public float MediumCrashSpeed = 8f;
         [Tooltip("Impact speed that defines a big crash")]
         public float BigCrashSpeed = 25f;
-        [Tooltip("Multiply how much damage is done by missiles")]
-        public float MissileDamageTakenMultiplier = 1f;
         [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
         public float MissilePushForce = 1f;
         [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]

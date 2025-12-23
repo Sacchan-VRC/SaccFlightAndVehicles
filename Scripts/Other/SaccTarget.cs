@@ -12,10 +12,6 @@ namespace SaccFlightAndVehicles
     {
         [Header("Do not put colliders on child objects, it wont work properly (unless rigidbody?)")]
         [UdonSynced] public float Health = 30f;
-        [Tooltip("Particle collisions will do this much damage")]
-        public float DamageFromBullet = 10f;
-        [Tooltip("Direct hits from missiles or any rigidbody will do this much damage")]
-        public float DamageFromCollision = 30f;
         [Tooltip("How long it takes to respawn, 0 to never respawn")]
         public float RespawnDelay = 10f;
         [Tooltip("Other UdonBehaviours that will recieve the event 'Explode'")]
