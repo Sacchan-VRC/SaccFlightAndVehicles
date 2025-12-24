@@ -173,7 +173,7 @@ namespace SaccFlightAndVehicles
                 LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
             else
                 LocalLaunchPoint = transform.position;
-            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle&&!NoSaccEntity ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
+            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle && !NoSaccEntity ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
             int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
             AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
             Target = AAMTargets[aamtarg].transform;
@@ -446,7 +446,7 @@ namespace SaccFlightAndVehicles
                 targdir = Target.position - transform.position;
             if (Physics.Raycast(transform.position, targdir, out rayHit, targdir.magnitude, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
             {
-                if (rayHit.collider && (rayHit.collider.gameObject.layer == OutsideVehicleLayer || rayHit.collider.gameObject.layer == (EntityControl? EntityControl.OnboardVehicleLayer: 31)))
+                if (rayHit.collider && (rayHit.collider.gameObject.layer == OutsideVehicleLayer || rayHit.collider.gameObject.layer == (EntityControl ? EntityControl.OnboardVehicleLayer : 31)))
                 { return true; }
                 else
                 { return false; }
@@ -533,7 +533,7 @@ namespace SaccFlightAndVehicles
                             }
                             // else if .. // could add a value for NoDamageBelow here
                         }
-                        if (HitVehicle&&TargetSAVControl)
+                        if (HitVehicle && TargetSAVControl)
                         {
                             if (!customArmorValueFound) Armor = HitVehicle.ArmorStrength;
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
@@ -591,35 +591,38 @@ namespace SaccFlightAndVehicles
 
             AAMCollider.enabled = false;
             float DamageDist = 999f;
-            if (TargetEntityControl && (DirectHit || SplashHit) && TargetSAVControl)
+            if (DirectHit || SplashHit)
             {
-                TargetEntityControl.LastAttacker = EntityControl;
-                DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
-                if (IsOwner)
+                if (TargetEntityControl && TargetSAVControl)
                 {
-                    if (DamageDist < 1 && !DirectHit)
-                    {
-                        float Armor = TargetEntityControl.ArmorStrength;
-                        float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
-                        if (dmg > TargetEntityControl.NoDamageBelow || dmg < 0)
-                        { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
-                    }
-                }
-            }
-            else if(DirectHit || SplashHit)
-            {
-                SaccTarget HitTarget = Target.gameObject.GetComponentInParent<SaccTarget>();
-                if(HitTarget)
-                {
-                    DamageDist = Vector3.Distance(transform.position, Target.position) / ProximityExplodeDistance;
+                    TargetEntityControl.LastAttacker = EntityControl;
+                    DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
                     if (IsOwner)
                     {
                         if (DamageDist < 1 && !DirectHit)
                         {
-                            float Armor = HitTarget.ArmorStrength;
-                            float dmg = (AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth")* DamageDist) / Armor;
-                            if (dmg > HitTarget.NoDamageBelow || dmg < 0)
-                            {  HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
+                            float Armor = TargetEntityControl.ArmorStrength;
+                            float dmg = (AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth") * DamageDist) / Armor;
+                            if (dmg > TargetEntityControl.NoDamageBelow || dmg < 0)
+                            { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
+                        }
+                    }
+                }
+                else
+                {
+                    SaccTarget HitTarget = Target.gameObject.GetComponentInParent<SaccTarget>();
+                    if (HitTarget)
+                    {
+                        DamageDist = Vector3.Distance(transform.position, Target.position) / ProximityExplodeDistance;
+                        if (IsOwner)
+                        {
+                            if (DamageDist < 1 && !DirectHit)
+                            {
+                                float Armor = HitTarget.ArmorStrength;
+                                float dmg = (AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)HitTarget.GetProgramVariable("FullHealth") * DamageDist) / Armor;
+                                if (dmg > HitTarget.NoDamageBelow || dmg < 0)
+                                { HitTarget.WeaponDamageTarget(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
+                            }
                         }
                     }
                 }
