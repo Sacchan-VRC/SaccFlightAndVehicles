@@ -170,12 +170,12 @@ namespace SaccFlightAndVehicles
                 if (!EntityControl._dead && (Occupied || AI_GUN))
                 {
                     _firing = value;
-                    AAGunAnimator.SetBool("firing", value);
+                    if (AAGunAnimator) AAGunAnimator.SetBool("firing", value);
                 }
                 else
                 {
                     _firing = false;
-                    AAGunAnimator.SetBool("firing", false);
+                    if (AAGunAnimator) AAGunAnimator.SetBool("firing", false);
                 }
             }
             get => _firing;
@@ -204,8 +204,11 @@ namespace SaccFlightAndVehicles
 
             FullAAMs = NumAAM;
             FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
-            AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
-            AAGunAnimator.SetBool("owner", IsOwner);
+            if (AAGunAnimator)
+            {
+                AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+                AAGunAnimator.SetBool("owner", IsOwner);
+            }
             MGAmmoFull = MGAmmoSeconds;
             FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
@@ -613,14 +616,17 @@ namespace SaccFlightAndVehicles
             MGAmmoSeconds = MGAmmoFull;
             Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
             NumAAM = FullAAMs;
-            AAGunAnimator.SetBool("firing", false);
-            AAGunAnimator.SetFloat("AAMs", (float)FullAAMs * FullAAMsDivider);
-            AAGunAnimator.SetFloat("health", 1);
             if (IsOwner)
             {
                 Rotator.localRotation = StartRot;
             }
-            AAGunAnimator.SetTrigger("explode");
+            if (AAGunAnimator)
+            {
+                AAGunAnimator.SetBool("firing", false);
+                AAGunAnimator.SetFloat("AAMs", (float)FullAAMs * FullAAMsDivider);
+                AAGunAnimator.SetFloat("health", 1);
+                AAGunAnimator.SetTrigger("explode");
+            }
 
             SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay);
             SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
@@ -665,7 +671,7 @@ namespace SaccFlightAndVehicles
         }
         public void ReAppear()
         {
-            AAGunAnimator.SetTrigger("reappear");
+            if (AAGunAnimator) AAGunAnimator.SetTrigger("reappear");
             EntityControl.dead = false;
             if (IsOwner)
             {
@@ -959,7 +965,7 @@ namespace SaccFlightAndVehicles
             AAMReloadTimer = 0;
             NumAAM++;
             if (NumAAM > FullAAMs) { NumAAM = FullAAMs; }
-            AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+            if (AAGunAnimator) AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
         }
         public void HPRepair()
         {
@@ -968,7 +974,7 @@ namespace SaccFlightAndVehicles
             { HPRepairTimer = float.MinValue; }
             else { HPRepairTimer = 0; }
             if (Health > FullHealth) { Health = FullHealth; }
-            AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
+            if (AAGunAnimator) AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
         }
         public void AI_GUN_Enter()
         {
@@ -983,7 +989,7 @@ namespace SaccFlightAndVehicles
             {
                 AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
-            if (AAGunAnimator) AAGunAnimator.SetBool("inside", isOwner);
+            if (AAGunAnimator) AAGunAnimator.SetBool("inside", IsOwner);
             RequestSerialization();
         }
         public void AI_GUN_Exit()
@@ -1022,10 +1028,13 @@ namespace SaccFlightAndVehicles
             LastHealthUpdate = Time.time;
 
             NumAAM = Mathf.Min((NumAAM + ((int)(TimeSinceLast / MissileReloadTime))), FullAAMs);
-            AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
             Health = Mathf.Min((Health + (((int)(TimeSinceLast / HPRepairDelay))) * HPRepairAmount), FullHealth);
-            AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
             MGAmmoRecharge += TimeSinceLast * MGReloadSpeed;
+            if (AAGunAnimator)
+            {
+                AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+                AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
+            }
         }
         public void SFEXT_G_PilotExit()
         {
@@ -1041,7 +1050,7 @@ namespace SaccFlightAndVehicles
             AAMHasTarget = false;
             AAMTargeting.gameObject.SetActive(false);
             AAMTargetLock.gameObject.SetActive(false);
-            AAGunAnimator.SetBool("inside", false);
+            if (AAGunAnimator) AAGunAnimator.SetBool("inside", false);
             if (RotatingSound) { RotatingSound.Stop(); }
             if (AI_GUN) { AI_GUN_Enter(); }
             RequestSerialization();
@@ -1058,13 +1067,17 @@ namespace SaccFlightAndVehicles
                 }
             }
             if (AI_GUN) { AI_GUN_Enter(); }
-            AAGunAnimator.SetBool("owner", true);
+            if (AAGunAnimator) AAGunAnimator.SetBool("owner", true);
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
             AI_GUN_Exit();
-            AAGunAnimator.SetBool("owner", false);
+            if (AAGunAnimator)
+            {
+                AAGunAnimator.SetBool("owner", false);
+                AAGunAnimator.SetBool("inside", false);
+            }
         }
         public void SFEXT_L_DamageFeedback()
         {
