@@ -600,7 +600,7 @@ namespace SaccFlightAndVehicles
                     if (DamageDist < 1 && !DirectHit)
                     {
                         float Armor = TargetEntityControl.ArmorStrength;
-                        float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)SAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
+                        float dmg = ((AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth")) * DamageDist) / Armor;
                         if (dmg > TargetEntityControl.NoDamageBelow || dmg < 0)
                         { TargetEntityControl.WeaponDamageVehicle(dmg, EntityControl ? EntityControl.gameObject : null, event_WeaponType); }
                     }
@@ -631,6 +631,7 @@ namespace SaccFlightAndVehicles
     }
 
 }
+
 
 
 
