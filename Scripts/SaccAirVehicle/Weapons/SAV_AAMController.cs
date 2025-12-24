@@ -533,7 +533,7 @@ namespace SaccFlightAndVehicles
                             }
                             // else if .. // could add a value for NoDamageBelow here
                         }
-                        if (HitVehicle)
+                        if (HitVehicle&&TargetSAVControl)
                         {
                             if (!customArmorValueFound) Armor = HitVehicle.ArmorStrength;
                             float dmg = AAMDamage_AbsoluteMode ? AAMDamage : AAMDamage * (float)TargetSAVControl.GetProgramVariable("FullHealth");
@@ -591,7 +591,7 @@ namespace SaccFlightAndVehicles
 
             AAMCollider.enabled = false;
             float DamageDist = 999f;
-            if (TargetEntityControl && (DirectHit || SplashHit))
+            if (TargetEntityControl && (DirectHit || SplashHit) && TargetSAVControl)
             {
                 TargetEntityControl.LastAttacker = EntityControl;
                 DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
@@ -631,5 +631,6 @@ namespace SaccFlightAndVehicles
     }
 
 }
+
 
 
