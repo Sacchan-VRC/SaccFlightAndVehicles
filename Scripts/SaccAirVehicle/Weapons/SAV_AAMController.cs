@@ -240,6 +240,7 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
+            Targetmovedir = Vector3.zero;
         }
         float ensureNoSelfCollision_time;
         public void ensureNoSelfCollision()
@@ -250,6 +251,27 @@ namespace SaccFlightAndVehicles
             AAMRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
+
+        Vector3 Targetmovedir = Vector3.zero;
+        void Update()
+        {
+            /*
+                Non-owner networked physics objects (includes SGV , SSV) don't have their positions updated during the FixedUpdate cycle, 
+                causing them to be overwritten "Targetmovedir" as zero. 
+                To prevent this, updating them separately during the Update cycle.
+            */
+            Vector3 TargetPos = Target.position;
+            if(Exploding&&!Initialized) return;
+            if (!TargetLost && StartTrack)
+            {
+                if(!TargetSAVControl&&PredictiveChase)
+                {
+                    Targetmovedir = (TargetPos - TargetPosLastFrame) / Time.deltaTime;
+                }
+            }
+            TargetPosLastFrame = TargetPos;
+        }
+
         void FixedUpdate()
         {
             if (Exploding) return;
@@ -303,7 +325,6 @@ namespace SaccFlightAndVehicles
                 float EngineTrack;
                 float AspectTrack;
                 bool Dumb;
-                Vector3 Targetmovedir;
                 Vector3 MissileToTargetVector;
                 if (TargetSAVControl)
                 {
@@ -354,7 +375,6 @@ namespace SaccFlightAndVehicles
                     if (RequireParentLock && !PitBull) { MotherLoS = CheckMotherLOS(); }
                     MissileToTargetVector = (TargetPos - Position).normalized;
                     CheckTargetLOS();
-                    Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
                     EngineTrack = 1;
                     AspectTrack = 1;
                     Dumb =
@@ -414,7 +434,6 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 TargDistlastframe = TargetDistance;
-                TargetPosLastFrame = TargetPos;
             }
         }
         bool CheckMotherLOS()
@@ -634,7 +653,6 @@ namespace SaccFlightAndVehicles
     }
 
 }
-
 
 
 
