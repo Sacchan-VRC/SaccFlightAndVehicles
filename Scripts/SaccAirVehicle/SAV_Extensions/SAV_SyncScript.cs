@@ -100,8 +100,8 @@ namespace SaccFlightAndVehicles
         Vector3 L_CurVel;
         Vector3 L_CurVelLast;
         private double StartupLocalTime;
-        private Vector3 ExtrapDirection_Smooth;
-        private Quaternion RotExtrapDirection_Smooth;
+        [System.NonSerialized] public Vector3 ExtrapDirection_Smooth; // Current velocity
+        [System.NonSerialized] public Quaternion RotExtrapDirection_Smooth; // Current angular velocity
         float IntervalsMid = 999f;
 #if UNITY_EDITOR
         private bool TestMode;
@@ -200,7 +200,7 @@ namespace SaccFlightAndVehicles
             VehicleRigid.constraints = RigidbodyConstraints.None;
             SetPhysics();
             _AntiWarp = AntiWarp; //prevent from running early as it causes vehicle to teleport 500ft in the air for some reason
-            if(!SyncRigid) {EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");} //prevent null exception for non-saccEntity
+            if (!SyncRigid) { EntityControl.SendEventToExtensions("SFEXT_L_WakeUp"); } //prevent null exception for non-saccEntity
         }
         private void InitSyncValues()
         {
@@ -601,7 +601,7 @@ namespace SaccFlightAndVehicles
             RotExtrapolation_Raw = L_PingAdjustedRotation;
 
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
-            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
+            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", ExtrapDirection_Smooth); }
 
             // Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
 

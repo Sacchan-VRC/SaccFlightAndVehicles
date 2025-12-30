@@ -7,6 +7,7 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    [DefaultExecutionOrder(100000)]
     public class SAV_AAMController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour AAMLauncherControl;
@@ -90,8 +91,11 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public SaccEntity EntityControl;
         private int MissileType = 1;
         private SaccAirVehicle TargetSAVControl;
+        private SAV_SyncScript TargetSyncScript;
         private Animator TargetAnimator;
         SaccEntity TargetEntityControl;
+        Rigidbody TargetRigidbody;
+        Vector3 Targetmovedir = Vector3.zero;
         private bool LockHack = true;
         private bool PitBull = false;
         private bool DoPitBull = false;
@@ -108,6 +112,7 @@ namespace SaccFlightAndVehicles
         private float TargetABPoint;
         private float TargetThrottleNormalizer;
         Vector3 TargetPosLastFrame;
+        Vector3 TargetPosLastFrame_Update;
 
         private bool IsOwner;
         private bool InEditor;
@@ -130,6 +135,7 @@ namespace SaccFlightAndVehicles
         private int OutsideVehicleLayer;
         Vector3 LocalLaunchPoint;
         private bool ColliderAlwaysActive;
+        private bool TargetIsPhysical;
         bool isNotHeat;
         void Initialize()
         {
@@ -202,11 +208,23 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
-                TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
+                Collider targetCol = Target.GetComponent<Collider>();
+                if (targetCol) TargetRigidbody = targetCol.attachedRigidbody;
                 if (Target.parent)
                 {
-                    TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
+                    if (TargetRigidbody)
+                    {
+                        TargetEntityControl = targetCol.attachedRigidbody.gameObject.GetComponent<SaccEntity>();
+                        if (TargetEntityControl)
+                        {
+                            TargetSyncScript = (SAV_SyncScript)TargetEntityControl.GetExtention(GetUdonTypeName<SAV_SyncScript>());
+                            TargetSAVControl = (SaccAirVehicle)TargetEntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+                        }
+                    }
+                    else
+                    {
+                        TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
+                    }
                     if (TargetSAVControl)
                     {
                         TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
@@ -236,11 +254,21 @@ namespace SaccFlightAndVehicles
                 else
                 { SendCustomEventDelayedSeconds(nameof(DisableLockHack), FlyStraightTime + LockHackTime); }
             }
+            TargetIsPhysical = TargetRigidbody && !TargetRigidbody.isKinematic;
+            if (TargetEntityControl)
+            {
+                TargetPosLastFrame = TargetPosLastFrame_Update = EntityControl.CenterOfMass.position;
+                TargDistlastframe = Vector3.Distance(transform.position, Target.position);
+            }
+            else
+            {
+                TargetPosLastFrame = TargetPosLastFrame_Update = Target.position;
+                TargDistlastframe = Vector3.Distance(transform.position, Target.position);
+            }
             Initialized = true;
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
-            Targetmovedir = Vector3.zero;
         }
         float ensureNoSelfCollision_time;
         public void ensureNoSelfCollision()
@@ -251,34 +279,12 @@ namespace SaccFlightAndVehicles
             AAMRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
-
-        Vector3 Targetmovedir = Vector3.zero;
-        void Update()
-        {
-            /*
-                Non-owner networked physics objects (includes SGV , SSV) don't have their positions updated during the FixedUpdate cycle, 
-                causing them to be overwritten "Targetmovedir" as zero. 
-                To prevent this, updating them separately during the Update cycle.
-            */
-            Vector3 TargetPos = Target.position;
-            if(Exploding&&!Initialized) return;
-            if (!TargetLost && StartTrack)
-            {
-                if(!TargetSAVControl&&PredictiveChase)
-                {
-                    Targetmovedir = (TargetPos - TargetPosLastFrame) / Time.deltaTime;
-                }
-            }
-            TargetPosLastFrame = TargetPos;
-        }
-
         void FixedUpdate()
         {
             if (Exploding) return;
             float sidespeed = Vector3.Dot(AAMRigid.velocity, transform.right);
             float downspeed = Vector3.Dot(AAMRigid.velocity, transform.up);
             AAMRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
-            float DeltaTime = Time.fixedDeltaTime;
             if (!ColliderActive && Initialized)
             {
                 Vector3 LaunchPoint;
@@ -294,6 +300,32 @@ namespace SaccFlightAndVehicles
                     ColliderActive = true;
                 }
             }
+            TrackTarget();
+        }
+        float Update_Time;
+        void LateUpdate()
+        {
+            if (Exploding || !Initialized || TargetIsPhysical) return;
+            /*
+                Non-owner networked physics objects don't have their positions updated during the FixedUpdate cycle, 
+                causing them to be overwritten "Targetmovedir" as zero. 
+                To prevent this, updating them separately during the Update cycle.
+                Unfortunately this will break tracking on things that are animated using update mode AnimatePhysics
+            */
+            if (StartTrack && !TargetLost)
+            {
+                Update_Time = Time.time;
+                if (!TargetSyncScript)
+                {
+                    Vector3 targpos = Target.position;
+                    Targetmovedir = (targpos - TargetPosLastFrame_Update) / Time.deltaTime;
+                    TargetPosLastFrame_Update = targpos;
+                }
+            }
+        }
+        void TrackTarget()
+        {
+            float DeltaTime = Time.fixedDeltaTime;
             if (!TargetLost && StartTrack)
             {
                 Vector3 Position = transform.position;
@@ -326,19 +358,52 @@ namespace SaccFlightAndVehicles
                 float AspectTrack;
                 bool Dumb;
                 Vector3 MissileToTargetVector;
-                if (TargetSAVControl)
+                float PredictedTargetDistance;
+                if (TargetSyncScript)
                 {
-                    Targetmovedir = (Vector3)TargetSAVControl.GetProgramVariable("CurrentVel");
-                    //other player's vehicles only move on Update() (low framerate fix)
-                    if (TargetEntityControl.CenterOfMass.position != LastRealPos)
+                    if (TargetEntityControl.IsOwner)// is physical
                     {
-                        LastRealPos = TargetEntityControl.CenterOfMass.position;
-                        PredictedPos = LastRealPos;
+                        // Targetmovedir is set later in this case so that it still works if TargetSyncScript is false
+                        PredictedPos = TargetEntityControl.CenterOfMass.position;
+                        PredictedTargetDistance = TargetDistance;
                     }
                     else
                     {
-                        PredictedPos += Targetmovedir * Time.fixedDeltaTime;
+                        Targetmovedir = (Vector3)TargetSyncScript.GetProgramVariable("ExtrapDirection_Smooth");
+                        //other player's vehicles only move on Update() so guess position by extrapolating
+                        if (TargetEntityControl.CenterOfMass.position != LastRealPos)
+                        {
+                            LastRealPos = TargetEntityControl.CenterOfMass.position;
+                            PredictedPos = LastRealPos + (Targetmovedir * (Time.fixedTime - Update_Time));
+                            PredictedTargetDistance = Vector3.Distance(TargetEntityControl.CenterOfMass.position, PredictedPos);
+                        }
+                        else
+                        {
+                            PredictedPos = LastRealPos + (Targetmovedir * (Time.fixedTime - Update_Time));
+                            PredictedTargetDistance = Vector3.Distance(Position, PredictedPos);
+                        }
                     }
+                }
+                else
+                {
+                    if (TargetIsPhysical)
+                    {
+                        Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
+                        PredictedTargetDistance = TargetDistance;
+                    }
+                    else
+                    {
+                        if (TargetPos != LastRealPos)
+                        {
+                            LastRealPos = TargetPos;
+                        }
+                        PredictedPos = LastRealPos + (Targetmovedir * (Time.fixedTime - Update_Time));
+                        PredictedTargetDistance = Vector3.Distance(Position, PredictedPos);
+                    }
+                }
+                if (TargetSAVControl)
+                {
+                    if (TargetEntityControl.IsOwner) Targetmovedir = (Vector3)TargetSAVControl.GetProgramVariable("CurrentVel");
                     MissileToTargetVector = (PredictedPos - Position).normalized;
                     bool TargetLineOfSight = CheckTargetLOS();
                     bool MotherLoS = true;
@@ -392,9 +457,14 @@ namespace SaccFlightAndVehicles
                     {
                         if (PredictiveChase)
                         {
-                            float timetotarget = Mathf.Min(TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f), MaximumExtrapTime);//ensure no division by 0
-                            Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget));
-                            MissileToTargetVector = TargetPredictedPos - Position;
+                            float timetotarget = Mathf.Min(PredictedTargetDistance / Mathf.Max(((TargDistlastframe - PredictedTargetDistance) / DeltaTime), 0.001f), MaximumExtrapTime);//ensure no division by 0
+                            Vector3 PredictedInterceptPos = PredictedPos + ((Targetmovedir * timetotarget));
+                            MissileToTargetVector = PredictedInterceptPos - Position;
+#if UNITY_EDITOR
+                            Debug.DrawRay(PredictedInterceptPos - Vector3.up * 5, Vector3.up * 10, Color.magenta, 0);
+                            Debug.DrawRay(PredictedInterceptPos - Vector3.right * 5, Vector3.right * 10, Color.magenta, 0);
+                            Debug.DrawRay(PredictedInterceptPos - Vector3.forward * 5, Vector3.forward * 10, Color.magenta, 0);
+#endif
                         }
                         //else using the already set targdirection
                         UnlockTimer = 0;
@@ -433,7 +503,8 @@ namespace SaccFlightAndVehicles
                         MissileIncoming = false;
                     }
                 }
-                TargDistlastframe = TargetDistance;
+                TargDistlastframe = PredictedTargetDistance;
+                TargetPosLastFrame = TargetPos;
             }
         }
         bool CheckMotherLOS()
@@ -519,9 +590,14 @@ namespace SaccFlightAndVehicles
             AAMRigid.position = LaunchPoint;
             TargetSAVControl = null;
             TargetEntityControl = null;
+            TargetSyncScript = null;
+            TargetRigidbody = null;
+            Initialized = false;
             hitwater = false;
             StartTrack = false;
             Exploding = false;
+            TargetIsPhysical = false;
+            Targetmovedir = Vector3.zero;
         }
         private void OnCollisionEnter(Collision other)
         {
@@ -653,6 +729,7 @@ namespace SaccFlightAndVehicles
     }
 
 }
+
 
 
 
