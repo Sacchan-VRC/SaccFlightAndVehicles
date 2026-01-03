@@ -49,28 +49,21 @@ namespace SaccFlightAndVehicles
         public Transform SyncTransform_Raw;
         private Transform VehicleTransform;
         private double nextUpdateTime = double.MaxValue;
-        /* [UdonSynced] */
         private double O_UpdateTime;
-        /* [UdonSynced] */
         private Vector3 O_Position;
         //the reason it's using a quat for rotation instead of euler angles is because it has to rotate twice to come back to the same value
         //giving a greater range for reconstruction of angular velocity, since that isn't synced
-        /* [UdonSynced] */
         private short O_RotationW;
-        /* [UdonSynced] */
         private short O_RotationX;
-        /* [UdonSynced] */
         private short O_RotationY;
-        /* [UdonSynced] */
         private short O_RotationZ;
-        /* [UdonSynced] */
         private Vector3 O_CurVel = Vector3.zero;
-        private Vector3 O_CurVelLast = Vector3.zero;
+        private Vector3 O_LastVel = Vector3.zero;
         private Vector3 O_Rotation;
         private Quaternion O_Rotation_Q = Quaternion.identity;
-        private Quaternion CurAngMom = Quaternion.identity;
-        private Quaternion CurAngMomAcceleration = Quaternion.identity;
-        private Quaternion LastCurAngMom = Quaternion.identity;
+        private Quaternion CurAngVel = Quaternion.identity;
+        private Quaternion CurAngVelAcceleration = Quaternion.identity;
+        private Quaternion LastAngVel = Quaternion.identity;
         private Quaternion O_LastRotation = Quaternion.identity;
         private Quaternion RotationLerper = Quaternion.identity;
         private float Ping;
@@ -78,7 +71,7 @@ namespace SaccFlightAndVehicles
         private double O_LastUpdateTime;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
         private bool IsOwner = false;
-        private Vector3 ExtrapolationDirection;
+        private Vector3 ExtrapDirection_Raw;
         private Quaternion RotationExtrapolationDirection;
         private Vector3 lerpedCurVel;
         private Vector3 Acceleration = Vector3.zero;
@@ -93,15 +86,16 @@ namespace SaccFlightAndVehicles
         private double lastframetime;
         private double lastframetime_extrap;
         float updateDelta = 0.25f;
-        private Vector3 poslasframe;
         private Vector3 Extrapolation_Raw;
         private Quaternion RotExtrapolation_Raw = Quaternion.identity;
         private double StartupServerTime;
         Vector3 L_CurVel;
-        Vector3 L_CurVelLast;
+        Vector3 L_LastVel;
         private double StartupLocalTime;
         [System.NonSerialized] public Vector3 ExtrapDirection_Smooth; // Current velocity
         [System.NonSerialized] public Quaternion RotExtrapDirection_Smooth; // Current angular velocity
+        Vector3 LastSmoothPosition;
+        Quaternion LastSmoothRotation;
         float IntervalsMid = 999f;
 #if UNITY_EDITOR
         private bool TestMode;
@@ -157,34 +151,34 @@ namespace SaccFlightAndVehicles
             }
             StartDrag = VehicleRigid.drag;
             StartAngDrag = VehicleRigid.angularDrag;
-            if (!InEditor)
+
+            if (ObjectMode ? Networking.IsOwner(SyncRigid.gameObject) : EntityControl.IsOwner)
             {
-                if (ObjectMode ? Networking.IsOwner(SyncRigid.gameObject) : EntityControl.IsOwner)
+                VehicleRigid.useGravity = IsOwner = true;
+                if (ObjectMode)
                 {
-                    IsOwner = true;
-                    if (ObjectMode)
-                    {
-                        VehicleRigid.drag = StartDrag;
-                        VehicleRigid.angularDrag = StartAngDrag;
-                    }
-                    else
-                    {
-                        VehicleRigid.drag = 0;
-                        VehicleRigid.angularDrag = 0;
-                    }
+                    VehicleRigid.drag = StartDrag;
+                    VehicleRigid.angularDrag = StartAngDrag;
                 }
                 else
                 {
-                    IsOwner = false;
-                    VehicleRigid.drag = 9999;
-                    VehicleRigid.angularDrag = 9999;
+                    VehicleRigid.drag = 0;
+                    VehicleRigid.angularDrag = 0;
                 }
             }
             else
-            {//play mode in editor
-                IsOwner = true;
-                VehicleRigid.drag = 9999;
-                VehicleRigid.angularDrag = 9999;
+            {
+                VehicleRigid.useGravity = IsOwner = false;
+                if (!NonOwnerEnablePhysics)
+                {
+                    VehicleRigid.drag = 9999;
+                    VehicleRigid.angularDrag = 9999;
+                }
+                else
+                {
+                    VehicleRigid.drag = 0;
+                    VehicleRigid.angularDrag = 0;
+                }
             }
             if (gameObject.activeInHierarchy) { InitSyncValues(); }//this gameobject shouldn't be active at start, but some people might still have it active from older versions
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
@@ -205,13 +199,12 @@ namespace SaccFlightAndVehicles
         private void InitSyncValues()
         {
             ResetSyncTimes();
-            Extrapolation_Raw = O_Position = VehicleTransform.position;
-            O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
+            O_LastRotation = LastSmoothRotation = O_Rotation_Q = VehicleTransform.rotation;
             double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
             nextUpdateTime = time + Random.Range(0f, updateInterval);
             O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = time;
             O_LastUpdateTime -= updateInterval;
-            O_LastPosition = O_Position = VehicleTransform.position;
+            Extrapolation_Raw = O_LastPosition = LastSmoothPosition = O_Position = VehicleTransform.position;
         }
         public void SFEXT_L_OwnershipTransfer()
         { ExitIdleMode(); }
@@ -225,7 +218,7 @@ namespace SaccFlightAndVehicles
         }
         private void TakeOwnerStuff()
         {
-            IsOwner = true;
+            VehicleRigid.useGravity = IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             VehicleRigid.interpolation = RigidbodyInterpolation.Extrapolate;
@@ -238,36 +231,46 @@ namespace SaccFlightAndVehicles
             {
                 Vector3 cvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                 VehicleRigid.velocity = cvel;
+                VehicleRigid.angularVelocity = Vector3.zero;
                 SAVControl.SetProgramVariable("LastFrameVel", cvel);
                 VehicleRigid.drag = 0;
                 VehicleRigid.angularDrag = 0;
             }
             L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
-            nextUpdateTime = L_UpdateTime - .01d;
+            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) + .2f;
             UpdatesSentWhileStill = 0;
         }
         private void LoseOwnerStuff()
         {
-            IsOwner = false;
+            VehicleRigid.useGravity = IsOwner = false;
             O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             O_LastUpdateTime -= updateInterval;
-            Extrapolation_Raw = O_Position;
-            ExtrapDirection_Smooth = O_CurVel;
-            RotExtrapolation_Raw = RotationLerper = O_LastRotation = O_Rotation_Q;
-            LastCurAngMom = CurAngMom = Quaternion.identity;
-            if (!NonOwnerEnablePhysics)
+            Extrapolation_Raw = LastSmoothPosition = O_LastPosition = O_Position = VehicleTransform.position;
+            ExtrapDirection_Raw = ExtrapDirection_Smooth = L_CurVel = L_LastVel = O_LastVel = VehicleRigid.velocity;
+            RotExtrapolation_Raw = RotationLerper = LastSmoothRotation = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
+            Acceleration = LastAcceleration = Vector3.zero;
+            CurAngVelAcceleration = LastAngVel = CurAngVel = RotationExtrapolationDirection = Quaternion.identity;
+            ErrorLastFrame = 0f;
+            O_LastUpdateTime = O_UpdateTime - 0.2d;
+            if (NonOwnerEnablePhysics)
+            {
+                VehicleRigid.isKinematic = false;
+                VehicleRigid.drag = 0;
+                VehicleRigid.angularDrag = 0;
+            }
+            else
             {
                 VehicleRigid.isKinematic = true;
+                VehicleRigid.drag = 9999;
+                VehicleRigid.angularDrag = 9999;
             }
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             VehicleRigid.interpolation = RigidbodyInterpolation.None;
-            VehicleRigid.drag = 9999;
-            VehicleRigid.angularDrag = 9999;
+            nextUpdateTime = double.MaxValue;
         }
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
             ExitIdleMode();
             SendCustomEventDelayedFrames(nameof(ResetSyncTimes), 1);// the frame the pilot enters is more likely to be a longer frame, so reset afterwards
         }
@@ -278,22 +281,8 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 ResetSyncTimes();
-                nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
             }
             ExitIdleMode();
-            //make it teleport instead of interpolating
-            ExtrapolationDirection = Vector3.zero;
-            Extrapolation_Raw = O_LastPosition = O_Position;
-            RotationLerper = O_LastRotation = O_Rotation_Q;
-            if (!IsOwner)
-            {
-                VehicleTransform.position = O_Position;
-                VehicleTransform.rotation = O_Rotation_Q;
-            }
-            ExtrapDirection_Smooth = Vector3.zero;
-            RotExtrapDirection_Smooth = Quaternion.identity;
-            L_CurVelLast = Vector3.zero;
-            LastAcceleration = Acceleration = Vector3.zero;
         }
         float lastFrameTime_hitchtest;
         private void Update()
@@ -415,8 +404,8 @@ namespace SaccFlightAndVehicles
             float deltatime = Time.deltaTime;
             double time;
             Vector3 Deriv = Vector3.zero;
-            Vector3 Correction = (Extrapolation_Raw - SyncTransform.position) * CorrectionTime;
-            float Error = Vector3.Distance(SyncTransform.position, Extrapolation_Raw);
+            Vector3 Correction = (Extrapolation_Raw - LastSmoothPosition) * CorrectionTime;
+            float Error = Vector3.Distance(LastSmoothPosition, Extrapolation_Raw);
             if (deltatime > .099f)
             {
                 time = Networking.GetServerTimeInSeconds();
@@ -434,26 +423,28 @@ namespace SaccFlightAndVehicles
             float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateDelta);
             //extrapolated position based on time passed since update
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
-            if (NonOwnerEnablePhysics) { VehicleRigid.velocity = VelEstimate; }
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
+            if (NonOwnerEnablePhysics) { VehicleRigid.velocity = ExtrapDirection_Smooth; }
 
             //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
-            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
-            Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
-            RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
+            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngVelAcceleration, TimeSinceUpdate);
+            Quaternion AngVelEstimate = FrameRotAccel * CurAngVel;
+            RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngVelEstimate, RotationSpeedLerpTime * deltatime);
 
             //positional update
-            Extrapolation_Raw = O_Position + (ExtrapolationDirection * (float)(time - O_UpdateTime));
-            Vector3 newpos = SyncTransform.position + ExtrapDirection_Smooth * deltatime;
+            Extrapolation_Raw = O_Position + (ExtrapDirection_Raw * (float)(time - O_UpdateTime));
+            Vector3 newpos = LastSmoothPosition + ExtrapDirection_Smooth * deltatime;
             //rotational update
             //rotate raw rot extrapolation by frames worth
             RotExtrapolation_Raw = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime) * RotExtrapolation_Raw;
             //rotate smooth rot extrapolation by frames worth
-            Quaternion newrot = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime) * SyncTransform.rotation;
+            Quaternion newrot = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime) * LastSmoothRotation;
             //correct rotational desync
             newrot = RealSlerp(newrot, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
 
-            SyncTransform.SetPositionAndRotation(newpos, newrot);
+            // SyncTransform.SetPositionAndRotation(newpos, newrot);
+            LastSmoothPosition = SyncTransform.position = newpos;
+            LastSmoothRotation = SyncTransform.rotation = newrot;
 #if UNITY_EDITOR
             if (SyncTransform_Raw)
             {
@@ -540,7 +531,8 @@ namespace SaccFlightAndVehicles
                     if (idleTicks > 1)// since we also waited for the owner to decide it's idle one tick should be enough
                     {
                         idleDetected = true;
-                        SyncTransform.position = Position;
+                        VehicleRigid.isKinematic = true;
+                        SyncTransform.position = O_Position;
                         float smv_ = short.MaxValue;
                         O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
                         SyncTransform.rotation = O_Rotation_Q;
@@ -551,12 +543,13 @@ namespace SaccFlightAndVehicles
             {
                 if (idleDetected) { ResetSyncTimes(); }
                 idleDetected = false;
+                SetPhysics();
                 idleTicks = 0;
             }
             float speednormalizer = 1 / updateDelta;
 
             LastAcceleration = Acceleration;
-            LastCurAngMom = CurAngMom;
+            LastAngVel = CurAngVel;
 
             //local time update was received
             L_UpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime);
@@ -569,15 +562,15 @@ namespace SaccFlightAndVehicles
             bool SetVelZero = false;
             if (Velocity.sqrMagnitude == 0)
             {
-                if (O_CurVelLast.sqrMagnitude != 0)
+                if (O_LastVel.sqrMagnitude != 0)
                 { L_CurVel = Vector3.zero; SetVelZero = true; }
                 else
-                { L_CurVel = (Position - O_LastPosition) * speednormalizer; }
+                { L_CurVel = (O_Position - O_LastPosition) * speednormalizer; }
             }
             else
             { L_CurVel = Velocity; }
-            O_CurVelLast = Velocity;
-            Acceleration = L_CurVel - L_CurVelLast;
+            O_LastVel = Velocity;
+            Acceleration = L_CurVel - L_LastVel;
 
             float smv = short.MaxValue;
             O_Rotation_Q = new Quaternion(RotX / smv, RotY / smv, RotZ / smv, RotW / smv);
@@ -587,45 +580,40 @@ namespace SaccFlightAndVehicles
             Acceleration = (PlaneRotDif * Acceleration) * .5f;//not sure why it's 0.5, but it seems correct from testing
             Acceleration += Acceleration * (Ping / updateDelta);
 
-            //current angular momentum as a quaternion
-            CurAngMom = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
-            CurAngMomAcceleration = CurAngMom * Quaternion.Inverse(LastCurAngMom);
+            //current angular velocity as a quaternion
+            CurAngVel = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
+            CurAngVelAcceleration = CurAngVel * Quaternion.Inverse(LastAngVel);
 
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //+ if idlemode, disable acceleration because it brakes
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || L_CurVel.magnitude < IdleMovementRange)
-            { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity; }
+            { Acceleration = Vector3.zero; CurAngVelAcceleration = Quaternion.identity; }
 
             Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
             Quaternion L_PingAdjustedRotation = PingRotExtrap * O_Rotation_Q;
             RotExtrapolation_Raw = L_PingAdjustedRotation;
-
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
-            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", ExtrapDirection_Smooth); }
+            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
 
-            // Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
-
-            //if we're going one way but moved the other, we must have teleported.
-            //set values to the same thing for Current and Last to make teleportation instead of interpolation
             if (Teleport)
             {
-                LastCurAngMom = CurAngMom;
-                SyncTransform.position = Extrapolation_Raw = O_Position;
-                SyncTransform.rotation = RotExtrapolation_Raw = O_Rotation_Q;
-                ExtrapDirection_Smooth = ExtrapolationDirection = L_CurVel;
+                LastAngVel = CurAngVel;
+                SyncTransform.position = Extrapolation_Raw = LastSmoothPosition = O_Position;
+                SyncTransform.rotation = RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
+                ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
                 RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
                 ErrorLastFrame = 0;
-                CurAngMomAcceleration = CurAngMom = Quaternion.identity;
+                CurAngVelAcceleration = CurAngVel = Quaternion.identity;
             }
             else
             {
-                ExtrapolationDirection = L_CurVel + Acceleration;
-                RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
+                ExtrapDirection_Raw = L_CurVel + Acceleration;
+                RotationExtrapolationDirection = CurAngVelAcceleration * CurAngVel;
             }
             O_LastUpdateTime = UpdateTime;
             O_LastRotation = O_Rotation_Q;
-            O_LastPosition = Position;
-            L_CurVelLast = L_CurVel;
+            O_LastPosition = O_Position;
+            L_LastVel = L_CurVel;
         }
         public void ResetSyncTimes()
         {
@@ -634,7 +622,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_Explode()
         {
-            if (IsOwner && FreezePositionOnDeath)
+            if ((IsOwner || NonOwnerEnablePhysics) && FreezePositionOnDeath)
             {
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
@@ -642,7 +630,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ReAppear()
         {
-            if (IsOwner)
+            if (IsOwner || NonOwnerEnablePhysics)
             {
                 VehicleRigid.drag = 0;
                 VehicleRigid.angularDrag = 0;
@@ -667,6 +655,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
+                else { VehicleRigid.isKinematic = false; }
                 VehicleRigid.interpolation = RigidbodyInterpolation.None;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }

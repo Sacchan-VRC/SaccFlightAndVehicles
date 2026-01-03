@@ -361,9 +361,9 @@ namespace SaccFlightAndVehicles
                 float PredictedTargetDistance;
                 if (TargetSyncScript)
                 {
-                    if (TargetEntityControl.IsOwner)// is physical
+                    if (TargetIsPhysical)
                     {
-                        // Targetmovedir is set later in this case so that it still works if TargetSyncScript is false
+                        Targetmovedir = TargetRigidbody.velocity;
                         PredictedPos = TargetEntityControl.CenterOfMass.position;
                         PredictedTargetDistance = TargetDistance;
                     }
@@ -403,7 +403,6 @@ namespace SaccFlightAndVehicles
                 }
                 if (TargetSAVControl)
                 {
-                    if (TargetEntityControl.IsOwner) Targetmovedir = (Vector3)TargetSAVControl.GetProgramVariable("CurrentVel");
                     MissileToTargetVector = (PredictedPos - Position).normalized;
                     bool TargetLineOfSight = CheckTargetLOS();
                     bool MotherLoS = true;

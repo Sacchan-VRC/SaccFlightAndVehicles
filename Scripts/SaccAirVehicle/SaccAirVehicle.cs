@@ -950,8 +950,6 @@ namespace SaccFlightAndVehicles
                 CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
                 if (Piloting)
                 {
-                    DoRepeatingWorld();
-
                     if (!_DisablePhysicsAndInputs)
                     {
                         //collect inputs
@@ -1336,7 +1334,6 @@ namespace SaccFlightAndVehicles
                         { ThrottleInput = PlayerThrottle = Mathf.Min(ThrottleOverride, Fuel * LowFuelDivider); }
                         FuelEvents();
                     }
-                    DoRepeatingWorld();
                 }
                 SoundBarrier = (1 - Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1)) * SoundBarrierStrength;
             }
@@ -1404,6 +1401,7 @@ namespace SaccFlightAndVehicles
 
                     if (!Asleep)
                     {
+                        if (RepeatingWorld) DoRepeatingWorld();
                         //used to create air resistance for updown and sideways if your movement direction is in those directions
                         //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
                         //and add wind
@@ -1989,54 +1987,19 @@ namespace SaccFlightAndVehicles
         }
         public void DoRepeatingWorld()
         {
-            if (RepeatingWorld)
-            {
-                if (RepeatingWorldCheckAxis)
-                {
-                    if (Mathf.Abs(CenterOfMass.position.z) > RepeatingWorldDistance)
-                    {
-                        if (CenterOfMass.position.z > 0)
-                        {
-                            Vector3 vehpos = VehicleTransform.position;
-                            vehpos.z -= RepeatingWorldDistance * 2;
-                            VehicleTransform.position = vehpos;
-                            VehicleRigidbody.position = VehicleTransform.position;
-                            EntityControl.ShouldTeleport = true;
-                        }
-                        else
-                        {
-                            Vector3 vehpos = VehicleTransform.position;
-                            vehpos.z += RepeatingWorldDistance * 2;
-                            VehicleTransform.position = vehpos;
-                            VehicleRigidbody.position = VehicleTransform.position;
-                            EntityControl.ShouldTeleport = true;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Mathf.Abs(CenterOfMass.position.x) > RepeatingWorldDistance)
-                    {
-                        if (CenterOfMass.position.x > 0)
-                        {
-                            Vector3 vehpos = VehicleTransform.position;
-                            vehpos.x -= RepeatingWorldDistance * 2;
-                            VehicleTransform.position = vehpos;
-                            VehicleRigidbody.position = VehicleTransform.position;
-                            EntityControl.ShouldTeleport = true;
-                        }
-                        else
-                        {
-                            Vector3 vehpos = VehicleTransform.position;
-                            vehpos.x += RepeatingWorldDistance * 2;
-                            VehicleTransform.position = vehpos;
-                            VehicleRigidbody.position = VehicleTransform.position;
-                            EntityControl.ShouldTeleport = true;
-                        }
-                    }
-                }
-                RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis;//Check one axis per frame
-            }
+            bool checkZAxis = RepeatingWorldCheckAxis;
+            RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis; // Toggle axis for next frame
+
+            float positionValue = checkZAxis ? CenterOfMass.position.z : CenterOfMass.position.x;
+            float distance = RepeatingWorldDistance * 2;
+
+            if (Mathf.Abs(positionValue) <= RepeatingWorldDistance) return;
+
+            Vector3 newPosition = VehicleRigidbody.position;
+            newPosition[checkZAxis ? 2 : 0] -= Mathf.Sign(positionValue) * distance;
+
+            VehicleRigidbody.position = newPosition;
+            EntityControl.ShouldTeleport = true;
         }
         public void TouchDown()
         {
