@@ -296,6 +296,11 @@ namespace SaccFlightAndVehicles
             Suspension();
             WheelPhysics();
         }
+        public void VehicleTeleported()
+        {
+            // to make PointVelocity = 0 instead of the whole teleported distance. 
+            GroundPointLast = transform.position;
+        }
         float gripLast;
         private void Suspension()
         {

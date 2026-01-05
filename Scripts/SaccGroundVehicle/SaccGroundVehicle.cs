@@ -1585,6 +1585,13 @@ namespace SaccFlightAndVehicles
                 Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
             }
         }
+        public void SFEXT_O_VehicleTeleported()
+        {
+            for (int i = 0; i < AllWheels.Length; i++)
+            {
+                AllWheels[i].SendCustomEvent("VehicleTeleported");
+            }
+        }
         public void CheckDistance()
         {
             CurrentDistance = Vector3.Distance(localPlayer.GetPosition(), CenterOfMass.position);
