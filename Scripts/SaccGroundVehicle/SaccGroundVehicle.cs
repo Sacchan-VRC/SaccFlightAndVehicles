@@ -160,6 +160,7 @@ namespace SaccFlightAndVehicles
         [Space(10)]
         [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks\nCannot be changed during play")]
         public bool TankMode;
+        public bool TankMode_UseSteeringWheel;
         [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
         [Tooltip("Use just the left control stick to control tank movement")]
@@ -656,7 +657,7 @@ namespace SaccFlightAndVehicles
                 }
                 if (Piloting)
                 {
-                    if (TankMode)
+                    if (TankMode && !TankMode_UseSteeringWheel)
                     {
                         if (!_DisableThrottleControl)
                         {
@@ -745,19 +746,11 @@ namespace SaccFlightAndVehicles
                             //
                             FinalThrottle = Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
 
-                            // bool LeftNeg = LeftThrottle < 0;
-                            // bool RightNeg = RightThrottle < 0;
-                            // float RGearRatio = RightNeg ? -GearRatio : GearRatio;
-                            // float LGearRatio = LeftNeg ? -GearRatio : GearRatio;
                             float reverseSpeedL = LeftThrottle < 0 ? TANK_ReverseSpeed : 1;
                             float reverseSpeedR = RightThrottle < 0 ? TANK_ReverseSpeed : 1;
                             float LGearRatio = Mathf.LerpUnclamped(0, GearRatio, LeftThrottle * reverseSpeedL);
                             float RGearRatio = Mathf.LerpUnclamped(0, GearRatio, RightThrottle * reverseSpeedR);
 
-                            // float LClutch = Clutch;
-                            // float RClutch = Clutch;
-                            // if (LeftThrottle == 0) { LClutch = 1; }
-                            // if (RightThrottle == 0) { RClutch = 1; }
                             for (int i = 0; i < DriveWheels.Length; i++)
                             {
                                 DriveWheels[i].SetProgramVariable("Clutch", Clutch);
@@ -1064,6 +1057,24 @@ namespace SaccFlightAndVehicles
                                 DriveWheels[i].SetProgramVariable("Clutch", Clutch);
                             }
                             FinalThrottle = ThrottleInput;
+                        }
+                        if (TankMode_UseSteeringWheel)
+                        {
+                            float LeftThrottle;
+                            float RightThrottle;
+                            RightThrottle = Mathf.Lerp(1, -1, YawInput) * FinalThrottle;
+                            LeftThrottle = Mathf.Lerp(1, -1, -YawInput) * FinalThrottle;
+
+                            for (int i = 0; i < DriveWheels.Length; i++)
+                            {
+                                DriveWheels[i].SetProgramVariable("Clutch", Clutch);
+                                DriveWheels[i].SetProgramVariable("_GearRatio", GearRatio * LeftThrottle);
+                            }
+                            for (int i = 0; i < SteerWheels.Length; i++)
+                            {
+                                SteerWheels[i].SetProgramVariable("Clutch", Clutch);
+                                SteerWheels[i].SetProgramVariable("_GearRatio", GearRatio * RightThrottle);
+                            }
                         }
                     }
                     if (Fuel > 0)
