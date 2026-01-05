@@ -1991,12 +1991,11 @@ namespace SaccFlightAndVehicles
             RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis; // Toggle axis for next frame
 
             float positionValue = checkZAxis ? CenterOfMass.position.z : CenterOfMass.position.x;
-            float distance = RepeatingWorldDistance * 2;
 
             if (Mathf.Abs(positionValue) <= RepeatingWorldDistance) return;
 
             Vector3 newPosition = VehicleRigidbody.position;
-            newPosition[checkZAxis ? 2 : 0] -= Mathf.Sign(positionValue) * distance;
+            newPosition[checkZAxis ? 2 : 0] -= Mathf.Sign(positionValue) * RepeatingWorldDistance * 2;
 
             VehicleRigidbody.position = newPosition;
             EntityControl.ShouldTeleport = true;
