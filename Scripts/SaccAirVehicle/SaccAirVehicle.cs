@@ -1770,8 +1770,9 @@ namespace SaccFlightAndVehicles
                 AngleOfAttack = 0;
                 VelLift = VelLiftStart;
                 VTOLAngleForward90 = 0;
-                SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
+                EntityControl.ShouldTeleport = true;
                 EntityControl.SendEventToExtensions("SFEXT_O_Explode");
+                SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
             }
 
             //pilot and passengers are dropped out of the vehicle
@@ -1835,6 +1836,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigidbody.position = VehicleTransform.position;
                 VehicleRigidbody.rotation = VehicleTransform.rotation;
             }
+            EntityControl.ShouldTeleport = true;
         }
         public void NotDead()
         {
@@ -2143,7 +2145,6 @@ namespace SaccFlightAndVehicles
                 VTOLAngle = VTOLDefaultValue;
                 VTOLAngleInput = VTOLDefaultValue;
                 VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
-                EntityControl.ShouldTeleport = true;
                 SetRespawnPos();
             }
 

@@ -227,6 +227,7 @@ namespace SaccFlightAndVehicles
                 }
                 else { Debug.LogWarning(CurrentCourse.name + ": Reverse Race Start Point is null"); }
             }
+            Vehicle_EntityControl.ShouldTeleport = true;
         }
         public void SetFreezeCarFalse()
         {

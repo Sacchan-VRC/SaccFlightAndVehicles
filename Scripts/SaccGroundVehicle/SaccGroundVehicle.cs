@@ -1232,6 +1232,7 @@ namespace SaccFlightAndVehicles
                 YawInput = 0;
                 ThrottleInput = 0;
                 Fuel = FullFuel;
+                EntityControl.ShouldTeleport = true;
                 EntityControl.SendEventToExtensions("SFEXT_O_Explode");
                 SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
             }
@@ -1328,6 +1329,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigidbody.position = VehicleTransform.position;
                 VehicleRigidbody.rotation = VehicleTransform.rotation;
             }
+            EntityControl.ShouldTeleport = true;
         }
         public void NotDead()
         {

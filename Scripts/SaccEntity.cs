@@ -222,6 +222,16 @@ namespace SaccFlightAndVehicles
             }
             get => _invincible;
         }
+        bool ShouldTeleport_;
+        public bool ShouldTeleport // for syncscript
+        {
+            set
+            {
+                if (EntityObjectSync && value) { EntityObjectSync.FlagDiscontinuity(); }
+                ShouldTeleport_ = value;
+            }
+            get => ShouldTeleport_;
+        }
         [System.NonSerializedAttribute] public bool Using = false; // is pilot or holding (local)
         [System.NonSerializedAttribute] public bool Occupied = false; // has a pilot (synced)
         [System.NonSerializedAttribute] public int PlayersInside = 0; // has a user in any seat (synced)
@@ -1254,7 +1264,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Vector3 Spawnposition;
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         private float lastRespawnTime;
-        public bool ShouldTeleport; // for syncscript
         public void EntityRespawn()//can be used by simple items to respawn
         {
             if (Time.time - lastRespawnTime < 3) { return; }
