@@ -43,7 +43,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] private Vector3 SmokeColorLast = Vector3.one;
         [System.NonSerializedAttribute] private Vector3 SmokeColorLastSent = Vector3.one;
         [System.NonSerializedAttribute] public bool localSmoking = false;
-        [System.NonSerializedAttribute] public Color SmokeColor_Color;
+        [System.NonSerializedAttribute] public Color SmokeColor_Color = Color.white;
         private Vector3 TempSmokeCol = Vector3.zero;
         private bool Pilot;
         private bool Selected;
@@ -75,15 +75,19 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             Selected = false;
         }
+        bool InVehicle;
         public void SFEXT_O_PilotEnter()
         {
             Pilot = true;
+            InVehicle = true;
             if (Dial_Funcon) { Dial_Funcon.SetActive(localSmoking); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(localSmoking); }
+            if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
         }
         public void SFEXT_O_PilotExit()
         {
             Pilot = false;
+            InVehicle = false;
             Selected = false;
             gameObject.SetActive(false);
         }
@@ -102,8 +106,14 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_P_PassengerEnter()
         {
+            InVehicle = true;
             if (Dial_Funcon) Dial_Funcon.SetActive(localSmoking);
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(localSmoking); }
+            if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
+        }
+        public void SFEXT_P_PassengerExit()
+        {
+            InVehicle = false;
         }
         public void SFEXT_G_Explode()
         {
@@ -210,7 +220,7 @@ namespace SaccFlightAndVehicles
                     var main = smoke.main;
                     main.startColor = new ParticleSystem.MinMaxGradient(SmokeColor_Color, SmokeColor_Color * .8f);
                 }
-                if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
+                if (InVehicle && SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
             }
         }
         public void KeyboardInput()
@@ -246,9 +256,14 @@ namespace SaccFlightAndVehicles
             {
                 if (localSmoking)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), SmokeOn, SmokeColor);
+                    SendCustomEventDelayedSeconds(nameof(UpdateSmoke), 5);
                 }
             }
+        }
+        public void UpdateSmoke()
+        {
+            if (Pilot)
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(NetworkUpdateSmoke), SmokeOn, SmokeColor);
         }
     }
 }
