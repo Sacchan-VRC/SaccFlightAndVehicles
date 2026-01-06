@@ -363,8 +363,8 @@ namespace SaccFlightAndVehicles
                         bool shouldTele;
                         if (EntityControl)
                         {
-                            shouldTele = (bool)EntityControl.GetProgramVariable("ShouldTeleport");
-                            if (shouldTele) { EntityControl.SetProgramVariable("ShouldTeleport", false); }
+                            shouldTele = EntityControl.ShouldTeleport;
+                            if (shouldTele) { EntityControl.ShouldTeleport = false; }
 #if UNITY_EDITOR
                             DBG_shouldTele = shouldTele;
 #endif
