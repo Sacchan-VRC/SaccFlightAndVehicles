@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour AAMLauncherControl;
         UdonSharpBehaviour SAVControl;
+        UdonSharpBehaviour SyncScript;
         [Tooltip("1 = direct hit takes 100% of target health.\n If AAMDamage_AbsoluteMode is true, 1 = 1 damage with direct hit.")]
         public float AAMDamage = 1;
         [Tooltip("Enable this to stop AAMDamage being multiplied by the vehicle's full health. See AAMDamge tooltip.")]
@@ -143,6 +144,7 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
                 SAVControl = (UdonSharpBehaviour)AAMLauncherControl.GetProgramVariable("SAVControl");
+                SyncScript = (SAV_SyncScript)EntityControl.GetExtention(GetUdonTypeName<SAV_SyncScript>());
                 VehicleRigid = EntityControl.VehicleRigidbody;
             }
             //whatever script is launching the missiles must contain all of these variables
@@ -274,8 +276,7 @@ namespace SaccFlightAndVehicles
         public void ensureNoSelfCollision()
         {
             if (ensureNoSelfCollision_time != Time.fixedTime) return;
-
-            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            transform.position += (Vector3)SyncScript.GetProgramVariable("ExtrapDirection_Smooth") * Time.deltaTime;
             AAMRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }

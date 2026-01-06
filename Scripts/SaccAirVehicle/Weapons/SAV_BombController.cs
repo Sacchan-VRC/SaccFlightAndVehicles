@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour BombLauncherControl;
         UdonSharpBehaviour SAVControl;
+        UdonSharpBehaviour SyncScript;
         [Tooltip("Bomb will explode after this time")]
         [SerializeField] private float MaxLifetime = 40;
         [Tooltip("Maximum liftime of bomb is randomized by +- this many seconds on appearance")]
@@ -92,6 +93,7 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
                 SAVControl = (UdonSharpBehaviour)BombLauncherControl.GetProgramVariable("SAVControl");
+                SyncScript = (SAV_SyncScript)EntityControl.GetExtention(GetUdonTypeName<SAV_SyncScript>());
                 VehicleRigid = EntityControl.VehicleRigidbody;
             }
             BombCollider = GetComponent<Collider>();
@@ -154,8 +156,7 @@ namespace SaccFlightAndVehicles
         public void ensureNoSelfCollision()
         {
             if (ensureNoSelfCollision_time != Time.fixedTime) return;
-
-            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            transform.position += (Vector3)SyncScript.GetProgramVariable("ExtrapDirection_Smooth") * Time.deltaTime;
             BombRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }

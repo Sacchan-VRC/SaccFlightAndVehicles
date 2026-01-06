@@ -11,6 +11,7 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour AGMLauncherControl;
         UdonSharpBehaviour SAVControl;
+        UdonSharpBehaviour SyncScript;
         [Tooltip("Missile will explode after this time")]
         public float MaxLifetime = 35;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -83,6 +84,7 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
                 SAVControl = (UdonSharpBehaviour)AGMLauncherControl.GetProgramVariable("SAVControl");
+                SyncScript = (SAV_SyncScript)EntityControl.GetExtention(GetUdonTypeName<SAV_SyncScript>());
                 VehicleRigid = EntityControl.VehicleRigidbody;
             }
             AGMCollider = gameObject.GetComponent<Collider>();
@@ -134,8 +136,7 @@ namespace SaccFlightAndVehicles
         public void ensureNoSelfCollision()
         {
             if (ensureNoSelfCollision_time != Time.fixedTime) return;
-
-            transform.position += (Vector3)SAVControl.GetProgramVariable("CurrentVel") * Time.deltaTime;
+            transform.position += (Vector3)SyncScript.GetProgramVariable("ExtrapDirection_Smooth") * Time.deltaTime;
             AGMRigid.position = transform.position;
             SendCustomEventDelayedFrames(nameof(ensureNoSelfCollision), 1);
         }
