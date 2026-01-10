@@ -512,7 +512,7 @@ namespace SaccFlightAndVehicles
                     TargetIndicator.gameObject.SetActive(true);
                     TargetIndicator.position = HudControlPosition + AAMCurrentTargetDirection;
                     TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
-                    TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - HUDControl.transform.position, TargetingTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
+                    TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - HudControlPosition, TargetingTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                 }
 
                 if (GUNLeadIndicator)
