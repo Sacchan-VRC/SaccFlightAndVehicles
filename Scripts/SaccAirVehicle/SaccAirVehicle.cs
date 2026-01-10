@@ -1999,7 +1999,7 @@ namespace SaccFlightAndVehicles
             Vector3 newPosition = VehicleRigidbody.position;
             newPosition[checkZAxis ? 2 : 0] -= Mathf.Sign(positionValue) * RepeatingWorldDistance * 2;
 
-            VehicleRigidbody.position = newPosition;
+            VehicleTransform.position = VehicleRigidbody.position = newPosition;
             EntityControl.ShouldTeleport = true;
         }
         public void TouchDown()
