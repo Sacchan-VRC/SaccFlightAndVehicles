@@ -530,12 +530,15 @@ namespace SaccFlightAndVehicles
                     idleTicks++;
                     if (idleTicks > 1)// since we also waited for the owner to decide it's idle one tick should be enough
                     {
-                        idleDetected = true;
-                        VehicleRigid.isKinematic = true;
-                        SyncTransform.position = O_Position;
-                        float smv_ = short.MaxValue;
-                        O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                        SyncTransform.rotation = O_Rotation_Q;
+                        if (SyncTransform) // will be false if initialization hasn't run yet
+                        {
+                            idleDetected = true;
+                            VehicleRigid.isKinematic = true;
+                            float smv_ = short.MaxValue;
+                            SyncTransform.position = O_Position;
+                            O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
+                            SyncTransform.rotation = O_Rotation_Q;
+                        }
                     }
                 }
             }
@@ -598,8 +601,13 @@ namespace SaccFlightAndVehicles
             if (Teleport)
             {
                 LastAngVel = CurAngVel;
-                SyncTransform.position = Extrapolation_Raw = LastSmoothPosition = O_Position;
-                SyncTransform.rotation = RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
+                if (SyncTransform)
+                {
+                    SyncTransform.position = O_Position;
+                    SyncTransform.rotation = O_Rotation_Q;
+                }
+                Extrapolation_Raw = LastSmoothPosition = O_Position;
+                RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
                 ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
                 RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
                 ErrorLastFrame = 0;
