@@ -68,7 +68,7 @@ namespace SaccFlightAndVehicles
         private Quaternion RotationLerper = Quaternion.identity;
         private float Ping;
         private double L_UpdateTime;
-        private double O_LastUpdateTime;
+        private double O_LastUpdateTime = double.MinValue;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
         private bool IsOwner = false;
         private Vector3 ExtrapDirection_Raw;
@@ -96,7 +96,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public Quaternion RotExtrapDirection_Smooth; // Current angular velocity
         Vector3 LastSmoothPosition;
         Quaternion LastSmoothRotation;
-        float IntervalsMid = 999f;
+        float IntervalsMid = 0f;
 #if UNITY_EDITOR
         private bool TestMode;
 #endif
@@ -498,8 +498,8 @@ namespace SaccFlightAndVehicles
             }
         }
 #endif
-        bool idleDetected = false;
-        uint idleTicks = 0;
+        bool idleDetected = true;
+        bool firstDeserialize = true;
         [NetworkCallable]
         public void SendSyncData(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity)
         {
@@ -525,29 +525,34 @@ namespace SaccFlightAndVehicles
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
             {
-                if (!idleDetected)
+                if (SyncTransform) // will be false if initialization hasn't run yet
                 {
-                    idleTicks++;
-                    if (idleTicks > 1)// since we also waited for the owner to decide it's idle one tick should be enough
+                    idleDetected = true;
+                    VehicleRigid.isKinematic = true;
+                    float smv_ = short.MaxValue;
+                    O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
+                    if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", Velocity); }
+                    if (SyncTransform)
                     {
-                        if (SyncTransform) // will be false if initialization hasn't run yet
-                        {
-                            idleDetected = true;
-                            VehicleRigid.isKinematic = true;
-                            float smv_ = short.MaxValue;
-                            SyncTransform.position = O_Position;
-                            O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                            SyncTransform.rotation = O_Rotation_Q;
-                        }
+                        SyncTransform.position = O_Position;
+                        SyncTransform.rotation = O_Rotation_Q;
                     }
                 }
+                O_LastUpdateTime = UpdateTime;
+                return;
             }
-            else
+            else if (idleDetected)
             {
-                if (idleDetected) { ResetSyncTimes(); }
+                if (!Initialized) return;
+                if (firstDeserialize) { Teleport = true; firstDeserialize = false; }
                 idleDetected = false;
+                ResetSyncTimes();
                 SetPhysics();
-                idleTicks = 0;
+                float smv_ = short.MaxValue;
+                O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
+                O_LastRotation = O_Rotation_Q;
+                L_LastVel = Velocity;
+                TeleResetValues();
             }
             float speednormalizer = 1 / updateDelta;
 
@@ -600,18 +605,12 @@ namespace SaccFlightAndVehicles
 
             if (Teleport)
             {
-                LastAngVel = CurAngVel;
                 if (SyncTransform)
                 {
                     SyncTransform.position = O_Position;
                     SyncTransform.rotation = O_Rotation_Q;
                 }
-                Extrapolation_Raw = LastSmoothPosition = O_Position;
-                RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
-                ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
-                RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
-                ErrorLastFrame = 0;
-                CurAngVelAcceleration = CurAngVel = Quaternion.identity;
+                TeleResetValues();
             }
             else
             {
@@ -622,6 +621,16 @@ namespace SaccFlightAndVehicles
             O_LastRotation = O_Rotation_Q;
             O_LastPosition = O_Position;
             L_LastVel = L_CurVel;
+        }
+        void TeleResetValues()
+        {
+            LastAngVel = CurAngVel;
+            Extrapolation_Raw = LastSmoothPosition = O_Position;
+            RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
+            ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
+            RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
+            ErrorLastFrame = 0;
+            CurAngVelAcceleration = CurAngVel = Quaternion.identity;
         }
         public void ResetSyncTimes()
         {
