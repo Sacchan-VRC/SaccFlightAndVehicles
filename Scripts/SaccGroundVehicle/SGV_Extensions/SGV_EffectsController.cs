@@ -880,7 +880,9 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             VehicleAnimator.SetBool("owner", true);
+            if (Sleeping) SendCustomEventDelayedFrames(nameof(DelayedSleep), 1);// has to run after sync script
         }
+        public void DelayedSleep() { if (!Piloting) FallAsleep(); }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
