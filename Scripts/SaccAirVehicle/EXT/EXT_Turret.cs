@@ -487,10 +487,15 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
-            if (localPlayer.IsOwner(gameObject))
+            if (localPlayer.IsOwner(gameObject) && !Manning)
             {
-                OwnerSend(false, false, true);
+                SendCustomEventDelayedSeconds(nameof(LateJoinerSend), 7); // needs to run after syncscript
             }
+        }
+        public void LateJoinerSend()
+        {
+            if (localPlayer.IsOwner(gameObject) && !Manning)
+                OwnerSend(false, false, true);
         }
         public void DelegateFire()
         {
