@@ -155,6 +155,7 @@ namespace SaccFlightAndVehicles
             if (ObjectMode ? Networking.IsOwner(SyncRigid.gameObject) : EntityControl.IsOwner)
             {
                 VehicleRigid.useGravity = IsOwner = true;
+                firstDeserialize = false;
                 if (ObjectMode)
                 {
                     VehicleRigid.drag = StartDrag;
@@ -281,8 +282,8 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 ResetSyncTimes();
+                ExitIdleMode();
             }
-            ExitIdleMode();
         }
         float lastFrameTime_hitchtest;
         private void Update()
@@ -456,7 +457,7 @@ namespace SaccFlightAndVehicles
         private void EnterIdleMode()
         { IdleUpdateMode = true; }
         private void ExitIdleMode()
-        { IdleUpdateMode = false; UpdatesSentWhileStill = 0; }
+        { IdleUpdateMode = false; UpdatesSentWhileStill = 0; nextUpdateTime = (StartupServerTime + (double)(Time.time - StartupLocalTime)); }
 #if UNITY_EDITOR
         [Tooltip("Doesn't work properly, can't wait beyond update interval.")]
         public float LagSimDelay;
@@ -525,17 +526,20 @@ namespace SaccFlightAndVehicles
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
             {
-                if (SyncTransform) // will be false if initialization hasn't run yet
+                if (!idleDetected || firstDeserialize || Teleport)
                 {
-                    idleDetected = true;
-                    VehicleRigid.isKinematic = true;
-                    float smv_ = short.MaxValue;
-                    O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                    if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", Velocity); }
-                    if (SyncTransform)
+                    if (SyncTransform) // will be false if initialization hasn't run yet
                     {
-                        SyncTransform.position = O_Position;
-                        SyncTransform.rotation = O_Rotation_Q;
+                        idleDetected = true;
+                        VehicleRigid.isKinematic = true;
+                        float smv_ = short.MaxValue;
+                        O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
+                        if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", Velocity); }
+                        if (SyncTransform)
+                        {
+                            LastSmoothPosition = SyncTransform.position = O_Position;
+                            LastSmoothRotation = SyncTransform.rotation = O_Rotation_Q;
+                        }
                     }
                 }
                 O_LastUpdateTime = UpdateTime;
@@ -550,9 +554,13 @@ namespace SaccFlightAndVehicles
                 SetPhysics();
                 float smv_ = short.MaxValue;
                 O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                O_LastRotation = O_Rotation_Q;
                 L_LastVel = Velocity;
-                TeleResetValues();
+                Extrapolation_Raw = O_Position;
+                O_LastRotation = RotExtrapolation_Raw = O_Rotation_Q;
+                ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
+                RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
+                ErrorLastFrame = 0;
+                LastAngVel = CurAngVelAcceleration = CurAngVel = Quaternion.identity;
             }
             float speednormalizer = 1 / updateDelta;
 
@@ -567,16 +575,7 @@ namespace SaccFlightAndVehicles
             DBGPING = Ping;
 #endif
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
-            bool SetVelZero = false;
-            if (Velocity.sqrMagnitude == 0)
-            {
-                if (O_LastVel.sqrMagnitude != 0)
-                { L_CurVel = Vector3.zero; SetVelZero = true; }
-                else
-                { L_CurVel = (O_Position - O_LastPosition) * speednormalizer; }
-            }
-            else
-            { L_CurVel = Velocity; }
+            L_CurVel = Velocity;
             O_LastVel = Velocity;
             Acceleration = L_CurVel - L_LastVel;
 
@@ -594,7 +593,7 @@ namespace SaccFlightAndVehicles
 
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //+ if idlemode, disable acceleration because it brakes
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || L_CurVel.magnitude < IdleMovementRange)
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || L_CurVel.magnitude < IdleMovementRange)
             { Acceleration = Vector3.zero; CurAngVelAcceleration = Quaternion.identity; }
 
             Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
