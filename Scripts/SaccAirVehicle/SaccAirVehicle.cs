@@ -2154,9 +2154,7 @@ namespace SaccFlightAndVehicles
                 PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
             }
             if (HasAfterburner) { SetAfterburnerOff(); }
-            //these two make it invincible and unable to be respawned again for 5s
-            EntityControl.dead = true;
-            SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
+            EntityControl.SetInvincibleFor(InvincibleAfterSpawn);
             if (LowFuelLastFrame)
             { SendNotLowFuel(); }
             if (NoFuelLastFrame)

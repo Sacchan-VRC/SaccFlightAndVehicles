@@ -1363,8 +1363,7 @@ namespace SaccFlightAndVehicles
                 EntityControl.ShouldTeleport = true;
                 SetRespawnPos();
             }
-            EntityControl.dead = true;
-            SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
+            EntityControl.SetInvincibleFor(InvincibleAfterSpawn);
         }
         public void SFEXT_O_TakeOwnership()
         {
