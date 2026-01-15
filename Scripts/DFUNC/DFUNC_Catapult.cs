@@ -432,6 +432,7 @@ namespace SaccFlightAndVehicles
             if (CatapultLock) { CatapultLock.Play(); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
+            EntityControl.ShouldTeleport = true;
             EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockIn");
         }
         public void CatapultLockOff()
