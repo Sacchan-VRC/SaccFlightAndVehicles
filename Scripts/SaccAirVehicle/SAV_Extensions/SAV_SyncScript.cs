@@ -89,8 +89,6 @@ namespace SaccFlightAndVehicles
         private Vector3 Extrapolation_Raw;
         private Quaternion RotExtrapolation_Raw = Quaternion.identity;
         private double StartupServerTime;
-        Vector3 L_CurVel;
-        Vector3 L_LastVel;
         private double StartupLocalTime;
         [System.NonSerialized] public Vector3 ExtrapDirection_Smooth; // Current velocity
         [System.NonSerialized] public Quaternion RotExtrapDirection_Smooth; // Current angular velocity
@@ -247,7 +245,7 @@ namespace SaccFlightAndVehicles
             O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             O_LastUpdateTime -= updateInterval;
             Extrapolation_Raw = LastSmoothPosition = O_LastPosition = O_Position = VehicleTransform.position;
-            ExtrapDirection_Raw = ExtrapDirection_Smooth = L_CurVel = L_LastVel = O_LastVel = VehicleRigid.velocity;
+            ExtrapDirection_Raw = ExtrapDirection_Smooth = O_CurVel = O_LastVel = VehicleRigid.velocity;
             RotExtrapolation_Raw = RotationLerper = LastSmoothRotation = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
             Acceleration = LastAcceleration = Vector3.zero;
             CurAngVelAcceleration = LastAngVel = CurAngVel = RotationExtrapolationDirection = Quaternion.identity;
@@ -349,18 +347,17 @@ namespace SaccFlightAndVehicles
                             ExitIdleMode();
                         }
                         //never use rigidbody values for position or rotation because the interpolation/extrapolation from update is needed for it to be smooth
-                        O_Position = VehicleTransform.position;
-                        O_Rotation_Q = VehicleTransform.rotation;
+                        Vector3 newPosition = VehicleTransform.position;
+                        Quaternion newRotation = VehicleTransform.rotation;
                         //convert each quat to shorts to save bandwidth
                         float smv = short.MaxValue;
-                        O_RotationX = (short)(O_Rotation_Q.x * smv);
-                        O_RotationY = (short)(O_Rotation_Q.y * smv);
-                        O_RotationZ = (short)(O_Rotation_Q.z * smv);
-                        O_RotationW = (short)(O_Rotation_Q.w * smv);
+                        short rotX = (short)(newRotation.x * smv);
+                        short rotY = (short)(newRotation.y * smv);
+                        short rotZ = (short)(newRotation.z * smv);
+                        short rotW = (short)(newRotation.w * smv);
 
-                        O_CurVel = VehicleRigid.velocity;
+                        Vector3 newVelocity = VehicleRigid.velocity;
 
-                        O_UpdateTime = time;//send servertime of update
                         bool shouldTele;
                         if (EntityControl)
                         {
@@ -371,10 +368,19 @@ namespace SaccFlightAndVehicles
 #endif
                         }
                         else shouldTele = false;
+#if UNITY_EDITOR
+                        DBG_newPosition = newPosition;
+                        DBG_updateTime = time;
+                        DBG_rotX = rotX;
+                        DBG_rotY = rotY;
+                        DBG_rotZ = rotZ;
+                        DBG_rotW = rotW;
+                        DBG_newVelocity = newVelocity;
+#endif
                         if (shouldTele)
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendSyncDataTP), O_UpdateTime, O_Position, O_RotationX, O_RotationY, O_RotationZ, O_RotationW, O_CurVel);
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendSyncDataTP), time, newPosition, rotX, rotY, rotZ, rotW, newVelocity);
                         else
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendSyncData), O_UpdateTime, O_Position, O_RotationX, O_RotationY, O_RotationZ, O_RotationW, O_CurVel);
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Others, nameof(SendSyncData), time, newPosition, rotX, rotY, rotZ, rotW, newVelocity);
                     }
                     nextUpdateTime = time + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval);
                 }
@@ -396,10 +402,9 @@ namespace SaccFlightAndVehicles
             if (DBG_DoDeserialize)
             {
                 DBG_DoDeserialize = false;
-                bool shouldTele;
-                shouldTele = DBG_shouldTele;
+                bool dbgtele = DBG_shouldTele;
                 if (DBG_shouldTele) DBG_shouldTele = false;
-                Deserialization(O_UpdateTime, O_Position, O_RotationX, O_RotationY, O_RotationZ, O_RotationW, O_CurVel, shouldTele);
+                Deserialization(DBG_updateTime, DBG_newPosition, DBG_rotX, DBG_rotY, DBG_rotZ, DBG_rotW, DBG_newVelocity, dbgtele);
             }
 #endif
             float deltatime = Time.deltaTime;
@@ -423,7 +428,7 @@ namespace SaccFlightAndVehicles
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
             float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateDelta);
             //extrapolated position based on time passed since update
-            Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
+            Vector3 VelEstimate = O_CurVel + (Acceleration * TimeSinceUpdate);
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
             if (NonOwnerEnablePhysics) { VehicleRigid.velocity = ExtrapDirection_Smooth; }
 
@@ -434,7 +439,13 @@ namespace SaccFlightAndVehicles
 
             //positional update
             Extrapolation_Raw = O_Position + (ExtrapDirection_Raw * (float)(time - O_UpdateTime));
-            Vector3 newpos = LastSmoothPosition + ExtrapDirection_Smooth * deltatime;
+            Vector3 newpos;
+            if (Deserialization_Teleported)
+            {
+                newpos = Extrapolation_Raw;
+                Deserialization_Teleported = false;
+            }
+            else newpos = LastSmoothPosition + ExtrapDirection_Smooth * deltatime;
             //rotational update
             //rotate raw rot extrapolation by frames worth
             RotExtrapolation_Raw = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime) * RotExtrapolation_Raw;
@@ -469,11 +480,18 @@ namespace SaccFlightAndVehicles
             if (TestMode)
             { DeserializationCheck(); }
         }
+        private double DBG_updateTime;
+        private Vector3 DBG_newPosition;
+        private Vector3 DBG_newVelocity;
+        private short DBG_rotX;
+        private short DBG_rotY;
+        private short DBG_rotZ;
+        private short DBG_rotW;
         private bool DBG_shouldTele = false;
         private bool DBG_DoDeserialize = false;
         private void DeserializationCheck()
         {
-            if (O_UpdateTime != O_LastUpdateTime)
+            if (DBG_updateTime != O_LastUpdateTime)
             {
                 if (!LagSimWait)
                 {
@@ -511,10 +529,12 @@ namespace SaccFlightAndVehicles
         {
             Deserialization(UpdateTime, Position, RotX, RotY, RotZ, RotW, Velocity, true);
         }
+        bool Deserialization_Teleported;
         void Deserialization(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity, bool Teleport)
         {
             O_UpdateTime = UpdateTime;
             O_Position = Position;
+            O_CurVel = Velocity;
             //time between this update and last
             float update_gap = (float)(UpdateTime - O_LastUpdateTime);
             if (update_gap < 0.0001f)
@@ -534,7 +554,7 @@ namespace SaccFlightAndVehicles
                         VehicleRigid.isKinematic = true;
                         float smv_ = short.MaxValue;
                         O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                        if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", Velocity); }
+                        if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", O_CurVel); }
                         if (SyncTransform)
                         {
                             LastSmoothPosition = SyncTransform.position = O_Position;
@@ -554,10 +574,9 @@ namespace SaccFlightAndVehicles
                 SetPhysics();
                 float smv_ = short.MaxValue;
                 O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
-                L_LastVel = Velocity;
                 Extrapolation_Raw = O_Position;
                 O_LastRotation = RotExtrapolation_Raw = O_Rotation_Q;
-                ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
+                ExtrapDirection_Smooth = ExtrapDirection_Raw = O_LastVel = O_CurVel;
                 RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
                 ErrorLastFrame = 0;
                 LastAngVel = CurAngVelAcceleration = CurAngVel = Quaternion.identity;
@@ -574,10 +593,7 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
             DBGPING = Ping;
 #endif
-            //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
-            L_CurVel = Velocity;
-            O_LastVel = Velocity;
-            Acceleration = L_CurVel - L_LastVel;
+            Acceleration = O_CurVel - O_LastVel;
 
             float smv = short.MaxValue;
             O_Rotation_Q = new Quaternion(RotX / smv, RotY / smv, RotZ / smv, RotW / smv);
@@ -592,15 +608,14 @@ namespace SaccFlightAndVehicles
             CurAngVelAcceleration = CurAngVel * Quaternion.Inverse(LastAngVel);
 
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
-            //+ if idlemode, disable acceleration because it brakes
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || L_CurVel.magnitude < IdleMovementRange)
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0)
             { Acceleration = Vector3.zero; CurAngVelAcceleration = Quaternion.identity; }
 
             Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
             Quaternion L_PingAdjustedRotation = PingRotExtrap * O_Rotation_Q;
             RotExtrapolation_Raw = L_PingAdjustedRotation;
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
-            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
+            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", O_CurVel); }
 
             if (Teleport)
             {
@@ -609,27 +624,24 @@ namespace SaccFlightAndVehicles
                     SyncTransform.position = O_Position;
                     SyncTransform.rotation = O_Rotation_Q;
                 }
-                TeleResetValues();
+                LastAngVel = CurAngVel;
+                Extrapolation_Raw = LastSmoothPosition = O_Position;
+                RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
+                ExtrapDirection_Smooth = ExtrapDirection_Raw = O_CurVel;
+                RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
+                ErrorLastFrame = 0;
+                CurAngVelAcceleration = CurAngVel = Quaternion.identity;
+                Deserialization_Teleported = true;
             }
             else
             {
-                ExtrapDirection_Raw = L_CurVel + Acceleration;
+                ExtrapDirection_Raw = O_CurVel + Acceleration;
                 RotationExtrapolationDirection = CurAngVelAcceleration * CurAngVel;
             }
             O_LastUpdateTime = UpdateTime;
             O_LastRotation = O_Rotation_Q;
             O_LastPosition = O_Position;
-            L_LastVel = L_CurVel;
-        }
-        void TeleResetValues()
-        {
-            LastAngVel = CurAngVel;
-            Extrapolation_Raw = LastSmoothPosition = O_Position;
-            RotExtrapolation_Raw = LastSmoothRotation = O_Rotation_Q;
-            ExtrapDirection_Smooth = ExtrapDirection_Raw = L_CurVel;
-            RotExtrapDirection_Smooth = RotationExtrapolationDirection = Quaternion.identity;
-            ErrorLastFrame = 0;
-            CurAngVelAcceleration = CurAngVel = Quaternion.identity;
+            O_LastVel = O_CurVel;
         }
         public void ResetSyncTimes()
         {
