@@ -241,7 +241,6 @@ namespace SaccFlightAndVehicles
         }
         public void Set_Inactive()
         {
-            GunAnimator.SetBool(GunFiringBoolName, false);
             Firing = false;
             gameObject.SetActive(false);
         }
@@ -290,9 +289,9 @@ namespace SaccFlightAndVehicles
                         }
                         if (!_firing)
                         {
+                            if (!gameObject.activeInHierarchy) return; // because update runs once after OnDisable somehow ¯\_(ツ)_/¯
                             Firing = true;
                             RequestSerialization();
-                            // EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring");
                         }
                         GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                     }
@@ -302,7 +301,6 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = false;
                             RequestSerialization();
-                            // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                         }
                     }
                     Hud();
@@ -313,9 +311,12 @@ namespace SaccFlightAndVehicles
                     Firing = false;
                     RequestSerialization();
                     OnDeserialization();
-                    // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                 }
             }
+        }
+        void OnDisable()
+        {
+            Firing = false;
         }
         private GameObject[] AAMTargets;
         private int AAMTarget;
