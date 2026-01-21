@@ -250,7 +250,6 @@ namespace SaccFlightAndVehicles
             Acceleration = LastAcceleration = Vector3.zero;
             CurAngVelAcceleration = LastAngVel = CurAngVel = RotationExtrapolationDirection = Quaternion.identity;
             ErrorLastFrame = 0f;
-            O_LastUpdateTime = O_UpdateTime - 0.2d;
             if (NonOwnerEnablePhysics)
             {
                 VehicleRigid.isKinematic = false;
@@ -532,16 +531,11 @@ namespace SaccFlightAndVehicles
         bool Deserialization_Teleported;
         void Deserialization(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity, bool Teleport)
         {
+            float update_gap = (float)(UpdateTime - O_LastUpdateTime);
+            if (update_gap < 0.0001f) { return; } // prevents out of order updates
             O_UpdateTime = UpdateTime;
             O_Position = Position;
             O_CurVel = Velocity;
-            //time between this update and last
-            float update_gap = (float)(UpdateTime - O_LastUpdateTime);
-            if (update_gap < 0.0001f)
-            {
-                O_LastUpdateTime = UpdateTime;
-                return;
-            }
             updateDelta = update_gap;
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
