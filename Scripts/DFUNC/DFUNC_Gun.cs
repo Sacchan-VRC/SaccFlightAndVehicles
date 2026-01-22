@@ -219,6 +219,7 @@ namespace SaccFlightAndVehicles
         }
         public void Set_Selected()
         {
+            if (!EntityControl.Occupied) return;
             if (HudCrosshairGun) { HudCrosshairGun.SetActive(true); }
             if (HudCrosshair) { HudCrosshair.SetActive(false); }
             for (int i = 0; i < EnableOnSelected.Length; i++)
@@ -237,7 +238,8 @@ namespace SaccFlightAndVehicles
         }
         public void Set_Active()
         {
-            gameObject.SetActive(true);
+            if (EntityControl.Occupied)
+                gameObject.SetActive(true);
         }
         public void Set_Inactive()
         {
@@ -248,10 +250,20 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
-            if (gameObject.activeSelf)//if someone times out, tell weapon to stop firing if you take ownership.
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
+            if (Piloting)
+            { // for when taking back ownership while sitting in pilot seat after grapple was let go
+                if (!gameObject.activeSelf)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active)); }
+            }
+            else
+            {
+                if (gameObject.activeSelf)//if someone times out, tell weapon to stop firing if you take ownership.
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
+            }
             if (Selected_HUD)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }
+            { if (!Selected) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }
+            else
+            { if (Selected) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Selected)); }
         }
         public void SFEXT_O_LoseOwnership()
         {
