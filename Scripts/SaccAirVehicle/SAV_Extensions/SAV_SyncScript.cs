@@ -71,6 +71,7 @@ namespace SaccFlightAndVehicles
         private double O_LastUpdateTime = double.MinValue;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
         private bool IsOwner = false;
+        private bool WasOwner = true;
         private Vector3 ExtrapDirection_Raw;
         private Quaternion RotationExtrapolationDirection;
         private Vector3 lerpedCurVel;
@@ -152,8 +153,7 @@ namespace SaccFlightAndVehicles
 
             if (ObjectMode ? Networking.IsOwner(SyncRigid.gameObject) : EntityControl.IsOwner)
             {
-                VehicleRigid.useGravity = IsOwner = true;
-                firstDeserialize = false;
+                VehicleRigid.useGravity = WasOwner = IsOwner = true;
                 if (ObjectMode)
                 {
                     VehicleRigid.drag = StartDrag;
@@ -167,7 +167,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                VehicleRigid.useGravity = IsOwner = false;
+                VehicleRigid.useGravity = WasOwner = IsOwner = false;
                 if (!NonOwnerEnablePhysics)
                 {
                     VehicleRigid.drag = 9999;
@@ -217,7 +217,7 @@ namespace SaccFlightAndVehicles
         }
         private void TakeOwnerStuff()
         {
-            VehicleRigid.useGravity = IsOwner = true;
+            VehicleRigid.useGravity = WasOwner = IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             VehicleRigid.interpolation = RigidbodyInterpolation.Extrapolate;
@@ -517,11 +517,10 @@ namespace SaccFlightAndVehicles
         }
 #endif
         bool idleDetected = true;
-        bool firstDeserialize = true;
         [NetworkCallable]
         public void SendSyncData(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity)
         {
-            Deserialization(UpdateTime, Position, RotX, RotY, RotZ, RotW, Velocity, false);
+            Deserialization(UpdateTime, Position, RotX, RotY, RotZ, RotW, Velocity, WasOwner);
         }
         [NetworkCallable]
         public void SendSyncDataTP(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity)
@@ -532,7 +531,8 @@ namespace SaccFlightAndVehicles
         void Deserialization(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity, bool Teleport)
         {
             float update_gap = (float)(UpdateTime - O_LastUpdateTime);
-            if (update_gap < 0.0001f) { return; } // prevents out of order updates
+            if (update_gap < 0.0001f || IsOwner) { return; } // prevents out of order updates
+            WasOwner = false;
             O_UpdateTime = UpdateTime;
             O_Position = Position;
             O_CurVel = Velocity;
@@ -540,7 +540,7 @@ namespace SaccFlightAndVehicles
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
             {
-                if (!idleDetected || firstDeserialize || Teleport)
+                if (!idleDetected || Teleport)
                 {
                     if (SyncTransform) // will be false if initialization hasn't run yet
                     {
@@ -562,7 +562,6 @@ namespace SaccFlightAndVehicles
             else if (idleDetected)
             {
                 if (!Initialized) return;
-                if (firstDeserialize) { Teleport = true; firstDeserialize = false; }
                 idleDetected = false;
                 ResetSyncTimes();
                 SetPhysics();
