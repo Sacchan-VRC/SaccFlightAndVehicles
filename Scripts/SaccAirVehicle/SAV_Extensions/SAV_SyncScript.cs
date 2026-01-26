@@ -386,7 +386,14 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
                 if (TestMode)
                 {
-                    ExtrapolationAndSmoothing();
+                    if (DBG_DoDeserialize)
+                    {
+                        DBG_DoDeserialize = false;
+                        bool dbgtele = DBG_shouldTele;
+                        if (DBG_shouldTele) DBG_shouldTele = false;
+                        Deserialization(DBG_updateTime, DBG_newPosition, DBG_rotX, DBG_rotY, DBG_rotZ, DBG_rotW, DBG_newVelocity, dbgtele);
+                    }
+                    if (!idleDetected) ExtrapolationAndSmoothing();
                 }
 #endif
             }
@@ -397,15 +404,6 @@ namespace SaccFlightAndVehicles
         }
         private void ExtrapolationAndSmoothing()
         {
-#if UNITY_EDITOR
-            if (DBG_DoDeserialize)
-            {
-                DBG_DoDeserialize = false;
-                bool dbgtele = DBG_shouldTele;
-                if (DBG_shouldTele) DBG_shouldTele = false;
-                Deserialization(DBG_updateTime, DBG_newPosition, DBG_rotX, DBG_rotY, DBG_rotZ, DBG_rotW, DBG_newVelocity, dbgtele);
-            }
-#endif
             float deltatime = Time.deltaTime;
             double time;
             Vector3 Deriv = Vector3.zero;
@@ -531,7 +529,11 @@ namespace SaccFlightAndVehicles
         void Deserialization(double UpdateTime, Vector3 Position, short RotX, short RotY, short RotZ, short RotW, Vector3 Velocity, bool Teleport)
         {
             float update_gap = (float)(UpdateTime - O_LastUpdateTime);
-            if (update_gap < 0.0001f || IsOwner) { return; } // prevents out of order updates
+#if UNITY_EDITOR
+            if (update_gap < 0.0001f) { return; }
+#else
+            if (update_gap < 0.0001f || IsOwner) { return; }
+#endif
             WasOwner = false;
             O_UpdateTime = UpdateTime;
             O_Position = Position;
@@ -545,7 +547,9 @@ namespace SaccFlightAndVehicles
                     if (SyncTransform) // will be false if initialization hasn't run yet
                     {
                         idleDetected = true;
+#if !UNITY_EDITOR
                         VehicleRigid.isKinematic = true;
+#endif
                         float smv_ = short.MaxValue;
                         O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
                         if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", O_CurVel); }
@@ -681,7 +685,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
         }
-        public void SFEXT_L_OnCollisionEnter() { ExitIdleMode(); }
+        public void SFEXT_L_OnCollisionEnter() { if (IdleUpdateMode) ExitIdleMode(); }
         private bool DisableAntiWarp;
         public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
         public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
