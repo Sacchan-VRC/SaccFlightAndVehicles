@@ -732,10 +732,6 @@ namespace SaccFlightAndVehicles
         {
             Piloting = true;
             InVehicle = true;
-            if (EntityControl.MySeat != -1)
-            {
-                InVehicle_Sounds = EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors == 0;
-            }
             UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
             { PlaneWind.volume = 0; PlaneWind.Play(); }
@@ -755,10 +751,6 @@ namespace SaccFlightAndVehicles
             DoSound = 0;
             Passenger = true;
             InVehicle = true;
-            if (EntityControl.MySeat != -1)
-            {
-                InVehicle_Sounds = EntityControl.VehicleSeats[EntityControl.MySeat].numOpenDoors == 0;
-            }
             UpdateDoorsOpen();
             if (PlaneWind && !PlaneWind.isPlaying)
             { PlaneWind.volume = 0; PlaneWind.Play(); }
