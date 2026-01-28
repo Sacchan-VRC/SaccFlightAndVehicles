@@ -225,8 +225,7 @@ namespace SaccFlightAndVehicles
             CanopyOpen = false;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBool, false); }
             CanopyTransitioning = true;
-            SoundControl.SendCustomEventDelayedSeconds("DoorClose", CanopyCloseTime);
-            SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
+            SendCustomEventDelayedSeconds(nameof(SetCanopyTransitioningFalse), CanopyCloseTime);
 
             if (DragApplied)
             {
@@ -276,7 +275,7 @@ namespace SaccFlightAndVehicles
             if (CanopyBroken) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
-            CanopyOpen = true;
+            if (!CanopyOpen) ToggleCanopy_(true);
             CanopyBroken = true;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, true); }
             if (EntityControl.IsOwner)
