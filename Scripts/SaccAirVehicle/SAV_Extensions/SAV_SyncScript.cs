@@ -96,6 +96,8 @@ namespace SaccFlightAndVehicles
         Vector3 LastSmoothPosition;
         Quaternion LastSmoothRotation;
         float IntervalsMid = 0f;
+        Vector3 LastSentPosition;
+        Quaternion LastSentRotation;
 #if UNITY_EDITOR
         private bool TestMode;
 #endif
@@ -134,7 +136,6 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_EntityStart()
         {
-            Initialized = true;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             bool InEditor = !Utilities.IsValid(localPlayer);
             if (SyncRigid)
@@ -167,7 +168,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                VehicleRigid.useGravity = WasOwner = IsOwner = false;
+                VehicleRigid.useGravity = IsOwner = false;
                 if (!NonOwnerEnablePhysics)
                 {
                     VehicleRigid.drag = 9999;
@@ -188,6 +189,7 @@ namespace SaccFlightAndVehicles
         }
         public void ActivateScript()
         {
+            Initialized = true;
             InitSyncValues();
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
@@ -201,8 +203,7 @@ namespace SaccFlightAndVehicles
             O_LastRotation = LastSmoothRotation = O_Rotation_Q = VehicleTransform.rotation;
             double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
             nextUpdateTime = time + Random.Range(0f, updateInterval);
-            O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = time;
-            O_LastUpdateTime -= updateInterval;
+            L_UpdateTime = lastframetime = lastframetime_extrap = time;
             Extrapolation_Raw = O_LastPosition = LastSmoothPosition = O_Position = VehicleTransform.position;
         }
         public void SFEXT_L_OwnershipTransfer()
@@ -236,7 +237,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.angularDrag = 0;
             }
             L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) + .2f;
+            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) + (Piloting ? 0f : Random.Range(0, IdleModeUpdateInterval));
             UpdatesSentWhileStill = 0;
         }
         private void LoseOwnerStuff()
@@ -333,13 +334,17 @@ namespace SaccFlightAndVehicles
                     if (!Networking.IsClogged || Piloting)
                     {
                         //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                        bool Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
-
+                        bool Still = !Piloting && (((VehicleTransform.position - LastSentPosition).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, LastSentRotation) < IdleRotationRange);
+                        LastSentPosition = VehicleTransform.position;
+                        LastSentRotation = VehicleTransform.rotation;
                         if (Still)
                         {
-                            UpdatesSentWhileStill++;
-                            if (UpdatesSentWhileStill > EnterIdleModeNumber)
-                            { EnterIdleMode(); }
+                            if (!IdleUpdateMode)
+                            {
+                                UpdatesSentWhileStill++;
+                                if (UpdatesSentWhileStill > EnterIdleModeNumber)
+                                { EnterIdleMode(); }
+                            }
                         }
                         else
                         {
@@ -530,11 +535,10 @@ namespace SaccFlightAndVehicles
         {
             float update_gap = (float)(UpdateTime - O_LastUpdateTime);
 #if UNITY_EDITOR
-            if (update_gap < 0.0001f) { return; }
+            if (update_gap < 0.0001f || !TestMode) { return; }
 #else
             if (update_gap < 0.0001f || IsOwner) { return; }
 #endif
-            WasOwner = false;
             O_UpdateTime = UpdateTime;
             O_Position = Position;
             O_CurVel = Velocity;
@@ -542,9 +546,9 @@ namespace SaccFlightAndVehicles
             // detect if the updates are coming in at a rate closer to the idle rate
             if (updateDelta > IntervalsMid)
             {
-                if (!idleDetected || Teleport)
+                if (SyncTransform) // will be false if initialization hasn't run yet
                 {
-                    if (SyncTransform) // will be false if initialization hasn't run yet
+                    if (!idleDetected || Teleport)
                     {
                         idleDetected = true;
 #if !UNITY_EDITOR
@@ -553,14 +557,12 @@ namespace SaccFlightAndVehicles
                         float smv_ = short.MaxValue;
                         O_Rotation_Q = new Quaternion(RotX / smv_, RotY / smv_, RotZ / smv_, RotW / smv_);
                         if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", O_CurVel); }
-                        if (SyncTransform)
-                        {
-                            LastSmoothPosition = SyncTransform.position = O_Position;
-                            LastSmoothRotation = SyncTransform.rotation = O_Rotation_Q;
-                        }
+                        LastSmoothPosition = SyncTransform.position = O_Position;
+                        LastSmoothRotation = SyncTransform.rotation = O_Rotation_Q;
+                        WasOwner = false;
                     }
+                    O_LastUpdateTime = UpdateTime;
                 }
-                O_LastUpdateTime = UpdateTime;
                 return;
             }
             else if (idleDetected)
@@ -578,6 +580,7 @@ namespace SaccFlightAndVehicles
                 ErrorLastFrame = 0;
                 LastAngVel = CurAngVelAcceleration = CurAngVel = Quaternion.identity;
             }
+            WasOwner = false;
             float speednormalizer = 1 / updateDelta;
 
             LastAcceleration = Acceleration;
@@ -679,8 +682,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
-                else { VehicleRigid.isKinematic = false; }
+                VehicleRigid.isKinematic = !NonOwnerEnablePhysics;
                 VehicleRigid.interpolation = RigidbodyInterpolation.None;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
