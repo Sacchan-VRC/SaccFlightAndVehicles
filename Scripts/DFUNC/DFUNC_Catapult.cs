@@ -196,7 +196,7 @@ namespace SaccFlightAndVehicles
                             {
                                 CatapultTransform = other.transform;
                                 //Hit detected, check if the plane is facing in the right direction..
-                                if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
+                                if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.forward) < MaxAttachAngle)
                                 {
                                     OnCatapult = true;
                                     AttachTime = Time.time;
@@ -216,22 +216,18 @@ namespace SaccFlightAndVehicles
                                         VehicleTransform.rotation = newrotation;
                                         //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
 
-                                        float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
+                                        float PlaneCatapultUpDistance = CatapultTransform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
                                         VehicleTransform.position = CatapultTransform.position - (CatapultTransform.up * PlaneCatapultUpDistance);
                                         //move the plane back so that the catapult is aligned to the catapult detector
                                         float PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
                                         VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
-                                        PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
-                                        PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
 
                                         VehicleRigidbody.position = VehicleTransform.position;
                                         VehicleRigidbody.rotation = VehicleTransform.rotation;
                                     }
-                                    else
-                                    {
-                                        PlaneCatapultOffset = VehicleTransform.position - CatapultTransform.position;
-                                        PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
-                                    }
+                                    PlaneCatapultOffset = CatapultTransform.InverseTransformDirection(VehicleTransform.position - CatapultTransform.position);
+                                    PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
+
 
                                     if (!DisableGearToggle && GearFunc)
                                     {
@@ -324,8 +320,8 @@ namespace SaccFlightAndVehicles
                     }
                 }
 
-                VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
-                VehicleTransform.position = CatapultTransform.position + PlaneCatapultOffset;
+                VehicleTransform.rotation = CatapultTransform.rotation * PlaneCatapultRotDif;
+                VehicleTransform.position = CatapultTransform.position + CatapultTransform.TransformDirection(PlaneCatapultOffset);
                 VehicleRigidbody.position = VehicleTransform.position;
                 VehicleRigidbody.rotation = VehicleTransform.rotation;
                 VehicleRigidbody.velocity = Vector3.zero;
@@ -365,8 +361,7 @@ namespace SaccFlightAndVehicles
                     if (CatapultRotDifEULER.z > 180) { CatapultRotDifEULER.z -= 360; }
                     Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                     VehicleRigidbody.angularVelocity = CatapultRotDifrad;
-                    EntityControl.invincible = true;
-                    SendCustomEventDelayedSeconds(nameof(deadfalse), (float)SAVControl.GetProgramVariable("GsAveragingTime") * 2f);
+                    EntityControl.SetInvincibleFor((float)SAVControl.GetProgramVariable("GsAveragingTime") * 2f);
                 }
                 CatapultRotLastFrame = CatapultTransform.rotation;
                 CatapultPosLastFrame = CatapultTransform.position;
