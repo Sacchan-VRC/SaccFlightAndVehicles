@@ -44,7 +44,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         public bool StickATGScrToFace_DT = true;
-        [UdonSynced(UdonSyncMode.None)] private bool LaserFireNow = false;
         public float ATGScrDist = .5f;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
@@ -107,8 +106,6 @@ namespace SaccFlightAndVehicles
             numUsers++;
             if (numUsers > 1) return;
 
-            OnEnableDeserializationBlocker = true;
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
         }
         public void SFEXT_O_PilotExit()
@@ -145,13 +142,10 @@ namespace SaccFlightAndVehicles
             AtGCam.gameObject.SetActive(true);
             TriggerLastFrame = true;
             func_active = true;
-            OnEnableDeserializationBlocker = true;
             gameObject.SetActive(true);
-            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
             if (DoAnimBool)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
-        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void DFUNC_Deselected()
         {
             func_active = false;
@@ -267,20 +261,29 @@ namespace SaccFlightAndVehicles
         private void PullTrigger()
         {
             FiredTime = Time.time;
-            if (LaserFireSound) { LaserFireSound.PlayOneShot(LaserFireSound.clip); }
             if (TriggerFireDelay == 0)
             {
                 FireLaser_Owner();
             }
             else
             {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireLaser_SoundEvent));
                 SendCustomEventDelayedSeconds(nameof(FireLaser_Owner), TriggerFireDelay);
             }
         }
         public void FireLaser_Owner()
         {
-            FireNextSerialization = true;
-            RequestSerialization();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireLaser_Event));
+        }
+        [NetworkCallable]
+        public void FireLaser_SoundEvent()
+        {
+            if (LaserFireSound) { LaserFireSound.PlayOneShot(LaserFireSound.clip); }
+        }
+        [NetworkCallable]
+        public void FireLaser_Event()
+        {
+            if (TriggerFireDelay == 0) { FireLaser_SoundEvent(); }
             FireLaser();
         }
         public void FireLaser()
@@ -339,22 +342,6 @@ namespace SaccFlightAndVehicles
             {
                 EntityControl.ToggleStickSelection(this);
             }
-        }
-        private bool FireNextSerialization = false;
-        public override void OnPreSerialization()
-        {
-            if (FireNextSerialization)
-            {
-                FireNextSerialization = false;
-                LaserFireNow = true;
-            }
-            else { LaserFireNow = false; }
-        }
-        bool OnEnableDeserializationBlocker;
-        public override void OnDeserialization()
-        {
-            if (OnEnableDeserializationBlocker) { return; }
-            if (LaserFireNow) { FireLaser(); }
         }
     }
 }
