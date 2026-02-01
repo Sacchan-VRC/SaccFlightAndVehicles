@@ -33,6 +33,8 @@ namespace SaccFlightAndVehicles
         public bool DoSideThrust = true;
         public bool DoUPDownThrust = true;
         public bool AllowMainEngineAndThrust = false;
+        [Tooltip("Set vehicle's throttle value to match the magnitude of the 3DThrust input, recommend setting vehicles ThrottleStrength to 0 if using this otherwise it'll always move forward, use for HUD visual like the S-GRVR.")]
+        public bool ThrottleMatch3DThrust = false;
         [SerializeField] bool RequireEngine = true;
         [SerializeField] bool DisableSAVJoystick = false;
         [SerializeField] bool DisableSAVThrottle = false;
@@ -90,12 +92,20 @@ namespace SaccFlightAndVehicles
                 {
                     if (value && !_ThreeDThrustActive)
                     {
-                        SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+                        if (!OverridingThrottle)
+                        {
+                            OverridingThrottle = true;
+                            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+                        }
                     }
                     else if (!value && _ThreeDThrustActive)
                     {
-                        SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
-                        SAVControl.SetProgramVariable("ThrottleOverride", 0f);
+                        if (OverridingThrottle)
+                        {
+                            OverridingThrottle = false;
+                            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+                            SAVControl.SetProgramVariable("ThrottleOverride", 0f);
+                        }
                     }
                 }
                 if (Piloting)
@@ -124,7 +134,7 @@ namespace SaccFlightAndVehicles
 
             if (!UseThrottleAsForward && !UseAsDFUNC && !ControlsWind)
             {
-                if (!OverridingThrottle && !AllowMainEngineAndThrust)
+                if (!OverridingThrottle && !AllowMainEngineAndThrust && DefaultEnabled)
                 {
                     OverridingThrottle = true;
                     SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
@@ -405,7 +415,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 UpdateThrustArrow();
-                if (!AllowMainEngineAndThrust)
+                if (!AllowMainEngineAndThrust && ThrottleMatch3DThrust)
                 {
                     SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Min(ThreeDThrottleInput.magnitude, 1));
                 }

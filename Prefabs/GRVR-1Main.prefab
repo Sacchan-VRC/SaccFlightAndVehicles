@@ -31182,6 +31182,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 7165555808720475924}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -32119,6 +32121,8 @@ MonoBehaviour:
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 4810694074260628692}
+  AdjustSeatRotation: 1
+  RotationCalibrationTarget: {fileID: 0}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -32279,13 +32283,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1564986659178906793}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 8496099365134152853}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -42351,6 +42355,7 @@ MonoBehaviour:
   GunFiringBoolName: gunfiring
   FireKey: 32
   FireNowKey: 0
+  TargetingTransform: {fileID: 0}
   AmmoBars:
   - {fileID: 1564986660355104341}
   GunRecoilEmpty: {fileID: 1564986659346940533}
@@ -42803,7 +42808,9 @@ MonoBehaviour:
   - {fileID: 6866471498013573617}
   - {fileID: 6866471498141761955}
   LaunchSound: {fileID: 0}
+  LaunchSound_Clips: []
   LaunchSound_Interior: {fileID: 0}
+  LaunchSound_Interior_Clips: []
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -42821,6 +42828,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -43684,10 +43693,13 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   SoundControl: {fileID: 2112087965254652501}
   Dial_Funcon: {fileID: 3756985997919686288}
+  Dial_Funcon_Array: []
   CanopyAnimator: {fileID: 1564986660552776568}
   CanopyOpenTime: 0
   CanopyCloseTime: 2.1666667
   EffectedSeats: []
+  CanopyCloseOnEnter: 0
+  CanopyOpenOnExit: 0
   CanopyCanBreakOff: 1
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 100
@@ -54563,11 +54575,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 1564986658502680149}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -54581,6 +54595,7 @@ MonoBehaviour:
   OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
+  QueuedDamage: 0
 --- !u!114 &1564986660552776519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59728,8 +59743,10 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 5347653333253470325}
   GrappleAnimator: {fileID: 0}
   Hook: {fileID: 3612472648396866777}
+  AlignHookOnFire: 0
   HookRopePoint: {fileID: 7222849397525218670}
   Dial_Funcon: {fileID: 701461702882762416}
+  Dial_Funcon_Array: []
   HookSpeed: 500
   SwingStrength: 10
   HookLaunchPoint: {fileID: 27405705086290164}
@@ -90646,6 +90663,7 @@ MonoBehaviour:
   ResupplyInitialDelay: 1
   ResupplyDelay: 1
   ResupplyLayer: 27
+  EventCallback: []
 --- !u!114 &3209257280250722067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90882,6 +90900,11 @@ MonoBehaviour:
   VTOLLoseControlSpeed: 1
   VTOLGroundEffectStrength: 0.3
   EnterVTOLEvent_Angle: 20
+  AlternateLift: 0
+  CenterOfDrag: {fileID: 0}
+  CenterOfThrust: {fileID: 0}
+  CenterOfLift: {fileID: 0}
+  Thrust_AlwaysWorldUp: 0
   ReverseThrustAllowAfterburner: 0
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -90899,22 +90922,23 @@ MonoBehaviour:
   RepairTime: 30
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
-  BulletDamageTaken: 10
-  PredictDamage: 1
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
   AtmosphereThinningStart: 6604
   AtmosphereThinningEnd: 9144
+  PredictExplosion: 1
+  SendKillEvents: 0
   SquareJoyInput: 1
   EngineOnOnEnter: 1
   EngineOffOnExit: 1
   DroneMode: 0
+  WreckedSpinForce: {x: 2, y: 3, z: 4}
   _EngineOn: 0
-  VehicleForce: {x: 0, y: 0, z: 0}
+  ThrustAcc: {x: 0, y: 0, z: 0}
+  LiftAcc: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
   Pitching: {x: 0, y: 0, z: 0}
   Yawing: {x: 0, y: 0, z: 0}
@@ -96208,13 +96232,12 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1695668829043343048}
   SAVControl: {fileID: 2961384493794590454}
   Dial_Funcon: {fileID: 6937768066133055362}
+  Dial_Funcon_Array: []
   GearAnimator: {fileID: 1564986660552776568}
   LandingGearDragMulti: 1.3
   AllowToggleGrounded: 1
   GearCheckDistance: 2
   AllowToggleDuringTransition: 1
-  LandingGearSound_Up: {fileID: 0}
-  LandingGearSound_Down: {fileID: 0}
   TransitionLength: 5
 --- !u!114 &1695668829043343048
 MonoBehaviour:
@@ -97032,6 +97055,8 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   ThrustAnimator: {fileID: 1564986660552776568}
   ThrustArrow: {fileID: 7032483272467936840}
+  ThrustArrowMaxSize: 1
+  showArrow_Desktop: 0
   ThrustForwardKey: 105
   ThrustBackKey: 107
   ThrustRightKey: 108
@@ -97046,8 +97071,22 @@ MonoBehaviour:
   DoSideThrust: 1
   DoUPDownThrust: 1
   AllowMainEngineAndThrust: 0
+  ThrottleMatch3DThrust: 1
+  RequireEngine: 1
+  DisableSAVJoystick: 0
+  DisableSAVThrottle: 0
+  SyncThrust: 1
+  ControlsWind: 0
+  SyncWind: 1
+  AllowVerticalWind: 0
+  MaxWindMagnitude: 100
+  WindGustRatio: 0.2
+  SetGustiness: 0.03
+  SetTurbulance: 0.0001
   UseThrottleAsForward: 0
   ThrottleAsForward_NoBackThrust: 0
+  updateInterval: 0.3
+  NetworkSmoothTime: 8
 --- !u!114 &7355186588233618505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97911,7 +97950,6 @@ MonoBehaviour:
   FreezePositionOnDeath: 1
   IdleMovementRange: 0.35
   IdleRotationRange: 5
-  TeleportAngleDifference: 20
   CorrectionTime: 8
   SpeedLerpTime: 4
   CorrectionDStrength: 1.666666
