@@ -16,14 +16,36 @@ namespace SaccFlightAndVehicles
         public VRCPlayerApi[] playersinside = new VRCPlayerApi[100];
         [System.NonSerialized] public int numPlayersInside = 0;
         public TextMeshProUGUI ChannelText;
+        public TextMeshProUGUI ChannelText_ListenOnly;
+        [UdonSynced, SerializeField, FieldChangeCallback(nameof(Channel_ListenOnly))] private byte _Channel_ListenOnly = 0;
+        public byte Channel_ListenOnly
+        {
+            set
+            {
+                byte lastChannel = _Channel_ListenOnly;
+                _Channel_ListenOnly = value;
+                if (InZone)
+                {
+                    if (lastChannel != Channel) { RadioBase.SetAllVoiceVolumesDefault(lastChannel); }
+                    UpdateChannel_ListenOnly();
+                }
+                if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = value == 0 ? "OFF" : value.ToString(); }
+            }
+            get => _Channel_ListenOnly;
+        }
         [UdonSynced, SerializeField, FieldChangeCallback(nameof(Channel))] private byte _Channel = 1;
         public byte Channel
         {
             set
             {
+                byte lastChannel = _Channel;
                 _Channel = value;
-                if (InZone) { RadioBase.SetAllVoiceVolumesDefault(); UpdateChannel(); }
-                if (ChannelText) { ChannelText.text = value.ToString(); }
+                if (InZone)
+                {
+                    if (lastChannel != Channel_ListenOnly) { RadioBase.SetAllVoiceVolumesDefault(lastChannel); }
+                    UpdateChannel();
+                }
+                if (ChannelText) { ChannelText.text = value == 0 ? "OFF" : value.ToString(); }
             }
             get => _Channel;
         }
@@ -35,6 +57,7 @@ namespace SaccFlightAndVehicles
         float VoiceGain;
         bool InZone;
         private bool ChannelSwapped;
+        private bool ChannelSwapped_ListenOnly;
         Vector3 SpawnPos;
         Quaternion SpawnRot;
         void Start()
@@ -48,6 +71,8 @@ namespace SaccFlightAndVehicles
                 SpawnPos = PickupObject.transform.localPosition;
                 SpawnRot = PickupObject.transform.localRotation;
             }
+            if (ChannelText) { ChannelText.text = Channel == 0 ? "OFF" : Channel.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = Channel_ListenOnly == 0 ? "OFF" : Channel_ListenOnly.ToString(); }
         }
         public void CheckPlayersInside()
         {
@@ -64,7 +89,7 @@ namespace SaccFlightAndVehicles
                 if (nextAPI.isLocal)
                 {
                     RadioBase.MyZone = this; InZone = true;
-                    UpdateChannel();
+                    UpdateChannel(); UpdateChannel_ListenOnly();
                 }
                 else
                 { AddPlayer(nextAPI); }
@@ -77,8 +102,9 @@ namespace SaccFlightAndVehicles
                     {
                         RadioBase.MyZone = null;
                         InZone = false;
-                        RadioBase.SetAllVoiceVolumesDefault();
-                        ResetChannel();
+                        RadioBase.SetAllVoiceVolumesDefault(Channel);
+                        RadioBase.SetAllVoiceVolumesDefault(Channel_ListenOnly);
+                        ResetChannel(); ResetChannel_ListenOnly();
                     }
                 }
                 else
@@ -94,6 +120,16 @@ namespace SaccFlightAndVehicles
         {
             ChannelSwapped = false;
             RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyChannel"));
+        }
+        public void UpdateChannel_ListenOnly()
+        {
+            ChannelSwapped_ListenOnly = true;
+            RadioBase.SetProgramVariable("CurrentChannel_ListenOnly", _Channel_ListenOnly);
+        }
+        public void ResetChannel_ListenOnly()
+        {
+            ChannelSwapped_ListenOnly = false;
+            RadioBase.SetProgramVariable("CurrentChannel_ListenOnly", (byte)RadioBase.GetProgramVariable("MyChannel_ListenOnly"));
         }
         //this will break if a player enters a seat while within the trigger because OnPlayerTriggerExit doesn't run
         /*     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
@@ -149,7 +185,7 @@ namespace SaccFlightAndVehicles
         public void IncreaseChannel()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
-            if (Channel + 1 > 16) { Channel = 1; }
+            if (Channel + 1 > 16) { Channel = 0; }
             else
             {
                 Channel++;
@@ -159,10 +195,30 @@ namespace SaccFlightAndVehicles
         public void DecreaseChannel()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
-            if (Channel - 1 < 1) { Channel = 16; }
+            if ((int)(Channel - 1) < 0) { Channel = 16; }
             else
             {
                 Channel--;
+            }
+            RequestSerialization();
+        }
+        public void IncreaseChannel_ListenOnly()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            if (Channel_ListenOnly + 1 > 16) { Channel_ListenOnly = 0; }
+            else
+            {
+                Channel_ListenOnly++;
+            }
+            RequestSerialization();
+        }
+        public void DecreaseChannel_ListenOnly()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            if ((int)(Channel_ListenOnly - 1) < 0) { Channel_ListenOnly = 16; }
+            else
+            {
+                Channel_ListenOnly--;
             }
             RequestSerialization();
         }

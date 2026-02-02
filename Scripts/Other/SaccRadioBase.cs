@@ -19,14 +19,17 @@ namespace SaccFlightAndVehicles
         // public float VoiceLowPass;
         [Tooltip("Make this text object darker when radio is disabled. Not required.")]
         public TextMeshProUGUI RadioEnabledTxt;
-        private byte CurrentChannel = 1;
-        public byte MyChannel = 1;
         [Tooltip("All SAV_Radio scripts")]
         public TextMeshProUGUI ChannelText;
+        public TextMeshProUGUI ChannelText_ListenOnly;
         [Header("Debug, leave empty (auto filled):")]
         public SAV_Radio[] AllRadios_RD;
         public SaccRadioZone[] RadioZones;
         public SAV_Radio MyRadio;
+        public byte CurrentChannel = 1;
+        public byte MyChannel = 1;
+        public byte CurrentChannel_ListenOnly = 0;
+        public byte MyChannel_ListenOnly = 0;
         private int NextRadio;
         [System.NonSerialized] public int MyRadioSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
         [System.NonSerialized] public SaccRadioZone MyZone;
@@ -38,7 +41,8 @@ namespace SaccFlightAndVehicles
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel = 1;
-            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
             string radioname = GetUdonTypeName<SAV_Radio>();
             PruneRadiosArray();
             for (int i = 0; i < AllRadios_RD.Length; i++)
@@ -93,8 +97,10 @@ namespace SaccFlightAndVehicles
             if (NextRadio == AllRadios_RD.Length) { NextRadio = 0; }
             SAV_Radio NextRadio_R = AllRadios_RD[NextRadio];
             if (MyRadio == NextRadio_R
-                || (byte)AllRadios_RD[NextRadio].Channel != CurrentChannel
-                || CurrentChannel == 0) { return; }
+                || (byte)NextRadio_R.Channel == 0
+                || ((byte)NextRadio_R.Channel != CurrentChannel && (byte)NextRadio_R.Channel != CurrentChannel_ListenOnly)
+                || (CurrentChannel + CurrentChannel_ListenOnly) == 0
+                ) { return; }
             for (int o = 0; o < NextRadio_R.RadioSeats.Length; o++)
             {
                 if (!NextRadio_R.RadioSeats[o]) continue;
@@ -121,9 +127,9 @@ namespace SaccFlightAndVehicles
         {
             if (!MyRadio && !MyZone) { return; }
             if (MyRadio == VehicleRadio
-                || !VehicleRadio
-                || (byte)VehicleRadio.Channel != CurrentChannel
-                || CurrentChannel == 0) { return; }
+                || VehicleRadio.Channel == 0
+                || ((byte)VehicleRadio.Channel != CurrentChannel && (byte)VehicleRadio.Channel != CurrentChannel_ListenOnly)
+                || (CurrentChannel + CurrentChannel_ListenOnly) == 0) { return; }
             for (int o = 0; o < VehicleRadio.RadioSeats.Length; o++)
             {
                 if (!VehicleRadio.RadioSeats[o]) continue;
@@ -153,7 +159,9 @@ namespace SaccFlightAndVehicles
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
             VRCPlayerApi[] RZ_players = NextRZ.playersinside;
-            if (CurrentChannel != NextRZ.Channel)
+            if (NextRZ.Channel == 0
+            || CurrentChannel != NextRZ.Channel && CurrentChannel_ListenOnly != NextRZ.Channel
+            || (CurrentChannel + CurrentChannel_ListenOnly) == 0)
             {
                 for (int i = 0; i < NextRZ.numPlayersInside; i++)
                 {
@@ -173,11 +181,11 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SetAllVoiceVolumesDefault()
+        public void SetAllVoiceVolumesDefault(byte resetchannel)
         {
             for (int i = 0; i < AllRadios_RD.Length; i++)
             {
-                if (!AllRadios_RD[i].Initialized) continue;
+                if (!AllRadios_RD[i].Initialized || AllRadios_RD[i]._Channel != resetchannel) continue;
                 for (int o = 0; o < AllRadios_RD[i].RadioSeats.Length; o++)
                 {
                     if (MyRadio)
@@ -258,6 +266,35 @@ namespace SaccFlightAndVehicles
             if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
             UpdateRadioScripts();
         }
+        public void IncreaseChannel_ListenOnly()
+        {
+            if (MyChannel_ListenOnly + 1 > 16) { MyChannel_ListenOnly = 0; }
+            else
+            {
+                MyChannel_ListenOnly++;
+            }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            CurrentChannel_ListenOnly = MyChannel_ListenOnly;
+            UpdateRadioScripts_ListenOnly();
+        }
+        public void DecreaseChannel_ListenOnly()
+        {
+            if (MyChannel_ListenOnly - 1 < 0) { MyChannel_ListenOnly = 16; }
+            else
+            {
+                MyChannel_ListenOnly--;
+            }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            CurrentChannel_ListenOnly = MyChannel_ListenOnly;
+            UpdateRadioScripts_ListenOnly();
+        }
+        public void SetChannel_ListenOnly(int inChannel)
+        {
+            inChannel = mod_noneg(inChannel, 17);
+            CurrentChannel_ListenOnly = MyChannel_ListenOnly = (byte)(inChannel);
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            UpdateRadioScripts_ListenOnly();
+        }
         int mod_noneg(int x, int m)
         {
             return (x % m + m) % m;
@@ -267,6 +304,13 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < AllRadios_RD.Length; i++)
             {
                 AllRadios_RD[i].NewChannel();
+            }
+        }
+        void UpdateRadioScripts_ListenOnly()
+        {
+            for (int i = 0; i < AllRadios_RD.Length; i++)
+            {
+                AllRadios_RD[i].NewChannel_ListenOnly();
             }
         }
     }
