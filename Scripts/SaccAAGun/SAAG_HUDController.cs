@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         public SaccAAGunController AAGunControl;
         public Transform ElevationIndicator;
         public Transform HeadingIndicator;
+        [Range(-180, 180), SerializeField] float HeadingOffset = 0;
         public Transform AAMTargetIndicator;
         public Transform GUNLeadIndicator;
         [Range(0.01f, 1)]
@@ -92,10 +93,11 @@ namespace SaccFlightAndVehicles
 
             //Heading indicator
             Vector3 newrot = new Vector3(0, Rotator.rotation.eulerAngles.y, 0);
-            if (HeadingIndicator)
-            {
-                HeadingIndicator.localRotation = Quaternion.Euler(-newrot);
-            }
+            float angleCompass = newrot.y + HeadingOffset;
+            if (angleCompass > 360) angleCompass -= 360;
+            if (angleCompass < 0) angleCompass += 360;
+            angleCompass -= 180;
+            if (HeadingIndicator) { HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -angleCompass, 0)); }
             /////////////////
 
             //Elevation indicator
