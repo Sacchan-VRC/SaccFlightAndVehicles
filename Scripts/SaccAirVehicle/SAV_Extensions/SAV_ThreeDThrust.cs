@@ -175,7 +175,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             InVR = SAVControl.InVR;
             SwitchHandsJoyThrottle = SAVControl.SwitchHandsJoyThrottle;
-            if (showArrow_Desktop && ThrustArrow) { ThrustArrow.gameObject.SetActive(true); }
+            if (!InVR && showArrow_Desktop && ThrustArrow) { ThrustArrow.gameObject.SetActive(true); }
         }
         public void SFEXT_O_PilotExit()
         {
