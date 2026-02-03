@@ -610,10 +610,18 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAAMs_Event(ushort TargetID)
         {
+            //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
+            bool swappedOwner = false;
+            if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+            {
+                IsOwner = !IsOwner;
+                swappedOwner = true;
+            }
             ushort lasttarget = AAMTarget;
             AAMTarget = TargetID;
             LaunchAAM();
             AAMTarget = lasttarget;
+            if (swappedOwner) IsOwner = !IsOwner;
         }
         void LaunchAAM()
         {

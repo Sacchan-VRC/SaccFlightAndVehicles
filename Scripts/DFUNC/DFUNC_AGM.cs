@@ -480,8 +480,16 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAGMs_Event(Vector3 inputLocation)
         {
+            //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
+            bool swappedOwner = false;
+            if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+            {
+                IsOwner = !IsOwner;
+                swappedOwner = true;
+            }
             SetTarget(inputLocation, false);
             LaunchAGM();
+            if (swappedOwner) IsOwner = !IsOwner;
         }
         void LaunchAGM()
         {

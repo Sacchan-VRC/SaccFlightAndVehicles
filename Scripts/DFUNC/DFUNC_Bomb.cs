@@ -292,11 +292,19 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchBombs_Event()
         {
+            //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
+            bool swappedOwner = false;
+            if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+            {
+                IsOwner = !IsOwner;
+                swappedOwner = true;
+            }
             for (int i = 0; i < NumBomb_PerShot; i++)
             {
                 LaunchBomb();
             }
             if (EntityControl.InVehicle && ReloadSound) SendCustomEventDelayedSeconds(nameof(PlayReloadSound), ReloadSound_offset);
+            if (swappedOwner) IsOwner = !IsOwner;
         }
         public void SFEXT_O_OnPickupUseUp()
         {

@@ -283,8 +283,16 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void FireLaser_Event()
         {
+            //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
+            bool swappedOwner = false;
+            if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+            {
+                IsOwner = !IsOwner;
+                swappedOwner = true;
+            }
             if (TriggerFireDelay == 0) { FireLaser_SoundEvent(); }
             FireLaser();
+            if (swappedOwner) IsOwner = !IsOwner;
         }
         public void FireLaser()
         {
