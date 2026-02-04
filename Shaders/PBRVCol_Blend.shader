@@ -280,6 +280,7 @@ Shader "SaccFlight/PBRVCol_Blend" {
                 "LightMode"="ForwardAdd"
             }
             Blend One One
+            Cull [CullMode]
             
             
             CGPROGRAM
@@ -459,7 +460,8 @@ Shader "SaccFlight/PBRVCol_Blend" {
             Tags {
                 "LightMode"="Meta"
             }
-            Cull Off
+            Blend One One
+            Cull [CullMode]
             
             CGPROGRAM
             #pragma vertex vert
@@ -579,6 +581,25 @@ Shader "SaccFlight/PBRVCol_Blend" {
             }
             ENDCG
         }
+        Pass {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            Cull [CullMode]
+            ZWrite On ZTest LEqual
+
+            CGPROGRAM
+            #pragma target 2.0
+
+            #pragma multi_compile_instancing
+            #pragma multi_compile_shadowcaster
+
+            #pragma vertex vertShadowCaster
+            #pragma fragment fragShadowCaster
+
+            #include "UnityStandardShadow.cginc"
+
+            ENDCG
+        }
     }
-    FallBack "Diffuse"
 }
