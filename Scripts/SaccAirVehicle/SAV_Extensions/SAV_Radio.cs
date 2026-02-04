@@ -419,12 +419,12 @@ namespace SaccFlightAndVehicles
             int unPTT_Channel = Channel;
             if (unPTT_Channel >= 200)
                 unPTT_Channel -= 200;
-            channeltxt = unPTT_Channel == 0 ? "OFF" : unPTT_Channel.ToString();
+            channeltxt = unPTT_Channel == 0 ? "X" : unPTT_Channel.ToString();
             if (ChannelNumber_UGUI) { ChannelNumber_UGUI.text = channeltxt; }
             if (ChannelNumber) { ChannelNumber.text = channeltxt; }
             if (UseListenOnlyChannel)
             {
-                string channeltxt_ListenOnly = Channel_ListenOnly == 0 ? "OFF" : Channel_ListenOnly.ToString();
+                string channeltxt_ListenOnly = Channel_ListenOnly == 0 ? "X" : Channel_ListenOnly.ToString();
                 if (ChannelNumber_UGUI_ListenOnly) { ChannelNumber_UGUI_ListenOnly.text = channeltxt_ListenOnly; }
                 if (ChannelNumber_ListenOnly) { ChannelNumber_ListenOnly.text = channeltxt_ListenOnly; }
             }
@@ -455,7 +455,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                byte lastChannel = _Channel;
+                byte lastChannel = _Channel_ListenOnly;
                 _Channel_ListenOnly = value;
                 if (ImOnRadio)
                 {

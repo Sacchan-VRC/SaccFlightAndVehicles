@@ -41,14 +41,19 @@ namespace SaccFlightAndVehicles
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel = 1;
-            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
-            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "X" : MyChannel.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "X" : MyChannel_ListenOnly.ToString(); }
             string radioname = GetUdonTypeName<SAV_Radio>();
             PruneRadiosArray();
             for (int i = 0; i < AllRadios_RD.Length; i++)
             {
                 AllRadios_RD[i].RadioBase = this;
                 // AllRadios_RD[i].Init();
+            }
+            for (int i = 0; i < RadioZones.Length; i++)
+            {
+                RadioZones[i].RadioBase = this;
+                RadioZones[i].Initialize();
             }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
@@ -244,7 +249,7 @@ namespace SaccFlightAndVehicles
             {
                 MyChannel++;
             }
-            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "X" : MyChannel.ToString(); }
             CurrentChannel = MyChannel;
             UpdateRadioScripts();
         }
@@ -255,7 +260,7 @@ namespace SaccFlightAndVehicles
             {
                 MyChannel--;
             }
-            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "X" : MyChannel.ToString(); }
             CurrentChannel = MyChannel;
             UpdateRadioScripts();
         }
@@ -263,7 +268,7 @@ namespace SaccFlightAndVehicles
         {
             inChannel = mod_noneg(inChannel, 17);
             CurrentChannel = MyChannel = (byte)(inChannel);
-            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "X" : MyChannel.ToString(); }
             UpdateRadioScripts();
         }
         public void IncreaseChannel_ListenOnly()
@@ -273,7 +278,7 @@ namespace SaccFlightAndVehicles
             {
                 MyChannel_ListenOnly++;
             }
-            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "X" : MyChannel_ListenOnly.ToString(); }
             CurrentChannel_ListenOnly = MyChannel_ListenOnly;
             UpdateRadioScripts_ListenOnly();
         }
@@ -284,7 +289,7 @@ namespace SaccFlightAndVehicles
             {
                 MyChannel_ListenOnly--;
             }
-            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "X" : MyChannel_ListenOnly.ToString(); }
             CurrentChannel_ListenOnly = MyChannel_ListenOnly;
             UpdateRadioScripts_ListenOnly();
         }
@@ -292,7 +297,7 @@ namespace SaccFlightAndVehicles
         {
             inChannel = mod_noneg(inChannel, 17);
             CurrentChannel_ListenOnly = MyChannel_ListenOnly = (byte)(inChannel);
-            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "OFF" : MyChannel_ListenOnly.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = MyChannel_ListenOnly == 0 ? "X" : MyChannel_ListenOnly.ToString(); }
             UpdateRadioScripts_ListenOnly();
         }
         int mod_noneg(int x, int m)

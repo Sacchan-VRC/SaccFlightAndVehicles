@@ -11,7 +11,7 @@ namespace SaccFlightAndVehicles
     public class SaccRadioZone : UdonSharpBehaviour
     {
         [Header("Stand inside the radius to enable radio, can be attached to a moving object")]
-        public SaccRadioBase RadioBase;
+        [System.NonSerialized] public SaccRadioBase RadioBase;
         public float ZoneRadius;
         public VRCPlayerApi[] playersinside = new VRCPlayerApi[100];
         [System.NonSerialized] public int numPlayersInside = 0;
@@ -29,7 +29,7 @@ namespace SaccFlightAndVehicles
                     if (lastChannel != Channel) { RadioBase.SetAllVoiceVolumesDefault(lastChannel); }
                     UpdateChannel_ListenOnly();
                 }
-                if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = value == 0 ? "OFF" : value.ToString(); }
+                if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = value == 0 ? "X" : value.ToString(); }
             }
             get => _Channel_ListenOnly;
         }
@@ -45,7 +45,7 @@ namespace SaccFlightAndVehicles
                     if (lastChannel != Channel_ListenOnly) { RadioBase.SetAllVoiceVolumesDefault(lastChannel); }
                     UpdateChannel();
                 }
-                if (ChannelText) { ChannelText.text = value == 0 ? "OFF" : value.ToString(); }
+                if (ChannelText) { ChannelText.text = value == 0 ? "X" : value.ToString(); }
             }
             get => _Channel;
         }
@@ -60,7 +60,7 @@ namespace SaccFlightAndVehicles
         private bool ChannelSwapped_ListenOnly;
         Vector3 SpawnPos;
         Quaternion SpawnRot;
-        void Start()
+        public void Initialize()
         {
             SendCustomEventDelayedFrames(nameof(CheckPlayersInside), Random.Range(0, 7));
             VoiceNear = RadioBase.VoiceNear;
@@ -71,8 +71,8 @@ namespace SaccFlightAndVehicles
                 SpawnPos = PickupObject.transform.localPosition;
                 SpawnRot = PickupObject.transform.localRotation;
             }
-            if (ChannelText) { ChannelText.text = Channel == 0 ? "OFF" : Channel.ToString(); }
-            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = Channel_ListenOnly == 0 ? "OFF" : Channel_ListenOnly.ToString(); }
+            if (ChannelText) { ChannelText.text = Channel == 0 ? "X" : Channel.ToString(); }
+            if (ChannelText_ListenOnly) { ChannelText_ListenOnly.text = Channel_ListenOnly == 0 ? "X" : Channel_ListenOnly.ToString(); }
         }
         public void CheckPlayersInside()
         {
