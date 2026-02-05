@@ -206,8 +206,6 @@ namespace SaccFlightAndVehicles
             L_UpdateTime = lastframetime = lastframetime_extrap = time;
             Extrapolation_Raw = O_LastPosition = LastSmoothPosition = O_Position = VehicleTransform.position;
         }
-        public void SFEXT_L_OwnershipTransfer()
-        { ExitIdleMode(); }
         public void SFEXT_O_TakeOwnership()
         {
             TakeOwnerStuff();
@@ -237,7 +235,9 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.angularDrag = 0;
             }
             L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) + (Piloting ? 0f : Random.Range(0, IdleModeUpdateInterval));
+            // prevent sending an update before last owner sends theirs by waiting 0.2~ in respawn case
+            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) + (Piloting ? 0f : Mathf.Max(0.2f, idleDetected ? Random.Range(0, IdleModeUpdateInterval) : Random.Range(0, updateInterval)));
+            IdleUpdateMode = false;
             UpdatesSentWhileStill = 0;
         }
         private void LoseOwnerStuff()
@@ -280,7 +280,9 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 ResetSyncTimes();
-                ExitIdleMode();
+                // if we took ownership by pressing the respawn button, use the updatetime set in TakeOwnerStuff()
+                if (Time.time - EntityControl.OwnerTransferTime > 0.2f)
+                { ExitIdleMode(); }
             }
         }
         float lastFrameTime_hitchtest;
@@ -692,7 +694,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
         public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
         public void SFEXT_L_CancelRace() { DisableAntiWarp = false; }
-        public void SFEXT_L_WakeUp() { ExitIdleMode(); }
+        public void SFEXT_L_WakeUp() { if (IsOwner) ExitIdleMode(); }
         //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
         public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
         {

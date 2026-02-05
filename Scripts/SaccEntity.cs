@@ -707,8 +707,10 @@ namespace SaccFlightAndVehicles
         {
             SendEventToExtensions("SFEXT_L_OnDisable");
         }
+        [System.NonSerialized] public float OwnerTransferTime = 0;
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
+            OwnerTransferTime = Time.time;
             OwnerAPI = player;
             if (player.isLocal)
             {
