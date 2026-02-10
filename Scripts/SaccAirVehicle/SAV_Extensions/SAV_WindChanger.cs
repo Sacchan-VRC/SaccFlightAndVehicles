@@ -1,4 +1,3 @@
-//comented stuff can be used to make changes in wind global
 using UdonSharp;
 using UnityEngine.UI;
 using UnityEngine;
@@ -40,13 +39,13 @@ namespace SaccFlightAndVehicles
             WindMenu.SetActive(false);
             if (DefaultSynced)
             {
-                WindSyncedToggle.isOn = true;
                 SendCustomEventDelayedSeconds(nameof(ToggleSyncedWind), 5);
             }
         }
         public void ToggleSyncedWind()
         {
             SyncedWind = !SyncedWind;
+            if (WindSyncedToggle && WindSyncedToggle.isOn != SyncedWind) WindSyncedToggle.SetIsOnWithoutNotify(SyncedWind);
             OnDeserialization();
         }
         public void UpdateValuesFromOther()
@@ -147,18 +146,7 @@ namespace SaccFlightAndVehicles
             if (SyncedWind)
             {
                 UpdateValuesFromOther();
-                Vector3 NewWindDir = transform.forward * WindStrengthLocal;
-                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
-                {
-                    if (vehicle)
-                    {
-                        vehicle.SetProgramVariable("Wind", NewWindDir);
-                        vehicle.SetProgramVariable("WindGustStrength", WindGustStrengthLocal);
-                        vehicle.SetProgramVariable("WindGustiness", WindGustinessLocal);
-                        vehicle.SetProgramVariable("WindTurbulanceScale", WindTurbulanceScaleLocal);
-                    }
-                }
-                WindSound();
+                ApplyWindDir();
             }
         }
     }
