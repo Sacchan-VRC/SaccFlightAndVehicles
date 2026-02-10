@@ -303,10 +303,13 @@ namespace SaccFlightAndVehicles
         {
             //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
             bool swappedOwner = false;
-            if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+            if (NetworkCalling.InNetworkCall)
             {
-                IsOwner = !IsOwner;
-                swappedOwner = true;
+                if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
+                {
+                    IsOwner = !IsOwner;
+                    swappedOwner = true;
+                }
             }
             for (int i = 0; i < NumBomb_PerShot; i++)
             {
