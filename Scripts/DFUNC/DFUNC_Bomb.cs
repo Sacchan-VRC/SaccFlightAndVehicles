@@ -243,6 +243,15 @@ namespace SaccFlightAndVehicles
             BombPoint = 0;
             if (DoAnimBool)
             { SetBoolOff(false); }
+            if (EntityControl.EntityPickup)
+            {
+                EntityControl.gameObject.layer = StartEntityLayer;
+                foreach (Collider stngcol in EntityColliders)
+                {
+                    stngcol.isTrigger = false;
+                    stngcol.enabled = true;
+                }
+            }
         }
         public void SFEXT_G_ReSupply()
         {
