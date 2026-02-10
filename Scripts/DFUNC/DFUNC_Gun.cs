@@ -219,7 +219,7 @@ namespace SaccFlightAndVehicles
         }
         public void Set_Selected()
         {
-            if (!EntityControl.Occupied) return;
+            if (numUsers == 0) return;
             if (HudCrosshairGun) { HudCrosshairGun.SetActive(true); }
             if (HudCrosshair) { HudCrosshair.SetActive(false); }
             for (int i = 0; i < EnableOnSelected.Length; i++)
@@ -238,8 +238,8 @@ namespace SaccFlightAndVehicles
         }
         public void Set_Active()
         {
-            if (EntityControl.Occupied)
-                gameObject.SetActive(true);
+            if (numUsers == 0) return;
+            gameObject.SetActive(true);
         }
         public void Set_Inactive()
         {
@@ -250,6 +250,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            if (EntityControl.MyEnterTime == Time.time) return;
             if (Piloting)
             { // for when taking back ownership while sitting in pilot seat after grapple was let go
                 if (!gameObject.activeSelf)

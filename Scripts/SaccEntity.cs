@@ -248,6 +248,8 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SaccEntity LastAttacker;
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
+        [System.NonSerializedAttribute] public float MyExitTime;
+        [System.NonSerializedAttribute] public float MyEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
         [System.NonSerializedAttribute] public bool CoMSet = false;
         public void Init() { Start(); }
@@ -789,6 +791,7 @@ namespace SaccFlightAndVehicles
         {
             Using = true;
             Piloting = true;
+            MyEnterTime = Time.time;
             if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Occupied = true;
@@ -846,6 +849,7 @@ namespace SaccFlightAndVehicles
                 Using = false;
                 Piloting = false;
                 InVehicle = false;
+                MyExitTime = Time.time;
                 localPlayer.SetPlayerTag("SF_LocalPiloting", string.Empty);
                 localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
                 EnableInVehicle_Disable();
@@ -868,6 +872,7 @@ namespace SaccFlightAndVehicles
         public void PassengerEnterVehicleLocal()
         {
             Passenger = true;
+            MyEnterTime = Time.time;
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             InVR = localPlayer.IsUserInVR();
             localPlayer.SetPlayerTag("SF_LocalInVehicle", "T");
@@ -883,6 +888,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = false;
             InVehicle = false;
+            MyExitTime = Time.time;
             localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
             EnableInVehicle_Disable();
             DisableInVehicle_Enable();
