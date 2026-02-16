@@ -62,6 +62,8 @@ namespace SaccFlightAndVehicles
             {
                 otherRB.angularVelocity = Vector3.zero;
             }
+            otherRB.position = otherSE.transform.position;
+            otherRB.rotation = otherSE.transform.rotation;
             otherSE.SendEventToExtensions("SFEXT_O_VehicleTeleported");
         }
     }
