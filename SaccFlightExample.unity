@@ -199,9 +199,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &23998346
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -2343,9 +2349,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &133972033
 GameObject:
   m_ObjectHideFlags: 0
@@ -2392,9 +2404,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &133972035
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -3091,9 +3109,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &206346166 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4613880693154491499, guid: 09ae8a5b6337d2b47b080b150c56240c,
@@ -3725,6 +3749,102 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1959932897}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &351073063
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 351073064}
+  - component: {fileID: 351073066}
+  - component: {fileID: 351073065}
+  m_Layer: 17
+  m_Name: SAV_Radio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &351073064
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351073063}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.0000027418132, z: -0, w: 1}
+  m_LocalPosition: {x: 29.95988, y: 0.4899962, z: 9.390186}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1816459232}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &351073065
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351073063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 3
+  serializedProgramAsset: {fileID: 11400000, guid: 7be44edeb9afa2a4794b15af64049c59,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 163dc219cb734ef4fae5f109df4fb31f, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
+--- !u!114 &351073066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351073063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2486c7bdc32dae340bcf1b790c46a95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 351073065}
+  ForceChannel: -1
+  RadioSeats: []
+  Dial_Funcons: []
+  _Channel: 0
+  ChannelUpKey: 93
+  ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
+  ChannelNumber_UGUI: {fileID: 0}
+  ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
+  ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &352589257 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 356017907670853424, guid: c45f86056689031458cad954adb47d00,
@@ -3824,9 +3944,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &368502547 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4613880694958156376, guid: 09ae8a5b6337d2b47b080b150c56240c,
@@ -3938,9 +4064,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &382481227 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7259475200017206735, guid: 78cf4117492eb064385b3aa151c1d1d4,
@@ -18385,9 +18517,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &633788331 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8257057009611502632, guid: c45f86056689031458cad954adb47d00,
@@ -18487,9 +18625,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &639231546 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2975415894609309462, guid: bbb8a568593b0f741be2e84b6a42c0b4,
@@ -19177,9 +19321,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &715616754
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -19874,9 +20024,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &763348827 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4483296327024401716, guid: 09ae8a5b6337d2b47b080b150c56240c,
@@ -25168,9 +25324,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1198807061 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8556913608580860439, guid: 88837fb73907e5d469798b4ab8178069,
@@ -26051,9 +26213,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1247196699 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2935594653847325618, guid: bbb8a568593b0f741be2e84b6a42c0b4,
@@ -26147,9 +26315,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1256055641 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4927169679595820196, guid: bdf71d3388385a548a090cd339249694,
@@ -27437,9 +27611,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &1331945042
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -27763,9 +27943,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1397443251 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7780437679490804914, guid: 78cf4117492eb064385b3aa151c1d1d4,
@@ -27865,9 +28051,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1403878014 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1564986659165521400, guid: 7b2d6da1e71c6644686d813e7c585f91,
@@ -27922,6 +28114,91 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 482842712}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1421957873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1421957874}
+  - component: {fileID: 1421957876}
+  - component: {fileID: 1421957875}
+  m_Layer: 17
+  m_Name: KillTracker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1421957874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421957873}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.0000027418132, z: -0, w: 1}
+  m_LocalPosition: {x: 29.95988, y: 0.4899962, z: 9.390186}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1816459232}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1421957875
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421957873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 1
+  serializedProgramAsset: {fileID: 11400000, guid: 85486fffda812ac4b8a2ed421773eb52,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 8b9888944a4a7894d86ae6cbba546455, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
+--- !u!114 &1421957876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421957873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf2a7550164d694588ee34c804db49b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 1421957875}
+  SAVControl: {fileID: 1816459233}
+  KillsBoard: {fileID: 119623979}
+  KillFeed: {fileID: 0}
+  Callbacks: []
 --- !u!1 &1425869015 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1589780486020964087, guid: 89cc28a0bdc532748accf448e019fc4c,
@@ -28012,6 +28289,7 @@ Transform:
   - {fileID: 950223496}
   - {fileID: 613439292}
   - {fileID: 131321269}
+  - {fileID: 1816459231}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1466225291 stripped
@@ -30167,9 +30445,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1560656683 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2595411096579968397, guid: 9aa40bfe9e0a08941b5397e10009b921,
@@ -30311,9 +30595,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1592228235
 GameObject:
   m_ObjectHideFlags: 0
@@ -30696,9 +30986,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!114 &1618658149
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -32120,9 +32416,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!4 &1739044491 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4058646134570206110, guid: 78cf4117492eb064385b3aa151c1d1d4,
@@ -32612,6 +32914,468 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 111141660}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1816459230
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1459405749}
+    m_Modifications:
+    - target: {fileID: 793131667538371, guid: 55c64244ecd323847841e5f1c7897eeb, type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 742c5acf28bb0b446910b0fcd561d307,
+        type: 2}
+    - target: {fileID: 44847094449288283, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 44847094449288283, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 96869881874425850, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 96869881874425850, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 127494547673766801, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 127494547673766801, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 482618971405913598, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 671b50b061832404581f3202f025da72,
+        type: 2}
+    - target: {fileID: 548507079517587903, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: d35a478eee8759a4cb70b4e91029a338,
+        type: 2}
+    - target: {fileID: 913213719002858612, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: b2207a5d9384c7146b85e7793ee16108,
+        type: 2}
+    - target: {fileID: 971201130890147910, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: ac117e4745ad1dc448ea64ea365bb62d,
+        type: 2}
+    - target: {fileID: 1037508907108126428, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 1037508907108126428, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 1355918479921115970, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 23970dfabda4da341b6ac76690d3286b,
+        type: 2}
+    - target: {fileID: 1360082168844249483, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 1360082168844249483, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 1412630856830764604, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: a5e20e3d62d6bf743bbaeea09f402b44,
+        type: 2}
+    - target: {fileID: 1560576788430081956, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 1560576788430081956, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 1602012770148128033, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 9244a79658a297549acd888e2c87b02f,
+        type: 2}
+    - target: {fileID: 1623212331317900183, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: d35a478eee8759a4cb70b4e91029a338,
+        type: 2}
+    - target: {fileID: 1733427164318118161, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: ea9077399c3b7bc4089659ef54e059af,
+        type: 2}
+    - target: {fileID: 1943162041780134310, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: e44f400c3c71fd046b2fd1ea2521aba6,
+        type: 2}
+    - target: {fileID: 2260129859820812713, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 9df766ddc996c6e42a460b2ea3acc629,
+        type: 2}
+    - target: {fileID: 2269333274038871446, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: bc59588cfb3677f40913609bf08de85a,
+        type: 2}
+    - target: {fileID: 2739017142470732001, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f3160cae23daa6a40bf523f079e50271,
+        type: 2}
+    - target: {fileID: 3177101806211352562, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 3177101806211352562, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 3435789060038992434, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 1bf749c13d6bf5e48abcd454b2ea0005,
+        type: 2}
+    - target: {fileID: 3518287967204185980, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 3518287967204185980, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 3738236262177436052, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 3738236262177436052, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 3784814917228931163, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 3784814917228931163, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 4104843755135168896, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4104843755135168896, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 4645623973700427024, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4645623973700427024, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 4755141567934688045, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4755141567934688045, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 4776318839928655445, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4776318839928655445, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 4999431816086689485, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4999431816086689485, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5062640309714584633, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5062640309714584633, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5173289270753335237, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f442ad3b45d9fe642ab19c85d110c6b6,
+        type: 2}
+    - target: {fileID: 5199628910853979867, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5199628910853979867, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5327243835825876232, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 1bf749c13d6bf5e48abcd454b2ea0005,
+        type: 2}
+    - target: {fileID: 5362302225513831665, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5362302225513831665, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5502223509782030217, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5502223509782030217, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 146.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4999962
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 80.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.0000029504295
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5667233138739798318, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5667233138739798318, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5807414031556004445, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5807414031556004445, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 5961510102964408356, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: cbdec63dedff8ab4c8d47dbbb6d3a194,
+        type: 2}
+    - target: {fileID: 5961563796488814140, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5961563796488814140, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6121468080233283273, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 9df766ddc996c6e42a460b2ea3acc629,
+        type: 2}
+    - target: {fileID: 6164824161827254669, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6164824161827254669, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6250067229461845881, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6250067229461845881, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6383527800640935880, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6383527800640935880, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6383527800640935880, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: ExtensionUdonBehaviours.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6383527800640935880, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: ExtensionUdonBehaviours.Array.data[5]
+      value: 
+      objectReference: {fileID: 1421957876}
+    - target: {fileID: 6383527800640935880, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: ExtensionUdonBehaviours.Array.data[6]
+      value: 
+      objectReference: {fileID: 351073066}
+    - target: {fileID: 6515832404996987659, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6515832404996987659, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6517677501477028891, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 1e2263c312f830e40a8f8e9155753e94,
+        type: 2}
+    - target: {fileID: 6555070174831330155, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6555070174831330155, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 6593536398350036689, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 7971e6bd1b8621742a320471380d4047,
+        type: 2}
+    - target: {fileID: 6720428097042435649, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d2815bbb4f053d46b344fd90119e603,
+        type: 2}
+    - target: {fileID: 6903910283293881504, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6903910283293881504, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 7143380093164433336, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 9df766ddc996c6e42a460b2ea3acc629,
+        type: 2}
+    - target: {fileID: 7184872550961042530, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 7184872550961042530, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 7221824314814385207, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializedProgramAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 84d88f7b0e9c11c419565cf7b2853a2c,
+        type: 2}
+    - target: {fileID: 7224071470843422984, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: m_Name
+      value: SH-3Main
+      objectReference: {fileID: 0}
+    - target: {fileID: 7243529969053099033, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 7243529969053099033, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 7591001209997463485, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 7591001209997463485, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 7806187071174846132, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 7806187071174846132, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 7911767454718101606, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 7911767454718101606, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    - target: {fileID: 8153800217844968318, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 8153800217844968318, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1495658757451072822, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1421957874}
+    - targetCorrespondingSourceObject: {fileID: 1495658757451072822, guid: 55c64244ecd323847841e5f1c7897eeb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 351073064}
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 55c64244ecd323847841e5f1c7897eeb, type: 3}
+--- !u!4 &1816459231 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5575300618277729479, guid: 55c64244ecd323847841e5f1c7897eeb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1816459230}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1816459232 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1495658757451072822, guid: 55c64244ecd323847841e5f1c7897eeb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1816459230}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1816459233 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6555070174831330155, guid: 55c64244ecd323847841e5f1c7897eeb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1816459230}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a81ed12406633174aa22632458cce3f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1825236823
 GameObject:
   m_ObjectHideFlags: 0
@@ -32737,9 +33501,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1828501800 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 172206485118398555, guid: bdf71d3388385a548a090cd339249694,
@@ -35641,9 +36411,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &1942373930 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5501753745013252379, guid: d36b415e069e39f4aade896c48207a7f,
@@ -38148,9 +38924,15 @@ MonoBehaviour:
   _Channel: 0
   ChannelUpKey: 93
   ChannelDownKey: 91
+  ChannelUpKey_Listen: 92
+  ChannelDownKey_Listen: 39
   ChannelNumber_UGUI: {fileID: 0}
   ChannelNumber: {fileID: 0}
+  ChannelNumber_UGUI_ListenOnly: {fileID: 0}
+  ChannelNumber_ListenOnly: {fileID: 0}
   ControlsRoot: {fileID: 0}
+  UseListenOnlyChannel: 0
+  _Channel_ListenOnly: 0
 --- !u!1 &2119059867 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4613880694913988589, guid: 09ae8a5b6337d2b47b080b150c56240c,
