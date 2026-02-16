@@ -1,5 +1,5 @@
 ﻿Sacchan's Flight and Vehicles Prefab
-VERSION 1.8.0
+VERSION 1.8.1
 Changelog is at the bottom
 
 Contact:
@@ -9,7 +9,10 @@ https://x.com/Sacchan_VRC
 To install: Extract the SaccFlightAndVehicles folder into your Assets folder
 To update: Use your folder browser to delete your old SaccFlightAndVehicles folder, and replace it with the new one. Don't do it inside Unity.
 
-Migrating a 1.7 project to 1.8 info:
+Migrating a 1.8.0 project to 1.8.1 info:
+I adjusted the grip curves on all vehicle wheels to mitigate a weird issue when in high gear on a low-hz monitor, issue can still occur at 60hz/a high enough gear.
+
+Migrating a 1.7 project to 1.8.0 info:
 Saccflight is now using Semantic Versioning. 1.71 would be 1.7.1 in the new scheme.
 REMEMBER: IF IN DOUBT, CHECK AN EXISTING PREFAB'S VALUES
 The custom weapon damage system has changed to use VRChat's new NetworkEventWithParameters functionality.
@@ -287,8 +290,9 @@ Crash_Damage_Speed is the speed at which vehicle will begin to take damage when 
 Radio Setup:
 Place a RadioBase prefab into your world, and for each vehicle that you want to have a radio on add a new child object of the SaccEntity and give it a SAV_Radio script. In the SaccEntity script, add the new object to the Extension Udon behaviours array.
 Nothing in the SAV_Radio script needs to be configured. Leave the Radio Seats array empty to make it effect all seats on the vehicle, if you put in any seats, only those seats will be able to use the radio.
-The SAV_Radio script can also be used as a DFUNC, when used as a DFUNC, the radio channel can be changed by pulling the trigger and twisting your hand, text object must be set up to display current channel. See the Function Dials section for how to set up DFUNCs.
-Do not include it in Extension Udon behaviours array at the same time as a Dial_Functions array.
+The SAV_Radio script can also be used as a DFUNC, when used as a DFUNC, the radio channel can be changed by pulling the trigger and twisting(rolling) your hand, text object must be set up to display current channel. See the Function Dials section for how to set up DFUNCs.
+As of version 1.8.1 there is an optional additional Listen Only channel in the SAV_Radio script, this channel can be changed by clicking and yawing the hand.
+Do not include SAAV_Radio in Extension Udon behaviours array at the same time as a Dial_Functions array.
 There is also a DFUNC_RadioPTT (Push to talk) script, set this up to only be heard on the radio while it's activated.
 
 Custom Layers:
@@ -333,6 +337,7 @@ There are 4 kinda of resupply. The default is to resupply all. To use other resu
 Target
 A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc.
 You can set it to never respawn by setting respawn delay to 0. You can use a script to respawn it manually if you desire, just called the RespawnTarget event to do so. The script on the vehicle respawn button can do this (SaccEntitySendEvent)
+If you want a moving target, always move it in Update() rather than fixedUpdate(). If moving a target with an animator, do not set the animator to Animate Physics. This is because missiles are designed to track in Update() because the syncscript moves vehicles in Update().
 
 Killsboard
 The board that tells you who has the biggest kill streak and number of vehicles destroyed, requires setup, see above
@@ -369,6 +374,12 @@ A pickup with sliders on it that allow you to control the strength and direction
 
 
 Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small update 1.8.1
+Added SH-3 Helicopter
+SyncScript now uses NetworkEventsWithParametersand and includes a teleport function
+Missile tracking improvements
+Many small fixes
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Medium update 1.8.0
 Added SF-2 and SaccBalloon
