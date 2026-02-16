@@ -180,7 +180,6 @@ namespace SaccFlightAndVehicles
                     VehicleRigid.angularDrag = 0;
                 }
             }
-            if (gameObject.activeInHierarchy) { InitSyncValues(); }//this gameobject shouldn't be active at start, but some people might still have it active from older versions
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
             IntervalsMid = Mathf.Lerp(updateInterval, IdleModeUpdateInterval, 0.5f);
             // delay 5s because it causes too many problems if active right away
@@ -689,12 +688,12 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
         }
-        public void SFEXT_L_OnCollisionEnter() { if (IdleUpdateMode) ExitIdleMode(); }
+        public void SFEXT_L_OnCollisionEnter() { if (IsOwner && IdleUpdateMode) ExitIdleMode(); }
         private bool DisableAntiWarp;
         public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
         public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
         public void SFEXT_L_CancelRace() { DisableAntiWarp = false; }
-        public void SFEXT_L_WakeUp() { if (IsOwner) ExitIdleMode(); }
+        public void SFEXT_L_WakeUp() { if (IsOwner && IdleUpdateMode) ExitIdleMode(); }
         //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
         public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
         {
