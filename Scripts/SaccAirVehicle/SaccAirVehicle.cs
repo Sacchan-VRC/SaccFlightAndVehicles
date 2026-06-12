@@ -352,7 +352,10 @@ namespace SaccFlightAndVehicles
         public void SetEngineOn()
         { EngineOn = true; }
         public void SetEngineOff()
-        { EngineOn = false; }
+        {
+            if (AfterburnerOn) { SetAfterburnerOff(); }
+            EngineOn = false;
+        }
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
