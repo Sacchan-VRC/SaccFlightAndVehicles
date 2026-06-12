@@ -61,7 +61,6 @@ MonoBehaviour:
   FreezePositionOnDeath: 1
   IdleMovementRange: 0.35
   IdleRotationRange: 5
-  TeleportAngleDifference: 20
   CorrectionTime: 8
   SpeedLerpTime: 4
   CorrectionDStrength: 1.666666
@@ -13313,6 +13312,7 @@ MonoBehaviour:
   ToggleMinDelay: 6
   StartUpTime: 5
   Dial_Funcon: {fileID: 1225856843937318879}
+  Dial_Funcon_Array: []
   DoEngineStartupAnimBool: 0
   EngineAnimator: {fileID: 0}
   AnimEngineStartupAnimBool: EngineStarting
@@ -44108,7 +44108,9 @@ MonoBehaviour:
   - {fileID: 7240980354073692193}
   - {fileID: 7240980354209745011}
   LaunchSound: {fileID: 0}
+  LaunchSound_Clips: []
   LaunchSound_Interior: {fileID: 0}
+  LaunchSound_Interior_Clips: []
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -44126,6 +44128,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 1
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -44255,7 +44259,6 @@ MonoBehaviour:
   VehicleMesh: {fileID: 7978705244105965653}
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 8333115238555617820}
-  Thrust_AlwaysWorldUp: 0
   PitchMoment: {fileID: 0}
   YawMoment: {fileID: 3794158492767849092}
   GroundDetector: {fileID: 8333115238806481908}
@@ -44404,6 +44407,7 @@ MonoBehaviour:
   CenterOfDrag: {fileID: 0}
   CenterOfThrust: {fileID: 0}
   CenterOfLift: {fileID: 0}
+  Thrust_AlwaysWorldUp: 0
   ReverseThrustAllowAfterburner: 0
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -44421,20 +44425,20 @@ MonoBehaviour:
   RepairTime: 30
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
-  BulletDamageTaken: 10
-  PredictDamage: 1
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
   AtmosphereThinningStart: 6604
   AtmosphereThinningEnd: 9144
+  PredictExplosion: 1
+  SendKillEvents: 0
   SquareJoyInput: 1
   EngineOnOnEnter: 1
   EngineOffOnExit: 1
   DroneMode: 0
+  WreckedSpinForce: {x: 2, y: 3, z: 4}
   _EngineOn: 0
   ThrustAcc: {x: 0, y: 0, z: 0}
   LiftAcc: {x: 0, y: 0, z: 0}
@@ -44674,6 +44678,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   HudHold: {fileID: 8333115239606137908}
   Dial_Funcon: {fileID: 5804284457425974499}
+  Dial_Funcon_Array: []
   GLimiter: 999
   AoALimiter: 999
   AltHoldPitchProportional: 0.028
@@ -51304,6 +51309,7 @@ MonoBehaviour:
   GunFiringBoolName: sidegunfiring
   FireKey: 32
   FireNowKey: 32
+  TargetingTransform: {fileID: 0}
   AmmoBars:
   - {fileID: 6416334152273763144}
   GunRecoilEmpty: {fileID: 0}
@@ -77246,9 +77252,9 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 2653143539570689386}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 0}
-  TargetEyePosition: {fileID: 2653143539570689386}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -77511,6 +77517,7 @@ MonoBehaviour:
   use_OnPickupUseDown: 0
   MissileType: 1
   NumAAM: 2
+  NumPreInstatiated: 5
   AAMLockAngle: 15
   AAMLockTime: 1.5
   LockTimeABDivide: 2
@@ -77542,6 +77549,7 @@ MonoBehaviour:
   TargetingTransform: {fileID: 0}
   HUDControl: {fileID: -7071171659312887935}
   AAMMaxTargetDistance: 6000
+  AAMTarget: 0
   HUDText_AAM_ammo: {fileID: 8333115238396513880}
   HUDText_AAM_ammo_TMP: {fileID: 0}
   HUDText_AAM_ammo_TMPUGUI: {fileID: 0}
@@ -78364,9 +78372,9 @@ MonoBehaviour:
   - {fileID: 8333115238474179255}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 388422482105506395}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 0}
-  TargetEyePosition: {fileID: 388422482105506395}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -94414,6 +94422,7 @@ MonoBehaviour:
   GunFiringBoolName: gunfiring
   FireKey: 32
   FireNowKey: 0
+  TargetingTransform: {fileID: 0}
   AmmoBars:
   - {fileID: 8333115239605801754}
   GunRecoilEmpty: {fileID: 8333115238600691514}
@@ -94524,6 +94533,7 @@ MonoBehaviour:
   - {fileID: 8333115240000494044}
   HUD_SmokeOnIndicator: {fileID: 8333115238550695088}
   Dial_Funcon: {fileID: 8714909356925222474}
+  Dial_Funcon_Array: []
   AllowChangeColor: 1
 --- !u!114 &8333115238658311498
 MonoBehaviour:
@@ -94922,7 +94932,9 @@ MonoBehaviour:
   - {fileID: 4132127738751896766}
   - {fileID: 4132127738884279532}
   LaunchSound: {fileID: 0}
+  LaunchSound_Clips: []
   LaunchSound_Interior: {fileID: 0}
+  LaunchSound_Interior_Clips: []
   ReloadSound: {fileID: 0}
   ReloadSound_offset: 0
   LaunchParticle: {fileID: 0}
@@ -94940,6 +94952,8 @@ MonoBehaviour:
   KeyboardInput_InstantFire: 0
   HandHeld_UseEventToFire: 0
   DT_UseToFire: 0
+  DropBombOnDeath: 0
+  DropBombOnDeath_InstantExplode: 0
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   EnableOnSelected: []
@@ -95395,9 +95409,9 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 2653143539710161896}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 0}
-  TargetEyePosition: {fileID: 2653143539710161896}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -95753,9 +95767,9 @@ MonoBehaviour:
   - {fileID: 5176589018563589172}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 2653143540183886235}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 0}
-  TargetEyePosition: {fileID: 2653143540183886235}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -106065,15 +106079,18 @@ MonoBehaviour:
   FireKey: 32
   AGM: {fileID: 8764863212401809087}
   NumAGM: 2
+  NumPreInstatiated: 5
   HUDText_AGM_ammo: {fileID: 8333115238833962017}
   HUDText_AGM_ammo_TMP: {fileID: 0}
   HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 8333115239849592805}
   AtGScreen: {fileID: 8333115239949523039}
+  AtGScreen_Array: []
   CamTurnSmoothness: 100
   CamZoomScale: 100
   CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 4170627024752863621}
+  Dial_Funcon_Array: []
   FullReloadTimeSec: 8
   AGMLock: {fileID: 8333115239407741684}
   AGMUnlock: {fileID: 8333115238839294822}
@@ -106179,10 +106196,13 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   SoundControl: {fileID: -333974543967690982}
   Dial_Funcon: {fileID: 5049991645689140439}
+  Dial_Funcon_Array: []
   CanopyAnimator: {fileID: 8333115239819171383}
   CanopyOpenTime: 0
   CanopyCloseTime: 2
   EffectedSeats: []
+  CanopyCloseOnEnter: 0
+  CanopyOpenOnExit: 0
   CanopyCanBreakOff: 1
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 100
@@ -122608,7 +122628,8 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 8333115238311187226}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -122627,6 +122648,7 @@ MonoBehaviour:
   OutsideVehicleLayer: 17
   PassengerFunctionControllers: []
   AAMTargets: []
+  QueuedDamage: 0
 --- !u!114 &8333115239819171336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122861,7 +122883,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2145381143
+    m_Bits: 2144856855
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 87a5b3b8e4643bb418eb835a02117ace, type: 2}
   m_TargetDisplay: 0
@@ -133153,9 +133175,9 @@ MonoBehaviour:
   - {fileID: 6416334152273725288}
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 2653143541454527584}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 1651320211060793692}
-  TargetEyePosition: {fileID: 2653143541454527584}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -133431,9 +133453,9 @@ MonoBehaviour:
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
+  TargetEyePosition: {fileID: 2653143541203552689}
   AdjustSeatRotation: 1
   RotationCalibrationTarget: {fileID: 0}
-  TargetEyePosition: {fileID: 2653143541203552689}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
@@ -148756,6 +148778,7 @@ MonoBehaviour:
   TurretTransform: {fileID: 8333115239819171338}
   Gun: {fileID: 7978705244105965673}
   GunPitch: {fileID: 0}
+  UseLeftHand: 0
   Aim_HandDirection: 0
   Aim_HeadDirectionVR: 0
   LimitTurnAngle: 1

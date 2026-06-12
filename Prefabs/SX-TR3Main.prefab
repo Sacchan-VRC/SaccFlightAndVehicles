@@ -5625,7 +5625,6 @@ MonoBehaviour:
   SmallCrashSpeed: 5
   MediumCrashSpeed: 15
   BigCrashSpeed: 45
-  MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
   AtmosphereThinningStart: 12192
@@ -6419,6 +6418,7 @@ MonoBehaviour:
   DoAnimBool: 1
   AnimBoolName: ballsout
   AnimFiredTriggerName: passengerlaserfire
+  AnimBoolStayTrueOnExit: 0
   WorldParent: {fileID: 0}
   StickATGScrToFace_DT: 1
   ATGScrDist: 0.3
@@ -17191,7 +17191,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2145381143
+    m_Bits: 2144856855
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 1403fc2fef970eb4b9e00c57481d7ddf, type: 2}
   m_TargetDisplay: 0
@@ -32612,6 +32612,7 @@ MonoBehaviour:
   DoSideThrust: 1
   DoUPDownThrust: 1
   AllowMainEngineAndThrust: 1
+  ThrottleMatch3DThrust: 0
   RequireEngine: 1
   DisableSAVJoystick: 0
   DisableSAVThrottle: 0
@@ -32982,7 +32983,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2145381143
+    m_Bits: 2144856855
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 87a5b3b8e4643bb418eb835a02117ace, type: 2}
   m_TargetDisplay: 0
@@ -38472,7 +38473,6 @@ MonoBehaviour:
   FreezePositionOnDeath: 1
   IdleMovementRange: 0.35
   IdleRotationRange: 5
-  TeleportAngleDifference: 20
   CorrectionTime: 8
   SpeedLerpTime: 4
   CorrectionDStrength: 1.666666
@@ -63497,7 +63497,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2145381143
+    m_Bits: 2144856855
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 87a5b3b8e4643bb418eb835a02117ace, type: 2}
   m_TargetDisplay: 0
@@ -86171,6 +86171,8 @@ MonoBehaviour:
   CanopyOpenTime: 0
   CanopyCloseTime: 1.8
   EffectedSeats: []
+  CanopyCloseOnEnter: 0
+  CanopyOpenOnExit: 0
   CanopyCanBreakOff: 0
   CanopyBreakSpeed: 50
   CanopyAutoCloseSpeed: 35

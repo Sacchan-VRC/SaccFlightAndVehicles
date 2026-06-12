@@ -94,22 +94,27 @@ MonoBehaviour:
   FireKey: 0
   AGM: {fileID: 543104622733814347}
   NumAGM: 4
+  NumPreInstatiated: 5
   HUDText_AGM_ammo: {fileID: 0}
   HUDText_AGM_ammo_TMP: {fileID: 7279771779728318822}
   HUDText_AGM_ammo_TMPUGUI: {fileID: 0}
   AtGCam: {fileID: 6648985906396714127}
   AtGScreen: {fileID: 6648985906453642824}
+  AtGScreen_Array: []
+  CamTurnSmoothness: 100
   CamZoomScale: 40
   CamZoomScale_Locked: 30
   Dial_Funcon: {fileID: 0}
+  Dial_Funcon_Array: []
   FullReloadTimeSec: 8
   AGMLock: {fileID: 6648985905982578822}
   AGMUnlock: {fileID: 6648985905964495553}
-  LockableLayers:
+  LockableLayermask:
     serializedVersion: 2
-    m_Bits: 133121
+    m_Bits: 2147616769
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
+  AGMInheritVelocity: 1
   DoAnimBool: 0
   AnimBoolName: AGMSelected
   AnimFloatName: AGMs
@@ -119,6 +124,7 @@ MonoBehaviour:
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  TargetingTransform: {fileID: 0}
   WorldParent: {fileID: 0}
   use_OnPickupUseDown: 1
 --- !u!114 &84813183395697963
@@ -263,6 +269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
 --- !u!114 &7937502703365089773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,11 +314,13 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 1
-  BulletArmorLevel: -9
+  ArmorStrength: 1
+  NoDamageBelow: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  DisableRespawnIfPassenger: 0
   _EnableInteract: 0
   Interact_CustomPickup: 1
   CustomPickup_AllowSteal: 1
@@ -329,6 +338,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  QueuedDamage: 0
 --- !u!114 &84813183423644651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -851,13 +861,13 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 385302126902660263}
-  EntityControl: {fileID: 0}
-  EntityEventName: 
-  EntityEventGlobal: 0
   OtherScripts:
   - {fileID: 7937502703365089773}
   OtherScripts_Event_Name: EntityRespawn
   OtherScript_EventGlobal: 0
+  EntityControl: {fileID: 0}
+  EntityEventName: 
+  EntityEventGlobal: 0
   AnimTriggerAnimator: {fileID: 0}
   AnimTriggerName: 
   AnimTrigger_Global: 0
@@ -1269,7 +1279,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2145381143
+    m_Bits: 2144856855
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 87a5b3b8e4643bb418eb835a02117ace, type: 2}
   m_TargetDisplay: 0
