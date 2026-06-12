@@ -44,9 +44,10 @@ namespace SaccFlightAndVehicles
         private int TrackDirection = 1;
         private int FirstCheckPoint = 1;
         private int FinalCheckpoint;
-        private bool RaceOn;
+        [System.NonSerialized] public bool RaceOn;
         private float RaceStartTime = 0;
         private float RaceTime;
+        private float RaceTime_penalty;
         private Animator CurrentCheckPointAnimator;
         private Animator NextCheckPointAnimator;
         private VRCPlayerApi localPlayer;
@@ -104,14 +105,14 @@ namespace SaccFlightAndVehicles
         {
             if (RaceOn && !RaceCountdown)
             {
-                RaceTime = Time.time - RaceStartTime;
+                RaceTime = (Time.time - RaceStartTime) + RaceTime_penalty;
                 if (Time_text) { Time_text.text = SecsToMinsSec(RaceTime); }
             }
         }
         private int CurrentSplit = 0;
         private void UpdateSplitTime(bool RaceEnded = false)
         {
-            CurrentSplits[CurrentSplit] = (Time.time - RaceStartTime - CalcSubFrameTime());
+            CurrentSplits[CurrentSplit] = (Time.time - RaceStartTime - CalcSubFrameTime()) + RaceTime_penalty;
             float splitdif;
             if (TrackForward)
             {
@@ -128,6 +129,13 @@ namespace SaccFlightAndVehicles
                 if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : "<color=green>") + (RaceEnded ? "\n" : "\n<color=white>") + SecsToMinsSec(CurrentSplits[CurrentSplit]); }
             }
             CurrentSplit++;
+            SetSplitEmptyDelayed(3f);
+        }
+        [System.NonSerialized] public float RecievedPenalty = 0;
+        public void AddPenalty()
+        {
+            RaceTime_penalty += RecievedPenalty;
+            if (SplitTime_text) { SplitTime_text.text = "<color=red>CUT+" + RecievedPenalty.ToString("F0"); }
             SetSplitEmptyDelayed(3f);
         }
         int TimerTextCounter = 0;
@@ -279,7 +287,7 @@ namespace SaccFlightAndVehicles
             Vehicle_EntityControl.SendEventToExtensions("SFEXT_L_FinishRace");
             //Debug.Log("Finish Race!");
             RaceFinishTime = Time.time;
-            RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime());
+            RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime()) + RaceTime_penalty;
             if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
             {
                 //if i am not on board, AND my time is better than the worst time on board OR
@@ -350,6 +358,7 @@ namespace SaccFlightAndVehicles
                 }
             }
             RaceTime = 0;
+            RaceTime_penalty = 0;
             SetTimerEmptyDelayed(6f);
         }
         void OnTriggerEnter(Collider other)
@@ -416,6 +425,7 @@ namespace SaccFlightAndVehicles
                 }
                 Vehicle_EntityControl.SendEventToExtensions("SFEXT_L_StartRace");
                 RaceTime = 0;
+                RaceTime_penalty = 0;
                 CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
                 CurrentSplit = 0;
 
@@ -516,6 +526,7 @@ namespace SaccFlightAndVehicles
             if (!Initialized) { Initialize(); }
             RaceOn = false;
             RaceTime = 0;
+            RaceTime_penalty = 0;
             LoopFinalSplit = false;
             if (CheckDisallowedRace())
             {
