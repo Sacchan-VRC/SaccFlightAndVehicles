@@ -9,7 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class DFUNC_RadioPTT : UdonSharpBehaviour
     {
-        [Header("PTT Can only be used by the owner of the SAV_Radio\nIf you want more than one person to be able to use PTT\n you must have another SAV_Radio in their PassengerFunctions")]
+        [Header("PTT Can be used by a passenger on the pilot's radio.")]
         [SerializeField] SAV_Radio Radio;
         [SerializeField] KeyCode PTT_Key;
         [Tooltip("Press to Toggle mic instead of push to talk?")]
