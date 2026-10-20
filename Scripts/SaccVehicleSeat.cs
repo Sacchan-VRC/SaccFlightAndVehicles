@@ -44,6 +44,11 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool SeatOccupied = false;
         [System.NonSerializedAttribute] public int ThisStationID;
         private bool SeatInitialized = false;
+        private bool SeatStarted;
+        private bool HasPendingSeatEntry;
+        private int PendingSeatPlayerId = -1;
+        private bool PendingSeatFake;
+        private bool SeatEntryRetryScheduled;
         private bool InEditor = true;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public VRCPlayerApi SeatedPlayer;
@@ -88,6 +93,50 @@ namespace SaccFlightAndVehicles
             }
             if (PassengerFunctions) { PassengerFunctions.Station = Station; }
             if (SeatOutSideVehicle) { numOpenDoors++; }
+            SeatStarted = true;
+        }
+        private bool SeatEventsReady()
+        {
+            if (!SeatStarted || !EntityControl || !EntityControl.InitializationComplete) { return false; }
+            if (!SeatInitialized) { InitializeSeat(); }
+            return SeatInitialized;
+        }
+        private void ScheduleSeatEntryRetry()
+        {
+            if (SeatEntryRetryScheduled) { return; }
+            SeatEntryRetryScheduled = true;
+            SendCustomEventDelayedFrames(nameof(ApplyPendingSeatEntry), 1);
+        }
+        private void CancelPendingSeatEntry(VRCPlayerApi player)
+        {
+            if (HasPendingSeatEntry && Utilities.IsValid(player) && player.playerId == PendingSeatPlayerId)
+            {
+                HasPendingSeatEntry = false;
+                PendingSeatPlayerId = -1;
+            }
+        }
+        public void ApplyPendingSeatEntry()
+        {
+            SeatEntryRetryScheduled = false;
+            if (!HasPendingSeatEntry) { return; }
+            // Resolve again: an early entrant may have left the instance while waiting.
+            VRCPlayerApi player = VRCPlayerApi.GetPlayerById(PendingSeatPlayerId);
+            if (!Utilities.IsValid(player))
+            {
+                HasPendingSeatEntry = false;
+                PendingSeatPlayerId = -1;
+                return;
+            }
+            if (!SeatEventsReady())
+            {
+                ScheduleSeatEntryRetry();
+                return;
+            }
+            bool previousFake = Fake;
+            Fake = PendingSeatFake;
+            HasPendingSeatEntry = false;
+            OnStationEntered(player);
+            Fake = previousFake;
         }
         public override void Interact()//entering the vehicle
         {
@@ -101,7 +150,16 @@ namespace SaccFlightAndVehicles
         }
         public override void OnStationEntered(VRCPlayerApi player)
         {
-            if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EntityControl might not have initialized
+            if (!Utilities.IsValid(player)) { return; }
+            if (!SeatEventsReady())
+            {
+                HasPendingSeatEntry = true;
+                PendingSeatPlayerId = player.playerId;
+                PendingSeatFake = Fake;
+                ScheduleSeatEntryRetry();
+                return;
+            }
+            HasPendingSeatEntry = false;
             if (player != null)
             {
                 SeatOccupied = true;
@@ -176,7 +234,9 @@ namespace SaccFlightAndVehicles
         }
         public override void OnStationExited(VRCPlayerApi player)
         {
-            if (!SeatInitialized) { InitializeSeat(); }
+            CancelPendingSeatEntry(player);
+            if (!SeatEventsReady() || !SeatOccupied || !Utilities.IsValid(player) ||
+                EntityControl.SeatedPlayers[ThisStationID] != player.playerId) { return; }
             if (player != null)
             {
                 PlayerExitPlane(player);
@@ -191,7 +251,8 @@ namespace SaccFlightAndVehicles
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
         {
-            if (!SeatInitialized) { InitializeSeat(); }
+            CancelPendingSeatEntry(player);
+            if (!SeatEventsReady()) { return; }
             if (Utilities.IsValid(player) && player.playerId == EntityControl.SeatedPlayers[ThisStationID])
             {
                 if (PassengerFunctions)
@@ -209,7 +270,8 @@ namespace SaccFlightAndVehicles
         }
         public void PlayerExitPlane(VRCPlayerApi player)
         {
-            if (!SeatInitialized) { InitializeSeat(); }
+            CancelPendingSeatEntry(player);
+            if (!SeatEventsReady()) { return; }
             EntityControl.SeatedPlayers[ThisStationID] = -1;
             SeatedPlayer = null;
             if (player != null)
@@ -274,7 +336,8 @@ namespace SaccFlightAndVehicles
         }
         public void InitializeSeat()
         {
-            if (!EntityControl.Initialized) { return; }
+            if (!EntityControl || !EntityControl.Initialized || EntityControl.VehicleStations == null ||
+                EntityControl.SeatedPlayers == null) { return; }
             if (!RotationCalibrationTarget) { RotationCalibrationTarget = transform; }//YAWCALIBRATION
             int x = 0;
             foreach (VRCStation station in EntityControl.VehicleStations)
@@ -283,11 +346,11 @@ namespace SaccFlightAndVehicles
                 {
                     ThisStationID = x;
                     if (IsPilotSeat) { EntityControl.PilotSeat = x; }
+                    SeatInitialized = true;
                     break;
                 }
                 x++;
             }
-            SeatInitialized = true;
         }
         public void SeatAdjustment()
         {

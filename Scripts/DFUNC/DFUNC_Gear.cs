@@ -29,6 +29,11 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool GearUp = true;
         private bool DragApplied = false;
+        private bool GearStateReady;
+        private bool GearStateInitialized;
+        private bool HasPendingGearState;
+        private bool PendingGearUp;
+        private bool PendingJoinSync;
         private bool IsOwner = false;
         private bool DisableGroundDetector = false;
         private Transform CenterOfMass;
@@ -47,14 +52,29 @@ namespace SaccFlightAndVehicles
         {
             CenterOfMass = EntityControl.CenterOfMass;
             LandingGearDragMulti -= 1;//to match how the old values worked
-            SetGearDown();
             if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(!GearUp); }
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             IsOwner = EntityControl.IsOwner;
+            GearStateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialGearState), 1);
+        }
+        public void ApplyInitialGearState()
+        {
+            if (GearStateReady || !GearStateInitialized || !EntityControl.InitializationComplete) { return; }
+            bool gearUp = HasPendingGearState && PendingGearUp;
+            HasPendingGearState = false;
+            GearStateReady = true;
+            // Force the first application, including physics and extension events.
+            GearUp = !gearUp;
+            if (gearUp) { SetGearUp(); }
+            else { SetGearDown(); }
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!GearStateReady) { return; }
             if (GearAnimator) { GearAnimator.SetBool("gearup", GearUp); }
         }
         public void DFUNC_Selected()
@@ -129,6 +149,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetGearUp()
         {
+            if (!GearStateReady)
+            {
+                HasPendingGearState = true;
+                PendingGearUp = true;
+                return;
+            }
             if (GearUp) { return; }
             //Debug.Log("SetGearUp");
             if (!DisableGroundDetector)
@@ -153,6 +179,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetGearDown()
         {
+            if (!GearStateReady)
+            {
+                HasPendingGearState = true;
+                PendingGearUp = false;
+                return;
+            }
             if (!GearUp) { return; }
             //Debug.Log("SetGearDown");
             if (DisableGroundDetector)
@@ -175,6 +207,7 @@ namespace SaccFlightAndVehicles
         }
         public void ToggleGear()
         {
+            if (!GearStateReady) { return; }
             if (AllowToggleGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))
             {
                 if (!GearUp)
@@ -190,6 +223,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!GearStateReady) { PendingJoinSync = true; return; }
             if (GearUp)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearUp));

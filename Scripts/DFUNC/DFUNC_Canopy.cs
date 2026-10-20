@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -52,17 +52,27 @@ namespace SaccFlightAndVehicles
         private bool DragApplied;
         private bool CanopyTransitioning = false;
         private bool InEditor = true;
+        private bool CanopyStateReady;
+        private bool CanopyStateInitialized;
+        private bool HasPendingCanopyState;
+        private bool PendingCanopyOpen;
+        private bool PendingCanopyBroken;
+        private bool PendingCanopyRepairIfHealthy;
+        private bool PendingJoinSync;
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             VehicleTransform = EntityControl.transform;
             CanopyDragMulti -= 1;
+            CanopyStateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialCanopyState), 1);
             //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
             SendCustomEventDelayedSeconds(nameof(CanopyOpeningStart), 10);
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!CanopyStateReady) { return; }
             if (CanopyAnimator) { { CanopyAnimator.SetBool(AnimCanopyBool, CanopyOpen); } }
         }
         public void DFUNC_Selected()
@@ -106,6 +116,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!CanopyStateReady) { PendingJoinSync = true; return; }
             if (!eventRunOnce) return;
             if (CanopyBroken)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyBreakOff)); }
@@ -114,12 +125,34 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_RespawnButton()
         {
+            if (!CanopyStateReady)
+            {
+                HasPendingCanopyState = true;
+                PendingCanopyBroken = false;
+                PendingCanopyRepairIfHealthy = false;
+                PendingCanopyOpen = true;
+                eventRunOnce = true;
+                return;
+            }
             CanopyBroken = false;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, false); }
             if (!CanopyOpen) CanopyOpening();
         }
         public void SFEXT_G_ReSupply()
         {
+            if (!CanopyStateReady)
+            {
+                if (PendingCanopyBroken)
+                {
+                    // FullHealth is established by the vehicle's EntityStart.
+                    PendingCanopyRepairIfHealthy = true;
+                    PendingCanopyBroken = false;
+                    PendingCanopyOpen = false;
+                    HasPendingCanopyState = true;
+                    eventRunOnce = true;
+                }
+                return;
+            }
             if (CanopyBroken)
             {
                 if ((float)SAVControl.GetProgramVariable("Health") == (float)SAVControl.GetProgramVariable("FullHealth"))
@@ -131,6 +164,15 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RePair() { SFEXT_G_ReSupply(); }
         public void RepairCanopy()
         {
+            if (!CanopyStateReady)
+            {
+                HasPendingCanopyState = true;
+                PendingCanopyBroken = false;
+                PendingCanopyRepairIfHealthy = false;
+                PendingCanopyOpen = false;
+                eventRunOnce = true;
+                return;
+            }
             CanopyBroken = false;
             if (CanopyAnimator) { CanopyAnimator.SetBool(AnimCanopyBroken, false); }
             if (EntityControl.IsOwner) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
@@ -138,6 +180,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!CanopyStateReady) { return; }
             if (Selected)
             {
                 float Trigger;
@@ -174,16 +217,49 @@ namespace SaccFlightAndVehicles
         }
         public void CanopyOpeningStart()
         {
+            if (!CanopyStateReady || eventRunOnce) { return; }
 #if UNITY_EDITOR
             if (!EntityControl.Occupied) // don't annoy me in editor
-#else
-            if (!eventRunOnce) // don't open if event has been recieved from other
 #endif
                 CanopyOpening();
+        }
+        public void ApplyInitialCanopyState()
+        {
+            if (CanopyStateReady || !CanopyStateInitialized || !EntityControl.InitializationComplete) { return; }
+            CanopyStateReady = true;
+            if (HasPendingCanopyState)
+            {
+                HasPendingCanopyState = false;
+                if (PendingCanopyRepairIfHealthy &&
+                    (float)SAVControl.GetProgramVariable("Health") != (float)SAVControl.GetProgramVariable("FullHealth"))
+                {
+                    // A failed repair leaves the broken canopy open; later open/close
+                    // events cannot move it until a repair succeeds.
+                    PendingCanopyBroken = true;
+                    PendingCanopyOpen = true;
+                }
+                PendingCanopyRepairIfHealthy = false;
+                if (PendingCanopyBroken)
+                {
+                    // Apply locally; do not broadcast another opening request on replay.
+                    CanopyOpening();
+                    CanopyBreakOff();
+                }
+                else if (PendingCanopyOpen) { CanopyOpening(); }
+                else { CanopyClosing(); }
+            }
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
         }
         public void CanopyOpening()
         {
             eventRunOnce = true;
+            if (!CanopyStateReady)
+            {
+                HasPendingCanopyState = true;
+                if (!PendingCanopyBroken) { PendingCanopyOpen = true; }
+                return;
+            }
             if (CanopyOpen || CanopyBroken) { return; }
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
@@ -218,6 +294,12 @@ namespace SaccFlightAndVehicles
         public void CanopyClosing()
         {
             eventRunOnce = true;
+            if (!CanopyStateReady)
+            {
+                HasPendingCanopyState = true;
+                if (!PendingCanopyBroken) { PendingCanopyOpen = false; }
+                return;
+            }
             if (!CanopyOpen || CanopyBroken) { return; }//don't bother when not necessary (OnPlayerJoined() wasn't you)
             LastCanopyToggleTime = Time.time;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
@@ -272,6 +354,15 @@ namespace SaccFlightAndVehicles
         }
         public void CanopyBreakOff()
         {
+            eventRunOnce = true;
+            if (!CanopyStateReady)
+            {
+                HasPendingCanopyState = true;
+                PendingCanopyOpen = true;
+                PendingCanopyBroken = true;
+                PendingCanopyRepairIfHealthy = false;
+                return;
+            }
             if (CanopyBroken) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(true);
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }

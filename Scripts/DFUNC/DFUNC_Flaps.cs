@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -34,6 +34,11 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool Flaps = false;
         private bool TriggerLastFrame;
         private bool DragApplied;
+        private bool FlapsStateReady;
+        private bool FlapsStateInitialized;
+        private bool HasPendingFlapsState;
+        private bool PendingFlaps;
+        private bool PendingJoinSync;
         private bool LiftApplied;
         private bool VelLiftApplied;
         private bool StraightenApplied;
@@ -69,11 +74,24 @@ namespace SaccFlightAndVehicles
 
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(Flaps); }
-            if (DefaultFlapsOff) { SetFlapsOff(); }
-            else { SetFlapsOn(); }
+            FlapsStateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialFlapsState), 1);
+        }
+        public void ApplyInitialFlapsState()
+        {
+            if (FlapsStateReady || !FlapsStateInitialized || !EntityControl.InitializationComplete) { return; }
+            bool flaps = HasPendingFlapsState ? PendingFlaps : !DefaultFlapsOff;
+            HasPendingFlapsState = false;
+            FlapsStateReady = true;
+            Flaps = !flaps;
+            if (flaps) { SetFlapsOn(); }
+            else { SetFlapsOff(); }
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!FlapsStateReady) { return; }
             if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, Flaps); }
         }
         public void SFEXT_O_PilotEnter()
@@ -117,6 +135,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!FlapsStateReady) { return; }
             if (!Asleep)
             {
                 if (Selected)
@@ -170,6 +189,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetFlapsOff()
         {
+            if (!FlapsStateReady)
+            {
+                HasPendingFlapsState = true;
+                PendingFlaps = false;
+                return;
+            }
             if (!Flaps) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
@@ -211,6 +236,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetFlapsOn()
         {
+            if (!FlapsStateReady)
+            {
+                HasPendingFlapsState = true;
+                PendingFlaps = true;
+                return;
+            }
             if (Flaps) { return; }
             Flaps = true;
             if (FlapsAnimator) { FlapsAnimator.SetBool(AnimatorBool, true); }
@@ -265,6 +296,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!FlapsStateReady) { PendingJoinSync = true; return; }
             if (!Flaps && !DefaultFlapsOff)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetFlapsOff));

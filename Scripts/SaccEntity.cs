@@ -252,6 +252,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float MyEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
         [System.NonSerializedAttribute] public bool CoMSet = false;
+        [System.NonSerialized] public bool InitializationComplete;
         public void Init() { Start(); }
         private void Start()
         {
@@ -416,6 +417,7 @@ namespace SaccFlightAndVehicles
             if (ArmorStrength == 0) ArmorStrength = 0.000001f;
 
             SendEventToExtensions("SFEXT_L_EntityStart");
+            InitializationComplete = true;
 
             //if in editor play mode without clientsim
             if (InEditor)
