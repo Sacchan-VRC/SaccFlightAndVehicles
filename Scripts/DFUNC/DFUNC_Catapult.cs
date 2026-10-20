@@ -59,6 +59,26 @@ namespace SaccFlightAndVehicles
         private float AttachTime;
         private float FullThrottleTime;
         private bool Launching_AB;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingState)
+            {
+                if (PendingState) { CatapultLockIn(); }
+                else { CatapultLockOff(); }
+            }
+            HasPendingState = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             InEditor = Networking.LocalPlayer == null;
@@ -72,6 +92,8 @@ namespace SaccFlightAndVehicles
                 IsOwner = EntityControl.IsOwner;
             }
             colliderSmall();
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         // non-owners have a bigger collider so that they can find catapults if the position isn't synced perfectly
         void colliderLarge()
@@ -183,6 +205,7 @@ namespace SaccFlightAndVehicles
         }
         private void OnTriggerEnter(Collider other)
         {
+            if (!StateReady) { return; }
             if (EntityControl._dead) return;
             if (Piloting)
             {
@@ -268,6 +291,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if ((Piloting && OnCatapult) || Launching)
             {
                 if (AutoLaunch)
@@ -408,6 +432,8 @@ namespace SaccFlightAndVehicles
         }
         public void LaunchCatapult()
         {
+            // A launch trigger received before initialization is already out of date.
+            if (!StateReady) { return; }
             if (VehicleAnimator) { VehicleAnimator.SetTrigger(AnimTriggerLaunchName); }
             if (Utilities.IsValid(CatapultAnimator))
             { CatapultAnimator.SetTrigger("launch"); }
@@ -418,6 +444,7 @@ namespace SaccFlightAndVehicles
         }
         public void CatapultLockIn()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = true; return; }
             if (!IsOwner)
             {
                 EnableToFindAnimator();
@@ -432,6 +459,7 @@ namespace SaccFlightAndVehicles
         }
         public void CatapultLockOff()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = false; return; }
             OnCatapult = false;
             if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", false); }
             EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockOff");

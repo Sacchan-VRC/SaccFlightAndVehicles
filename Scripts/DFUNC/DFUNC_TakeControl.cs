@@ -43,6 +43,26 @@ namespace SaccFlightAndVehicles
         private SaccAirVehicle SAVControl;
         private Vector3[] MoveTransformsPos_Orig;
         private Quaternion[] MoveTransformsRot_Orig;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingState)
+            {
+                if (PendingState) { Swap_Event(); }
+                else { UnSwap_Event(); }
+            }
+            HasPendingState = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             VehicleSeats = EntityControl.VehicleSeats;
@@ -98,9 +118,12 @@ namespace SaccFlightAndVehicles
                 }
                 if (!PilotSVSeatFound) ThisSeatRadio_DoSwap = true;
             }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void TakeControl()
         {
+            if (!StateReady) { return; }
             if (gameObject.activeInHierarchy || !SAVControl.Occupied)
             {
                 if (!Swapped)
@@ -111,6 +134,7 @@ namespace SaccFlightAndVehicles
         }
         public void Swap_Event()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = true; return; }
             bool autoEngineEnter = true;
             bool autoEngineExit = true;
             bool DoAutoEngine = false;
@@ -162,6 +186,7 @@ namespace SaccFlightAndVehicles
         }
         public void UnSwap_Event()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = false; return; }
             bool autoEngineEnter = true;
             bool autoEngineExit = true;
             bool DoAutoEngine = false;
@@ -213,7 +238,7 @@ namespace SaccFlightAndVehicles
         }
         public void ResetSwap()
         {
-            if (Swapped)
+            if (Swapped || HasPendingState)
             {
                 UnSwap_Event();
             }

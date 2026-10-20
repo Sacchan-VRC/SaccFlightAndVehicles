@@ -30,14 +30,39 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         private float ToggleTime;
         private float TriggerTapTime;
+        private bool HasPendingStartup;
+        private float PendingStartupTime;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            SFEXT_L_OnEnable();
+            if (HasPendingStartup)
+            {
+                bool starting = EngineStartCount > EngineStartCancelCount;
+                EngineStartCount = EngineStartCancelCount = 0;
+                if (starting) { EngineStartup(); }
+                HasPendingStartup = false;
+            }
+        }
         public void SFEXT_L_EntityStart()
         {
             wrecked = EntityControl.wrecked;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!StateReady) { return; }
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, (bool)SAVControl.GetProgramVariable("_EngineOn")); }
         }
@@ -104,15 +129,18 @@ namespace SaccFlightAndVehicles
         {
             EngineStartCount++;
             ToggleTime = Time.time;
+            if (!StateReady) { HasPendingStartup = true; PendingStartupTime = Time.time; return; }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(true); }
-            SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
+            float remaining = HasPendingStartup ? Mathf.Max(0, StartUpTime - (Time.time - PendingStartupTime)) : StartUpTime;
+            SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), remaining);
             if (DoEngineStartupAnimBool)
             { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
             EntityControl.SendEventToExtensions("SFEXT_G_EngineStartup");
         }
         public void EngineStartupFinish()
         {
+            if (!StateReady) { return; }
             if (EngineStartCount > 0) { EngineStartCount--; }
             if (EntityControl.IsOwner)
             {
@@ -136,6 +164,7 @@ namespace SaccFlightAndVehicles
         public void EngineStartupCancel()
         {
             EngineStartCancelCount++;
+            if (!StateReady) { HasPendingStartup = true; return; }
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             if (DoEngineStartupAnimBool)
