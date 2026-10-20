@@ -37,6 +37,7 @@ namespace SaccFlightAndVehicles
         private int NumZones;
         private bool DoZones = false;
         private bool DoEntities = true;
+        [System.NonSerialized] public bool Initialized;
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
@@ -57,6 +58,12 @@ namespace SaccFlightAndVehicles
             }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
+            Initialized = true;
+            // Radios may have received a channel before the base assigned their reference.
+            for (int i = 0; i < AllRadios_RD.Length; i++)
+            {
+                AllRadios_RD[i].ApplyInitialState();
+            }
         }
         private void PruneRadiosArray()
         {

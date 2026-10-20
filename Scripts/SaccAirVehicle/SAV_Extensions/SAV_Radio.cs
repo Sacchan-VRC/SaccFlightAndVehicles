@@ -32,6 +32,7 @@ namespace SaccFlightAndVehicles
             {
                 byte lastChannel = _Channel;
                 _Channel = value;
+                if (!StateReady) { HasPendingChannel = true; return; }
                 if (ImOnRadio)
                 {
                     UpdateChannel();
@@ -54,9 +55,30 @@ namespace SaccFlightAndVehicles
         private bool ChannelSwapped_ListenOnly;
         private bool ChannelSwapped;
         bool inVehicle;
+        private bool StateReady;
+        private bool HasPendingChannel;
+        private bool HasPendingPTT;
+        private bool PendingPTT;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !Initialized || !RadioBase) { return; }
+            if (!EntityControl.InitializationComplete || !RadioBase.Initialized)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingChannel) { Channel = _Channel; }
+            HasPendingChannel = false;
+            if (HasPendingPTT)
+            {
+                if (PendingPTT) { Call_PTT_ON(); }
+                else { Call_PTT_OFF(); }
+            }
+            HasPendingPTT = false;
+        }
         public void Init()
         {
-            Initialized = true;
             localPlayer = Networking.LocalPlayer;
             VRCPlayerApi ownerAPI = EntityControl.OwnerAPI;
             if (Utilities.IsValid(ownerAPI))
@@ -81,6 +103,8 @@ namespace SaccFlightAndVehicles
             if (DialPosition != -999) { DFUNCMODE = true; }
 
             for (int i = 0; i < Dial_Funcons.Length; i++) { Dial_Funcons[i].SetActive(false); }
+            Initialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_L_EntityStart()
         {
@@ -241,12 +265,14 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void Call_PTT_ON()
         {
+            if (!StateReady) { HasPendingPTT = true; PendingPTT = true; return; }
             if (localPlayer.IsOwner(gameObject))
                 PTT_ON();
         }
         [NetworkCallable]
         public void Call_PTT_OFF()
         {
+            if (!StateReady) { HasPendingPTT = true; PendingPTT = false; return; }
             if (localPlayer.IsOwner(gameObject))
                 PTT_OFF();
         }
