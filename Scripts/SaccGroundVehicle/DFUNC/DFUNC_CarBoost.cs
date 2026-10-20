@@ -58,6 +58,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (!StateReady) { HasPendingBoost = true; _Boosting = value; return; }
                 BoostAnimator.SetFloat(BOOSTING_STRING, value);
                 _Boosting = value;
             }
@@ -69,6 +70,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (!StateReady) { HasPendingRemaining = true; _BoostRemaining = value; return; }
                 BoostAnimator.SetFloat(BOOSTREMAINING_STRING, value * BoostRemainingDivider);
                 _BoostRemaining = value;
             }
@@ -86,6 +88,24 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        private bool HasPendingBoost;
+        private bool HasPendingRemaining;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (!HasPendingRemaining) { _BoostRemaining = UseMainFuel || BoostOverheatMode ? 0 : BoostInSeconds; }
+            if (_BoostRemainingAnimFloatName != string.Empty) { BoostRemaining = _BoostRemaining; }
+            Boosting = HasPendingBoost ? _Boosting : 0;
+            HasPendingBoost = HasPendingRemaining = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             VehicleRigidbody = EntityControl.VehicleRigidbody;
@@ -97,19 +117,13 @@ namespace SaccFlightAndVehicles
             BoostingAnimFloatName = _BoostingAnimFloatName;
             BoostRemainingAnimFloatName = _BoostRemainingAnimFloatName;
             BoostRemainingDivider = 1 / BoostInSeconds;
-            if (UseMainFuel)
-            { _BoostRemaining = 0; }
-            else
-            {
-                if (_BoostRemainingAnimFloatName != string.Empty)//prevent missing parameter warning
-                { BoostRemaining = BoostOverheatMode ? 0 : BoostInSeconds; }
-                else
-                { _BoostRemaining = BoostOverheatMode ? 0 : BoostInSeconds; }
-            }
-            Boosting = 0;
+
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if (Piloting)
             {
                 float Trigger = 0;

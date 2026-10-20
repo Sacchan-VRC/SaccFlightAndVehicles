@@ -35,6 +35,27 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool HookDown = false;
         private bool DisableGroundBrake;
         private bool func_active;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            bool desired = HasPendingState ? PendingState : false;
+            if (desired) { SetHookDown(); }
+            else { SetHookUp(); }
+            HasPendingState = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -42,10 +63,12 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-            SetHookUp();
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!StateReady) { return; }
             if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", HookDown); }
         }
         public void DFUNC_Selected()
@@ -96,11 +119,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (HookDown)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHookDown)); }
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if (func_active)
             {
                 float Trigger;
@@ -157,6 +182,7 @@ namespace SaccFlightAndVehicles
         }
         private void FixedUpdate()
         {
+            if (!StateReady) { return; }
             if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
             {
                 float DeltaTime = Time.deltaTime;
@@ -172,6 +198,7 @@ namespace SaccFlightAndVehicles
         }
         public void ToggleHook()
         {
+            if (!StateReady) { return; }
             if (HookDetector)
             {
                 if (!HookDown)
@@ -196,6 +223,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetHookDown()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = true;
+                return;
+            }
             if (HookDown) return;
             HookDown = true;
             if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", true); }
@@ -207,6 +240,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetHookUp()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = false;
+                return;
+            }
             if (!HookDown) return;
             HookDown = false;
             if (VehicleAnimator) { VehicleAnimator.SetBool("hookdown", false); }

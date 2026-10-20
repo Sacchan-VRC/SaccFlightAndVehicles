@@ -53,6 +53,14 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (!StateReady)
+                {
+                    if (!HasPendingGear) { GearBeforeInitialization = _CurrentGear; }
+                    _CurrentGear = value;
+                    PendingGear = value;
+                    HasPendingGear = true;
+                    return;
+                }
                 SGVControl.SetProgramVariable("CurrentGear", value);
                 SGVControl.SetProgramVariable("GearRatio", GearRatios[value] * FinalDrive);
                 SGVControl.SendCustomEvent("UpdateGearRatio");
@@ -135,6 +143,24 @@ namespace SaccFlightAndVehicles
         }
         private float LastGearChangeTime;
         private float RevLimiter;
+        private byte PendingGear;
+        private byte GearBeforeInitialization;
+        private bool HasPendingGear;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingGear) { _CurrentGear = GearBeforeInitialization; }
+            CurrentGear = HasPendingGear ? PendingGear : NeutralGear;
+            HasPendingGear = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
@@ -150,14 +176,16 @@ namespace SaccFlightAndVehicles
             }
             if (AutoClutch_Length <= 0) { ClutchDecaySpeed = Mathf.Infinity; }
             else { ClutchDecaySpeed = 1 / AutoClutch_Length; }
-            CurrentGear = NeutralGear;
-            SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
+
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(disableSelf), 5); // enable for a bit to run initial deserialization now instead of when you get in to prevent wrong gear bug
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void disableSelf() { if (!Occupied) gameObject.SetActive(false); }
         private void LateUpdate()
         {
+            if (!StateReady) { return; }
             if (Piloting)
             {
                 Vector2 StickPos = Vector2.zero;

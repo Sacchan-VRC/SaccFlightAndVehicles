@@ -41,11 +41,33 @@ namespace SaccFlightAndVehicles
         private float GLimiterRange_Neg;
         private float AoALimiterRange;
         [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            bool desired = HasPendingState ? PendingState : DefaultLimitsOn;
+            FlightLimitsEnabled = !desired;
+            if (desired) { SetLimitsOn(); }
+            else { SetLimitsOff(); }
+            HasPendingState = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             InVR = EntityControl.InVR;
-            if (!DefaultLimitsOn) { SetLimitsOff(); }
+
             GLimiterRange_Pos = GLimiter_Pos - GLimiter_Begin_Pos;
             if (GLimiter_Neg < 0 || GLimiter_Begin_Neg < 0)
             {
@@ -54,6 +76,8 @@ namespace SaccFlightAndVehicles
             }
             GLimiterRange_Neg = GLimiter_Neg - GLimiter_Begin_Neg;
             AoALimiterRange = AoALimiter - AoALimiter_Begin;
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void DFUNC_Selected()
         {
@@ -95,6 +119,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetLimitsOn()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = true;
+                return;
+            }
             if (FlightLimitsEnabled) { return; }
             if (Piloting && !InVR) { gameObject.SetActive(true); }
             FlightLimitsEnabled = true;
@@ -105,6 +135,12 @@ namespace SaccFlightAndVehicles
         }
         public void SetLimitsOff()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = false;
+                return;
+            }
             if (!FlightLimitsEnabled) { return; }
             if (Piloting && !InVR) { gameObject.SetActive(false); }
             FlightLimitsEnabled = false;
@@ -126,6 +162,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (!FlightLimitsEnabled && DefaultLimitsOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOff)); }
             else if (FlightLimitsEnabled && !DefaultLimitsOn)
@@ -133,6 +170,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if (Selected)
             {
                 float Trigger;

@@ -71,6 +71,31 @@ namespace SaccFlightAndVehicles
         private bool ToggleAllowed = true;
         private bool TriggerLastFrame;
         private bool IsSecondary = false;
+        private bool BoolStateApplied;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            bool desired = HasPendingState ? PendingState : OnDefault;
+            if (!IsSecondary || HasPendingState)
+            {
+                if (desired) { SetBoolOn(); }
+                else { SetBoolOff(); }
+            }
+            HasPendingState = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             SoundControl = EntityControl.GetExtention(GetUdonTypeName<SAV_SoundController>());
@@ -89,20 +114,20 @@ namespace SaccFlightAndVehicles
             else//this object is master
             {
                 if (OpensDoor && (ToggleMinDelay < DoorCloseTime) || (ToggleMinDelay < DoorOpenTime)) { ToggleMinDelay = Mathf.Max(DoorCloseTime, DoorOpenTime); }
-                if (OnDefault)
-                {
-                    SetBoolOn();
-                }
                 foreach (GameObject funcon in Dial_Funcon)
                 { funcon.SetActive(InvertFuncon ? !OnDefault : OnDefault); }
             }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_L_OnEnable()
         {
+            if (!StateReady) { return; }
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, AnimOn); }
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (!IsSecondary)
             {
                 if (OnDefault && !AnimOn)
@@ -203,6 +228,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             float Trigger;
             if (use_OnPickupUseDown)
                 Trigger = PickupTrigger;
@@ -239,6 +265,7 @@ namespace SaccFlightAndVehicles
         }
         public void Toggle()
         {
+            if (!StateReady) { return; }
             if (IsSecondary)
             {
                 if (Time.time - (float)MasterToggle.GetProgramVariable("ToggleTime") > ToggleMinDelay)
@@ -266,7 +293,14 @@ namespace SaccFlightAndVehicles
         }
         public void SetBoolOn()
         {
-            if (AnimOn) { return; }
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = true;
+                return;
+            }
+            if (AnimOn && BoolStateApplied) { return; }
+            BoolStateApplied = true;
             ToggleTime = Time.time;
             AnimOn = true;
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
@@ -300,13 +334,21 @@ namespace SaccFlightAndVehicles
         }
         public void SetBoolOff()
         {
-            if (!AnimOn) { return; }
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = false;
+                return;
+            }
+            if (!AnimOn && BoolStateApplied) { return; }
+            bool wasOn = AnimOn;
+            BoolStateApplied = true;
             ToggleTime = Time.time;
             AnimOn = false;
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(InvertFuncon ? !false : false); }
-            if (OpensDoor)
+            if (OpensDoor && wasOn)
             {
                 if (EffectedSeats.Length == 0)
                 {

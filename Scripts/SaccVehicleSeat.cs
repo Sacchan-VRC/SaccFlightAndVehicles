@@ -49,6 +49,9 @@ namespace SaccFlightAndVehicles
         private int PendingSeatPlayerId = -1;
         private bool PendingSeatFake;
         private bool SeatEntryRetryScheduled;
+        private bool HasPendingSeatPose;
+        private Vector3 PendingSeatPose;
+        private int PendingSeatPosePlayerId = -1;
         private bool InEditor = true;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public VRCPlayerApi SeatedPlayer;
@@ -109,6 +112,12 @@ namespace SaccFlightAndVehicles
         }
         private void CancelPendingSeatEntry(VRCPlayerApi player)
         {
+            if (Utilities.IsValid(player) &&
+                (PendingSeatPosePlayerId < 0 || PendingSeatPosePlayerId == player.playerId))
+            {
+                HasPendingSeatPose = false;
+                PendingSeatPosePlayerId = -1;
+            }
             if (HasPendingSeatEntry && Utilities.IsValid(player) && player.playerId == PendingSeatPlayerId)
             {
                 HasPendingSeatEntry = false;
@@ -230,6 +239,7 @@ namespace SaccFlightAndVehicles
                     EntityControl.PassengerEnterVehicleGlobal(player);
                 }
                 if (AnimBoolAnimator) { AnimBoolAnimator.SetBool(AnimBoolOnEnter, true); }
+                ApplyPendingSeatPose();
             }
         }
         public override void OnStationExited(VRCPlayerApi player)
@@ -433,6 +443,20 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void UpdateSeatPosition(Vector3 inputPose)
         {
+            PendingSeatPose = inputPose;
+            VRCPlayerApi sender = NetworkCalling.CallingPlayer;
+            PendingSeatPosePlayerId = Utilities.IsValid(sender) ? sender.playerId :
+                Utilities.IsValid(SeatedPlayer) ? SeatedPlayer.playerId : -1;
+            HasPendingSeatPose = true;
+            ApplyPendingSeatPose();
+        }
+        private void ApplyPendingSeatPose()
+        {
+            if (!HasPendingSeatPose || !SeatEventsReady() || !SeatOccupied ||
+                !Utilities.IsValid(SeatedPlayer)) { return; }
+            HasPendingSeatPose = false;
+            if (PendingSeatPosePlayerId >= 0 && PendingSeatPosePlayerId != SeatedPlayer.playerId) { return; }
+            Vector3 inputPose = PendingSeatPose;
             if (Seat)
             {
                 Vector3 newpos = (new Vector3(SeatStartPos.x, inputPose.x, inputPose.y));

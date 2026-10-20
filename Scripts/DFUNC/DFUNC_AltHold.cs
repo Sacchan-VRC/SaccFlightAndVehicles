@@ -64,6 +64,27 @@ namespace SaccFlightAndVehicles
         private bool JoyStickOveridden;
         private bool StickHeld;
         private bool Piloting;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            bool desired = HasPendingState ? PendingState : false;
+            if (desired) { ActivateAltHold(); }
+            else { DeactivateAltHold(); }
+            HasPendingState = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
@@ -72,6 +93,8 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             for (int i = 0; i < Dial_Funcon_Array.Length; i++) { Dial_Funcon_Array[i].SetActive(false); }
             IsOwner = EntityControl.IsOwner;
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void DFUNC_Selected()
         {
@@ -127,6 +150,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (AltHold)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
@@ -154,6 +178,12 @@ namespace SaccFlightAndVehicles
         }
         public void ActivateAltHold()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = true;
+                return;
+            }
             if (AltHold) { return; }
             AltHold = true;
             if (!JoyStickOveridden && !StickHeld)
@@ -170,6 +200,12 @@ namespace SaccFlightAndVehicles
         }
         public void DeactivateAltHold()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = false;
+                return;
+            }
             if (!AltHold) { return; }
             if (!InVR || !Selected) { gameObject.SetActive(false); }
             AltHold = false;
@@ -190,6 +226,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if (Selected)
             {
                 if (InVR)
@@ -214,6 +251,7 @@ namespace SaccFlightAndVehicles
         }
         void FixedUpdate()
         {
+            if (!StateReady) { return; }
             if (AltHold && IsOwner)
             {
                 float DeltaTime = Time.fixedDeltaTime;

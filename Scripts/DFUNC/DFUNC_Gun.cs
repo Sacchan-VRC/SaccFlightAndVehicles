@@ -31,7 +31,22 @@ namespace SaccFlightAndVehicles
         public GameObject HudCrosshair;
         [Tooltip("How long it takes to fully reload from empty in seconds")]
         public float FullReloadTimeSec = 20;
-        [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
+        [UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(Ammo))] public float GunAmmoInSeconds = 12;
+        private bool AmmoCapacityCaptured;
+        public float Ammo
+        {
+            set
+            {
+                // Preserve the configured capacity before the first synchronized value replaces it.
+                if (!StateInitialized && !AmmoCapacityCaptured)
+                {
+                    FullGunAmmoInSeconds = GunAmmoInSeconds;
+                    AmmoCapacityCaptured = true;
+                }
+                GunAmmoInSeconds = value;
+            }
+            get => GunAmmoInSeconds;
+        }
         public float RecoilForce = 1;
         [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
         public bool DoAnimBool = false;
@@ -61,6 +76,12 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (!StateReady)
+                {
+                    _firing = PendingFiring = value;
+                    HasPendingFiring = true;
+                    return;
+                }
                 if (EntityControl.IsOwner && RecoilForce > 0)
                 {
                     if (value)
@@ -93,9 +114,26 @@ namespace SaccFlightAndVehicles
         private bool Piloting = false;
         private Vector3 AmmoBarScaleStart;
         private Vector3[] AmmoBarScaleStarts;
+        private bool PendingFiring;
+        private bool HasPendingFiring;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingFiring) { Firing = PendingFiring; }
+            HasPendingFiring = false;
+            UpdateAmmoVisuals();
+        }
         public void SFEXT_L_EntityStart()
         {
-            FullGunAmmoInSeconds = GunAmmoInSeconds;
+            if (!AmmoCapacityCaptured) { FullGunAmmoInSeconds = GunAmmoInSeconds; }
             reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
 
             AmmoBarScaleStarts = new Vector3[AmmoBars.Length];
@@ -120,6 +158,8 @@ namespace SaccFlightAndVehicles
                 distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
             }
             if (distance_from_head == 0) { distance_from_head = 1.333f; }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void ReInitAmmo()//set FullAAMs then run this to change vehicles max gun ammo
         {
@@ -201,6 +241,7 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateAmmoVisuals()
         {
+            if (!StateReady) { return; }
             for (int i = 0; i < AmmoBars.Length; i++)
             {
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
@@ -278,6 +319,7 @@ namespace SaccFlightAndVehicles
         }
         public void LateUpdate()
         {
+            if (!StateReady) { return; }
             if (Piloting)
             {
                 if (Selected || Input.GetKey(FireNowKey) || (!inVR && DT_UseToFire))
@@ -346,6 +388,7 @@ namespace SaccFlightAndVehicles
         private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                                   //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
         {
+            if (!StateReady) { return; }
             if (_firing && EntityControl.IsOwner)
             {
                 if (!GunRecoilEmpty)

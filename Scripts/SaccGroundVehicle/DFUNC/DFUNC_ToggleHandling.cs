@@ -54,6 +54,27 @@ namespace SaccFlightAndVehicles
         private bool Selected;
         private bool TriggerLastFrame;
         bool KeepingAwake;
+        private bool HasPendingState;
+        private bool PendingState;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            bool desired = HasPendingState ? PendingState : false;
+            if (desired) { ToggleOn(); }
+            else { ToggleOff(); }
+            HasPendingState = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
@@ -100,6 +121,8 @@ namespace SaccFlightAndVehicles
 
             if (ObjectAlwaysEnabled)
             { gameObject.SetActive(true); }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         void Update()
         {
@@ -150,6 +173,12 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void ToggleOn()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = true;
+                return;
+            }
             if (Toggled) return;
             if (KeepAwakeWhileOn && !KeepingAwake)
             {
@@ -209,6 +238,12 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void ToggleOff()
         {
+            if (!StateReady)
+            {
+                HasPendingState = true;
+                PendingState = false;
+                return;
+            }
             if (!Toggled) return;
             if (KeepAwakeWhileOn && KeepingAwake)
             {
@@ -279,6 +314,7 @@ namespace SaccFlightAndVehicles
         }
         public void Toggle()
         {
+            if (!StateReady) { return; }
             if (Toggled)
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleOff));
             else if ((!NoFuelTurnOff || !NoFuel) && (!WreckedTurnOff || !wrecked))
@@ -314,6 +350,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (EntityControl.IsOwner)
                 if (Toggled) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ToggleOn));
         }

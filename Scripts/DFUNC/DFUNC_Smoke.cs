@@ -50,6 +50,27 @@ namespace SaccFlightAndVehicles
         private bool InEditor;
         private float LastSerialization;
         private Transform ControlsRoot;
+        private bool PendingSmoking;
+        private bool HasPendingColor;
+        private Vector3 PendingColor;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            SetSmoking(PendingSmoking);
+            if (HasPendingColor) { NetworkUpdateSmoke(_smokeon, PendingColor); }
+            HasPendingColor = false;
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
@@ -62,6 +83,8 @@ namespace SaccFlightAndVehicles
 
             for (int x = 0; x < DisplaySmokeem.Length; x++)
             { DisplaySmokeem[x] = DisplaySmoke[x].emission; }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void DFUNC_Selected()
         {
@@ -206,6 +229,13 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void NetworkUpdateSmoke(bool smokeon, Vector3 newcolor)
         {
+            if (!StateReady)
+            {
+                SmokeOn = smokeon;
+                PendingColor = newcolor;
+                HasPendingColor = true;
+                return;
+            }
             if (SmokeOn != smokeon)
             {
                 SmokeOn = smokeon;
@@ -236,6 +266,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetSmoking(bool smoking)
         {
+            if (!StateReady) { PendingSmoking = smoking; return; }
             localSmoking = smoking;
             if (HUD_SmokeOnIndicator) { HUD_SmokeOnIndicator.SetActive(smoking); }
             for (int x = 0; x < DisplaySmokeem.Length; x++)
@@ -252,6 +283,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (Pilot)
             {
                 if (localSmoking)

@@ -36,6 +36,23 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        private bool HasPendingAngle;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (!HasPendingAngle) { VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle"); }
+            VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle;
+            SAVControl.SetProgramVariable("VTOLAngle", VTOLAngle);
+            HasPendingAngle = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             VTOLDefault = (float)SAVControl.GetProgramVariable("VTOLDefaultValue");
@@ -48,7 +65,9 @@ namespace SaccFlightAndVehicles
             IsOwner = EntityControl.IsOwner;
             float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
             VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
-            VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");
+
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -83,6 +102,7 @@ namespace SaccFlightAndVehicles
         }
         private void LateUpdate()
         {
+            if (!StateReady) { return; }
             if (IsOwner)
             {
                 if (!InVR || Selected)
@@ -177,6 +197,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnDeserialization()
         {
+            if (!StateReady) { HasPendingAngle = true; return; }
             if (!IsOwner)
             {
                 //extrapolate VTOLAngle and lerp towards it to smooth out movement

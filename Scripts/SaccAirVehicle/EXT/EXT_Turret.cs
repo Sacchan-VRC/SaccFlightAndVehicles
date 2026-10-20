@@ -107,6 +107,33 @@ namespace SaccFlightAndVehicles
         [SerializeField] private Transform HORSYNC_RAW;
         [SerializeField] private Transform VERTSYNC_RAW;
 #endif
+        private bool HasPendingRotation;
+        private short PendingRotationX;
+        private short PendingRotationY;
+        private short PendingRotationZ;
+        private bool PendingJoinSync;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingRotation)
+            {
+                // Start interpolation at the received pose instead of the prefab pose.
+                L_LastUpdateTime = Time.time - updateInterval;
+                NetworkUpdateTurret_Instant(PendingRotationX, PendingRotationY, PendingRotationZ, false);
+                HasPendingRotation = false;
+            }
+            else { OwnerSend(true, false, false); }
+            if (PendingJoinSync && EntityControl.IsOwner) { SFEXT_O_OnPlayerJoined(); }
+            PendingJoinSync = false;
+        }
         public void SFEXT_L_EntityStart()
         {
 #if UNITY_EDITOR
@@ -129,7 +156,9 @@ namespace SaccFlightAndVehicles
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
             Stabilize_ = Stabilize;
             //enable for 5 seconds to sync turret rotation to late joiners
-            OwnerSend(true, false, false); // set values if owner or no serialization has been recieved
+
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -180,6 +209,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!StateReady) { return; }
             if (Manning)
             {
                 //ROTATION
@@ -412,6 +442,14 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void NetworkUpdateTurret_Instant(short O_RotationX, short O_RotationY, short O_RotationZ, bool Fire)
         {
+            if (!StateReady)
+            {
+                PendingRotationX = O_RotationX;
+                PendingRotationY = O_RotationY;
+                PendingRotationZ = O_RotationZ;
+                HasPendingRotation = true;
+                return;
+            }
             float uDelta = Time.time - L_LastUpdateTime;
             if (uDelta < 0.0001f)
             {
@@ -447,6 +485,14 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void NetworkUpdateTurret(short O_RotationX, short O_RotationY, short O_RotationZ)
         {
+            if (!StateReady)
+            {
+                PendingRotationX = O_RotationX;
+                PendingRotationY = O_RotationY;
+                PendingRotationZ = O_RotationZ;
+                HasPendingRotation = true;
+                return;
+            }
             float uDelta = Time.time - L_LastUpdateTime;
             if (uDelta < 0.0001f)
             {
@@ -487,6 +533,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPlayerJoined()
         {
+            if (!StateReady) { PendingJoinSync = true; return; }
             if (localPlayer.IsOwner(gameObject) && !Manning)
             {
                 SendCustomEventDelayedSeconds(nameof(LateJoinerSend), 7); // needs to run after syncscript
