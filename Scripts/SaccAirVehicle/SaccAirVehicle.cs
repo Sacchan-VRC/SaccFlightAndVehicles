@@ -891,6 +891,7 @@ namespace SaccFlightAndVehicles
             EngineStateInitialized = true;
             // Let the remaining EntityStart handlers finish before notifying them.
             SendCustomEventDelayedFrames(nameof(ApplyPendingEngineState), 1);
+            SendCustomEventDelayedFrames(nameof(ApplyPendingExplode), 1);
         }
         public void SetupGCalcValues()
         {
@@ -1711,6 +1712,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void KillEvent(int killerID, byte weaponType)
         {
+            // Kill notifications received while loading must not use uncached player references.
+            if (!EntityControl || !EntityControl.InitializationComplete || !Utilities.IsValid(localPlayer)) { return; }
             // this exists to tell the killer that they got a kill.
             if (killerID > -1)
             {
@@ -1748,6 +1751,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void Explode()
         {
+            if (!EngineStateInitialized || !EntityControl.InitializationComplete) { HasPendingExplode = true; return; }
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             FallAsleep();
             SetEngineOff();
@@ -1807,6 +1811,21 @@ namespace SaccFlightAndVehicles
             { SendNotLowFuel(); }
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
+        }
+        private bool HasPendingExplode;
+        public void ApplyPendingExplode()
+        {
+            if (!EngineStateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyPendingExplode), 1);
+                return;
+            }
+            if (HasPendingExplode)
+            {
+                HasPendingExplode = false;
+                Explode();
+            }
         }
         public void SFEXT_O_OnPlayerJoined()
         {

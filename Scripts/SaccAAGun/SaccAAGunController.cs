@@ -167,6 +167,12 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (!StateReady)
+                {
+                    _firing = PendingFiring = value;
+                    HasPendingFiring = true;
+                    return;
+                }
                 if (!EntityControl._dead && (Occupied || AI_GUN))
                 {
                     _firing = value;
@@ -184,6 +190,22 @@ namespace SaccFlightAndVehicles
         [UdonSynced] private bool SendTargeted;
         private float SendTargeted_Time;
         const float SENDTARGETED_INTERVAL = 1;
+        private bool StateInitialized;
+        private bool StateReady;
+        private bool HasPendingFiring;
+        private bool PendingFiring;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingFiring) { Firing = PendingFiring; }
+            HasPendingFiring = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
@@ -233,6 +255,8 @@ namespace SaccFlightAndVehicles
             {
                 InstantiateWeapon();
             }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void SFEXT_L_OnEnable()
         {
@@ -639,6 +663,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void KillEvent(int killerID, byte weaponType)
         {
+            // Kill notifications received while loading must not use uncached player references.
+            if (!StateReady || !Utilities.IsValid(localPlayer)) { return; }
             // this exists to tell the killer that they got a kill.
             if (killerID > -1)
             {
@@ -1098,11 +1124,14 @@ namespace SaccFlightAndVehicles
         }
         public override void OnDeserialization()
         {
+            // Missile launches and target warnings are transient; do not replay stale effects.
+            if (!StateReady) { return; }
             if (AAMFireNow) { LaunchAAM(); }
             if (SendTargeted)
             {
                 if (!Manning)
                 {
+                    if (AAMTarget < 0 || AAMTarget >= NumAAMTargets) { return; }
                     var Target = AAMTargets[AAMTarget];
                     if (Target && Target.transform.parent)
                     {

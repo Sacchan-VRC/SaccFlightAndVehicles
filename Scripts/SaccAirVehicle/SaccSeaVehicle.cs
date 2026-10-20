@@ -1136,6 +1136,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void KillEvent(int killerID, byte weaponType)
         {
+            // Kill notifications received while loading must not use uncached player references.
+            if (!EntityControl || !EntityControl.InitializationComplete || !Utilities.IsValid(localPlayer)) { return; }
             // this exists to tell the killer that they got a kill.
             if (killerID > -1)
             {
