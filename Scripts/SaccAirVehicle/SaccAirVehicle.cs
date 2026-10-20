@@ -290,10 +290,22 @@ namespace SaccFlightAndVehicles
         [SerializeField] private Vector3 WreckedSpinForce = new Vector3(2, 3, 4);
         [Header("Debug:")]
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
+        private bool EngineStateInitialized;
+        private bool EngineStateReady;
+        private bool EngineStatePending;
+        private bool PendingEngineOn;
         public bool EngineOn
         {
             set
             {
+                // A late-join state event can arrive before EntityStart.
+                // Keep the latest value without touching the Animator or extensions.
+                if (!EngineStateReady)
+                {
+                    PendingEngineOn = value;
+                    EngineStatePending = true;
+                    return;
+                }
                 //disable thrust vectoring if engine off
                 if (value)
                 {
@@ -353,6 +365,14 @@ namespace SaccFlightAndVehicles
         { EngineOn = true; }
         public void SetEngineOff()
         { EngineOn = false; }
+        public void ApplyPendingEngineState()
+        {
+            if (!EngineStateInitialized) { return; }
+            EngineStateReady = true;
+            if (!EngineStatePending) { return; }
+            EngineStatePending = false;
+            EngineOn = PendingEngineOn;
+        }
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
@@ -868,6 +888,9 @@ namespace SaccFlightAndVehicles
             if (ExplodeHealth > 0) { ExplodeHealth = 0f; }
 
             SetupGCalcValues();
+            EngineStateInitialized = true;
+            // Let the remaining EntityStart handlers finish before notifying them.
+            SendCustomEventDelayedFrames(nameof(ApplyPendingEngineState), 1);
         }
         public void SetupGCalcValues()
         {

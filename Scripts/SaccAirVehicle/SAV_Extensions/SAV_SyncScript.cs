@@ -81,6 +81,14 @@ namespace SaccFlightAndVehicles
         private int UpdatesSentWhileStill;
         private Rigidbody VehicleRigid;
         private bool Initialized = false;
+        private bool HasPendingSync;
+        private double PendingSyncTime;
+        private Vector3 PendingSyncPosition;
+        private Vector3 PendingSyncVelocity;
+        private short PendingSyncRotX;
+        private short PendingSyncRotY;
+        private short PendingSyncRotZ;
+        private short PendingSyncRotW;
         public bool IdleUpdateMode;
         private bool Piloting;
         private int EnterIdleModeNumber;
@@ -188,11 +196,20 @@ namespace SaccFlightAndVehicles
         }
         public void ActivateScript()
         {
-            Initialized = true;
             InitSyncValues();
+            if (!SyncTransform) { SyncTransform = VehicleTransform; }
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
             SetPhysics();
+            Initialized = true;
+            if (HasPendingSync)
+            {
+                HasPendingSync = false;
+                // Start at the newest received pose instead of extrapolating from
+                // the prefab pose across the initialization delay.
+                Deserialization(PendingSyncTime, PendingSyncPosition, PendingSyncRotX,
+                    PendingSyncRotY, PendingSyncRotZ, PendingSyncRotW, PendingSyncVelocity, true);
+            }
             _AntiWarp = AntiWarp; //prevent from running early as it causes vehicle to teleport 500ft in the air for some reason
             if (!SyncRigid) { EntityControl.SendEventToExtensions("SFEXT_L_WakeUp"); } //prevent null exception for non-saccEntity
         }
@@ -540,6 +557,22 @@ namespace SaccFlightAndVehicles
 #else
             if (update_gap < 0.0001f || IsOwner) { return; }
 #endif
+            // ActivateScript's delay must also cover receive-side state changes.
+            if (!Initialized)
+            {
+                if (!HasPendingSync || UpdateTime > PendingSyncTime)
+                {
+                    HasPendingSync = true;
+                    PendingSyncTime = UpdateTime;
+                    PendingSyncPosition = Position;
+                    PendingSyncVelocity = Velocity;
+                    PendingSyncRotX = RotX;
+                    PendingSyncRotY = RotY;
+                    PendingSyncRotZ = RotZ;
+                    PendingSyncRotW = RotW;
+                }
+                return;
+            }
             O_UpdateTime = UpdateTime;
             O_Position = Position;
             O_CurVel = Velocity;

@@ -140,10 +140,21 @@ namespace SaccFlightAndVehicles
         public float TwistThrottleDegrees = 40f;
         private float ThrottleZeroPoint;
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
+        private bool EngineStateInitialized;
+        private bool EngineStateReady;
+        private bool EngineStatePending;
+        private bool PendingEngineOn;
         public bool EngineOn
         {
             set
             {
+                // Buffer state until the Animator and the other extensions are ready.
+                if (!EngineStateReady)
+                {
+                    PendingEngineOn = value;
+                    EngineStatePending = true;
+                    return;
+                }
                 if (value)
                 {
                     if (!_EngineOn)
@@ -171,6 +182,14 @@ namespace SaccFlightAndVehicles
         public void SetEngineOff()
         {
             EngineOn = false;
+        }
+        public void ApplyPendingEngineState()
+        {
+            if (!EngineStateInitialized) { return; }
+            EngineStateReady = true;
+            if (!EngineStatePending) { return; }
+            EngineStatePending = false;
+            EngineOn = PendingEngineOn;
         }
         [System.NonSerializedAttribute] public float AllGs;
 
@@ -543,6 +562,8 @@ namespace SaccFlightAndVehicles
             if (!GroundDetector) { DisableGroundDetection_++; }
 
             SetupGCalcValues();
+            EngineStateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyPendingEngineState), 1);
         }
         public void SetupGCalcValues()
         {
