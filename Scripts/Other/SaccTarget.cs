@@ -36,6 +36,18 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SaccEntity LastAttacker;
         bool dead;
         float lastUpdateTime;
+        private bool StateInitialized;
+        private bool StateReady;
+        private bool HasPendingState;
+        private bool HasPendingOwnership;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            StateReady = true;
+            if (HasPendingOwnership && Networking.IsOwner(gameObject) && dead) { SendNetworkUpdate(); }
+            if (HasPendingState) { OnDeserialization(); }
+            HasPendingOwnership = HasPendingState = false;
+        }
         void Start()
         {
             TargetAnimator = gameObject.GetComponent<Animator>();
@@ -44,6 +56,8 @@ namespace SaccFlightAndVehicles
             TargetAnimator.SetBool("dead", false);
             TargetAnimator.SetFloat("healthpc", Health / FullHealth);
             if (ArmorStrength == 0) ArmorStrength = 0.000001f;
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         void OnParticleCollision(GameObject other)
         {
@@ -178,6 +192,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void SendDamageEvent(float dmg, byte weaponType)
         {
+            // A damage notification while loading is superseded by the synchronized health.
+            if (!StateReady) { return; }
             if (dead) return;
             LastHitByPlayer = NetworkCalling.CallingPlayer;
             LastHitDamage = dmg;
@@ -196,6 +212,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void KillEvent(int killerID, byte weaponType)
         {
+            if (!StateReady || !Utilities.IsValid(localPlayer)) { return; }
             // this exists to tell the killer that they got a kill.
             if (killerID > -1)
             {
@@ -235,6 +252,7 @@ namespace SaccFlightAndVehicles
         }
         public void RespawnTarget()
         {
+            if (!StateReady) { return; }
             if (!localPlayer.IsOwner(gameObject))
             { Networking.SetOwner(localPlayer, gameObject); }
             respawning = false;
@@ -258,6 +276,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
+            if (!StateReady) { HasPendingOwnership = true; return; }
             if (!player.isLocal) return;
             if (dead)
             {
@@ -266,6 +285,7 @@ namespace SaccFlightAndVehicles
         }
         public void Explode()
         {
+            if (!StateReady) { return; }
             if (!localPlayer.IsOwner(gameObject)) return;
             Health = 0;
             SendNetworkUpdate();
@@ -287,6 +307,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnDeserialization()
         {
+            if (!StateReady) { HasPendingState = true; return; }
             if (Time.time - PredictExplode_Time < 1) return;
             lastUpdateTime = Time.time;
             if (Health < HPlast)
