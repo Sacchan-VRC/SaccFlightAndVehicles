@@ -98,6 +98,18 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;
         bool inVR;
         private UdonSharpBehaviour SoundControl;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+        }
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -131,6 +143,8 @@ namespace SaccFlightAndVehicles
                     InstantiateWeapon();
                 }
             }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         private GameObject InstantiateWeapon()
         {
@@ -301,6 +315,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchBombs_Event()
         {
+            // Do not replay a shot received before the projectile pool is initialized.
+            if (!StateReady) { return; }
             //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
             bool swappedOwner = false;
             if (NetworkCalling.InNetworkCall)

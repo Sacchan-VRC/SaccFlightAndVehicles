@@ -143,6 +143,18 @@ namespace SaccFlightAndVehicles
         private bool DoAnimFiredTrigger = false;
         private float reloadspeed;
         private bool Piloting;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+        }
         public void SFEXT_L_EntityStart()
         {
             TrackedTransform = transform;//avoid null
@@ -172,6 +184,8 @@ namespace SaccFlightAndVehicles
                     InstantiateWeapon();
                 }
             }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void ReInitNumMissiles()//set FullAGMs then run this to change vehicles max AGMs
         {
@@ -480,6 +494,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAGMs_Event(Vector3 inputLocation)
         {
+            // Do not replay a shot received before the projectile pool is initialized.
+            if (!StateReady) { return; }
             //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
             bool swappedOwner = false;
             if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
@@ -588,6 +604,7 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAGM_Owner()
         {
+            if (!StateReady) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAGMs_Event), TrackedTransform_Local.TransformPoint(TrackedObjectOffset_Local));
         }
     }

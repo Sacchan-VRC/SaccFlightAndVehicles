@@ -114,6 +114,26 @@ namespace SaccFlightAndVehicles
         private bool DoAnimFiredTrigger;
         private int NumChildrenStart;
         private VRCPlayerApi localPlayer;
+        private bool StateInitialized;
+        private bool StateReady;
+        private bool HasPendingLockState;
+        private bool PendingLockState;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingLockState)
+            {
+                if (PendingLockState) { AAMLockedTrue(); }
+                else { AAMLockedFalse(); }
+            }
+            HasPendingLockState = false;
+        }
         public void SFEXT_L_EntityStart()
         {
             FullAAMs = NumAAM;
@@ -163,6 +183,8 @@ namespace SaccFlightAndVehicles
             if (!TargetingTransform)
             { TargetingTransform = VehicleTransform; }
             if (AnimLockedOnBoolName != string.Empty) { DoLockedBool = true; }
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void ReInitNumMissiles()//set FullAAMs then run this to change vehicles max AAMs
         {
@@ -610,6 +632,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchAAMs_Event(ushort TargetID)
         {
+            // Do not replay a shot received before the projectile pool is initialized.
+            if (!StateReady) { return; }
             //temporarily set IsOwner to the correct player so that the projectile gets the correct owner in cases where firer is not script owner
             bool swappedOwner = false;
             if ((NetworkCalling.CallingPlayer.isLocal && !IsOwner) || (!NetworkCalling.CallingPlayer.isLocal && IsOwner))
@@ -717,6 +741,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void TargetedAlarm(ushort TargetID)
         {
+            // Target warnings are transient; a later warning uses the current target.
+            if (!StateReady || TargetID >= NumAAMTargets) { return; }
             AAMTarget = TargetID;
             var Target = AAMTargets[TargetID];
             if (Target && Target.transform.parent)
@@ -729,11 +755,13 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void AAMLockedTrue()
         {
+            if (!StateReady) { HasPendingLockState = true; PendingLockState = true; return; }
             if (!EntityControl.Occupied) return;
             AAMLocked = true;
         }
         public void AAMLockedFalse()
         {
+            if (!StateReady) { HasPendingLockState = true; PendingLockState = false; return; }
             AAMLocked = false;
         }
     }

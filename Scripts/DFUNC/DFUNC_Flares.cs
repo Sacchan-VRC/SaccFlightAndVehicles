@@ -38,6 +38,18 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         private float FlareLaunchTime;
+        private bool StateInitialized;
+        private bool StateReady;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+        }
         public void DFUNC_Selected()
         {
             Selected = true;
@@ -54,6 +66,8 @@ namespace SaccFlightAndVehicles
             reloadspeed = FullFlares / FullReloadTimeSec;
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
             InVR = EntityControl.InVR;
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
         }
         public void ReInitNumFlares()//set FullFlares then run this to change vehicles max flares
         {
@@ -192,6 +206,8 @@ namespace SaccFlightAndVehicles
         [NetworkCallable]
         public void LaunchFlare_Owner()
         {
+            // Do not replay a flare burst received before initialization.
+            if (!StateReady) { return; }
             for (int i = 0; i < NumFlare_PerShot; i++)
             {
                 LaunchFlare();
