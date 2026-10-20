@@ -74,6 +74,7 @@ namespace SaccFlightAndVehicles
         private bool InEditor = false;
         private float FloatDiameter;
         private int FPLength;
+        private bool StateInitialized;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         void Start()
         {
@@ -115,6 +116,7 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
                 SAVControl.SetProgramVariable("Taxiing", false);
             }
+            StateInitialized = true;
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -154,6 +156,8 @@ namespace SaccFlightAndVehicles
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
         {
+            // EntityStart will activate the floats for the current owner after initialization.
+            if (!StateInitialized || !Utilities.IsValid(localPlayer)) { return; }
             if (!HoverBike && localPlayer.IsOwner(VehicleRigidbody.gameObject))
             { gameObject.SetActive(true); }
         }

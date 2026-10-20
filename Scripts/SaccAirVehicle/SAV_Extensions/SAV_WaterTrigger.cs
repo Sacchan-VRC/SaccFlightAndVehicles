@@ -23,14 +23,34 @@ namespace SaccFlightAndVehicles
         private int NumTriggers = 0;
         private bool InWater;
         private Collider ThisCollider;
-        private bool Initilized;
+        private bool StateInitialized;
+        private bool StateReady;
+        private bool HasPendingState;
+        private bool PendingState;
         private bool DisableTaxiRotation;
+        public void ApplyInitialState()
+        {
+            if (StateReady || !StateInitialized) { return; }
+            if (!EntityControl.InitializationComplete)
+            {
+                SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
+                return;
+            }
+            StateReady = true;
+            if (HasPendingState)
+            {
+                if (PendingState) { SendEnterWater(); }
+                else { SendExitWater(); }
+            }
+            HasPendingState = false;
+        }
         public void SFEXT_L_EntityStart()
         {
-            Initilized = true;
             WaterLayer = LayerMask.NameToLayer("Water");
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             ThisCollider = gameObject.GetComponent<Collider>();
+            StateInitialized = true;
+            SendCustomEventDelayedFrames(nameof(ApplyInitialState), 1);
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             {
@@ -52,6 +72,7 @@ namespace SaccFlightAndVehicles
         }
         private void OnTriggerEnter(Collider other)
         {
+            if (!StateInitialized) { return; }
             if (other && other.gameObject.layer == WaterLayer)
             {
                 NumTriggers += 1;
@@ -67,6 +88,7 @@ namespace SaccFlightAndVehicles
         }
         private void OnTriggerExit(Collider other)
         {
+            if (!StateInitialized) { return; }
             if (other && other.gameObject.layer == WaterLayer)
             {
                 NumTriggers -= 1;
@@ -85,6 +107,7 @@ namespace SaccFlightAndVehicles
         }
         public void SendEnterWater()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = true; return; }
             EntityControl.SendEventToExtensions("SFEXT_G_EnterWater");
             if (!DisableTaxiRotation)
             {
@@ -94,6 +117,7 @@ namespace SaccFlightAndVehicles
         }
         public void SendExitWater()
         {
+            if (!StateReady) { HasPendingState = true; PendingState = false; return; }
             EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
             if (DisableTaxiRotation)
             {
@@ -104,11 +128,12 @@ namespace SaccFlightAndVehicles
         //collider enabled and disabled so that it does ontriggerenter on enable
         private void OnEnable()
         {
-            if (!Initilized) { return; }//for test mode when onenable runs before ECStart
+            if (!StateInitialized) { return; }//for test mode when onenable runs before ECStart
             ThisCollider.enabled = true;
         }
         private void OnDisable()
         {
+            if (!StateInitialized) { return; }
             ThisCollider.enabled = false;
             if (SAVControl)
             {
