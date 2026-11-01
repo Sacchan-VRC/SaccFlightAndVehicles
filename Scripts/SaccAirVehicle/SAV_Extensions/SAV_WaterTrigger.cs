@@ -45,7 +45,7 @@ namespace SaccFlightAndVehicles
             if (InWater)
             {
                 float DeltaTime = Time.deltaTime;
-                if (SAVControl) { SAVControl.SetProgramVariable("Health", (float)SAVControl.GetProgramVariable("Health") - (WaterDamageSec * DeltaTime)); }
+                if (SAVControl) { SAVControl.SetProgramVariable("Health_", (float)SAVControl.GetProgramVariable("Health_") - (WaterDamageSec * DeltaTime)); }
                 VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, WaterSlowDown * DeltaTime);
                 VehicleRigidbody.angularVelocity = Vector3.Lerp(VehicleRigidbody.angularVelocity, Vector3.zero, WaterSlowDownRot * DeltaTime);
             }
@@ -61,7 +61,7 @@ namespace SaccFlightAndVehicles
                 if (!ApplyPhysOverridden)
                 {
                     ApplyPhysOverridden = true;
-                    if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") + 1); }
+                    if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication_", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication_") + 1); }
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace SaccFlightAndVehicles
                     if (ApplyPhysOverridden)
                     {
                         ApplyPhysOverridden = false;
-                        if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") - 1); }
+                        if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication_", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication_") - 1); }
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace SaccFlightAndVehicles
             EntityControl.SendEventToExtensions("SFEXT_G_EnterWater");
             if (!DisableTaxiRotation)
             {
-                if (SAVControl) { SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1); }
+                if (SAVControl) { SAVControl.SetProgramVariable("DisableTaxiRotation_", (int)SAVControl.GetProgramVariable("DisableTaxiRotation_") + 1); }
                 DisableTaxiRotation = true;
             }
         }
@@ -97,7 +97,7 @@ namespace SaccFlightAndVehicles
             EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
             if (DisableTaxiRotation)
             {
-                if (SAVControl) { SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1); }
+                if (SAVControl) { SAVControl.SetProgramVariable("DisableTaxiRotation_", (int)SAVControl.GetProgramVariable("DisableTaxiRotation_") - 1); }
                 DisableTaxiRotation = false;
             }
         }
@@ -113,7 +113,7 @@ namespace SaccFlightAndVehicles
             if (SAVControl)
             {
                 if (InWater && WaterDamageSec > 0)
-                { SAVControl.SetProgramVariable("Health", -1); }//just kill the vehicle if it's underwater and the player gets out
+                { SAVControl.SetProgramVariable("Health_", -1); }//just kill the vehicle if it's underwater and the player gets out
             }
             InWater = false;
             NumTriggers = 0;
@@ -123,7 +123,7 @@ namespace SaccFlightAndVehicles
             if (ApplyPhysOverridden)
             {
                 ApplyPhysOverridden = false;
-                if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") - 1); }
+                if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication_", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication_") - 1); }
             }
         }
         public void SFEXT_G_RespawnButton()
@@ -131,7 +131,7 @@ namespace SaccFlightAndVehicles
             if (ApplyPhysOverridden)
             {
                 ApplyPhysOverridden = false;
-                if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") - 1); }
+                if (SAVControl) { SAVControl.SetProgramVariable("DisablePhysicsApplication_", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication_") - 1); }
             }
         }
         public void SFEXT_O_TakeOwnership()
