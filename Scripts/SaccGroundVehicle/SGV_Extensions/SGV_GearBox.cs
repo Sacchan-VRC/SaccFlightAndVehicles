@@ -296,7 +296,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_P_PassengerEnter()
         {
-            SGVControl.SetProgramVariable("Clutch", 0);// prevent passengers from seeing as if clutch is always pressed
+            SGVControl.SetProgramVariable("Clutch", 0f);// prevent passengers from seeing as if clutch is always pressed
         }
         public void SFEXT_O_PilotExit()
         {
