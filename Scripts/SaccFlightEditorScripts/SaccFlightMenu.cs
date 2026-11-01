@@ -86,7 +86,7 @@ namespace SaccFlightAndVehicles
             }
         }
     }
-    public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
+    public class SetObjectReferences : IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 10;
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
