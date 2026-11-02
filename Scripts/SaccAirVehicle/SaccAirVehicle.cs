@@ -1,4 +1,4 @@
-
+﻿
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -166,6 +166,12 @@ namespace SaccFlightAndVehicles
         public float TaxiFullTurningSpeed = 20f;
         [Tooltip("Changes suspension paramater ally to disable suspension down on V1 speed to avoid sticky wheels.")]
         public bool WheelSuspension = false;
+        [Tooltip("Changes suspension paramater mode. true: Spring weeking & shorting. false: Spring shorting(legacy).")]
+        public bool WheelSuspension_DryingModeSelector = true;
+        [Tooltip("Changes suspension paramater multipler. 1: disable on V1, 1++: disable on v<V1, 1--: disable on v>V1")]
+        public float WheelSuspension_DryingMultiplier_Lift = 1.2f;
+        [Tooltip("Changes suspension paramater multipler. Pitch-moment multiplier to disable suspension. Higher = disable suspension easily")]
+        public float WheelSuspension_DryingMultiplier_Rotation = 2f;
         [Tooltip("Adjust how steep the lift curve is. Higher = more lift")]
         public float Lift = 0.00015f;
         [Tooltip("How much angle of attack on yaw turns the vehicle. Yaw steering strength in air")]
@@ -482,6 +488,9 @@ namespace SaccFlightAndVehicles
 
         private float[] initSuspensionDistance;
         private float[] initTargetPosition;
+        private float[] initWheelSpringStrength;
+        private float[] initWheelDampStrength;
+        private float[] onWheelRotationAccel;
 
         [System.NonSerializedAttribute] public bool LowFuelLastFrame;
         [System.NonSerializedAttribute] public bool NoFuelLastFrame;
@@ -772,29 +781,35 @@ namespace SaccFlightAndVehicles
             EnableLiftSurfaces(IsOwner);
 
             VehicleWheelColliders = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
+
+            float RBMass = VehicleRigidbody.mass;
+            foreach (WheelCollider wheel in VehicleWheelColliders)
+            {
+                wheel.mass *= RBMass;
+                    JointSpring SusiSpring = wheel.suspensionSpring;
+                SusiSpring.spring *= RBMass;
+                SusiSpring.damper *= RBMass;
+                wheel.suspensionSpring = SusiSpring;
+            }
             if (VehicleWheelColliders.Length != 0)
             {
                 HasWheelColliders = true;
 
                 initSuspensionDistance = new float[VehicleWheelColliders.Length];
                 initTargetPosition = new float[VehicleWheelColliders.Length];
+                initWheelSpringStrength = new float[VehicleWheelColliders.Length];
+                initWheelDampStrength = new float[VehicleWheelColliders.Length];
+                onWheelRotationAccel = new float[VehicleWheelColliders.Length];
 
                 for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
                 {
                     WheelCollider wheel = VehicleWheelColliders[wheelIndex];
                     initSuspensionDistance[wheelIndex] = wheel.suspensionDistance;
-                    initTargetPosition[wheelIndex] = wheel.suspensionSpring.targetPosition;
+                    JointSpring SusiSpring = wheel.suspensionSpring;
+                    initTargetPosition[wheelIndex] = SusiSpring.targetPosition;
+                    initWheelSpringStrength[wheelIndex] = SusiSpring.spring;
+                    initWheelDampStrength[wheelIndex] = SusiSpring.damper;//fetch wheel paramaters after suspension parameters are multiplied by rigidbody mass.
                 }
-            }
-
-            float RBMass = VehicleRigidbody.mass;
-            foreach (WheelCollider wheel in VehicleWheelColliders)
-            {
-                wheel.mass *= RBMass;
-                JointSpring SusiSpring = wheel.suspensionSpring;
-                SusiSpring.spring *= RBMass;
-                SusiSpring.damper *= RBMass;
-                wheel.suspensionSpring = SusiSpring;
             }
 
             VehicleAnimator = EntityControl.GetComponent<Animator>();
@@ -810,6 +825,7 @@ namespace SaccFlightAndVehicles
             RollThrustVecMultiStart = RollThrustVecMulti;
 
             CenterOfMass = EntityControl.CenterOfMass;
+            CenterOfMass.rotation = VehicleRigidbody.rotation;//wheel suspension dryier use this .InverseTransformPoint to find rigidbody-local torque calculation.
             SetCoMMeshOffset();
 
             if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
@@ -1561,15 +1577,46 @@ namespace SaccFlightAndVehicles
 
                         if (HasWheelColliders && WheelSuspension)
                         {
-                            float suspensionDownCof = LiftAcc.y / VehicleRigidbody.mass / 9.81f;
-                            suspensionDownCof = Mathf.Clamp(suspensionDownCof, 0, 1);
-                            for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
+                            if (WheelSuspension_DryingModeSelector)
                             {
-                                WheelCollider wheel = VehicleWheelColliders[wheelIndex];
-                                wheel.suspensionDistance = initSuspensionDistance[wheelIndex] - initSuspensionDistance[wheelIndex] * suspensionDownCof * initTargetPosition[wheelIndex];
-                                JointSpring wheelSpring = wheel.suspensionSpring;
-                                wheelSpring.targetPosition = initTargetPosition[wheelIndex] * (1 - suspensionDownCof);
-                                wheel.suspensionSpring = wheelSpring;
+                                float suspensionDisableInterpolation = LiftAcc.y / 9.81f * WheelSuspension_DryingMultiplier_Lift;
+
+                                Quaternion PitchingRot;
+                                if (PitchMoment)
+                                {
+                                    PitchingRot = Quaternion.Euler(Mathf.Max(0, -Pitching.y) * Mathf.Rad2Deg * -CenterOfMass.transform.InverseTransformPoint(PitchMoment.position).z, 0, 0);
+                                }
+                                else
+                                {
+                                    PitchingRot = Quaternion.Euler(Mathf.Max(0, -Pitching.x) * Mathf.Rad2Deg * 9.81f, 0, 0);
+                                }
+                                for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
+                                {
+                                    WheelCollider wheel = VehicleWheelColliders[wheelIndex];
+                                    Vector3 onVehiclePos = CenterOfMass.transform.InverseTransformPoint(wheel.transform.position);
+                                    Vector3 torquedPos;
+                                    torquedPos = PitchingRot * onVehiclePos;
+                                    float onWheelRotationAccel = Mathf.Max(0, +(torquedPos.y - onVehiclePos.y) / 9.81f * WheelSuspension_DryingMultiplier_Rotation);
+
+                                    JointSpring wheelSpring = wheel.suspensionSpring;
+                                    wheelSpring.spring = initWheelSpringStrength[wheelIndex] * (1 - Mathf.Clamp01(suspensionDisableInterpolation + onWheelRotationAccel));
+                                    wheelSpring.damper = initWheelDampStrength[wheelIndex] * (1 - Mathf.Clamp01(suspensionDisableInterpolation + onWheelRotationAccel));
+                                    //wheelSpring.targetPosition = initTargetPosition[wheelIndex] * (1 - suspensionDisableInterpolation);
+                                    wheel.suspensionSpring = wheelSpring;
+                                }
+                            }
+                            else
+                            {
+                                float suspensionDownCof = LiftAcc.y / VehicleRigidbody.mass / 9.81f;
+                                suspensionDownCof = Mathf.Clamp(suspensionDownCof, 0, 1);
+                                for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
+                                {
+                                    WheelCollider wheel = VehicleWheelColliders[wheelIndex];
+                                    wheel.suspensionDistance = initSuspensionDistance[wheelIndex] - initSuspensionDistance[wheelIndex] * suspensionDownCof * initTargetPosition[wheelIndex];
+                                    JointSpring wheelSpring = wheel.suspensionSpring;
+                                    wheelSpring.targetPosition = initTargetPosition[wheelIndex] * (1 - suspensionDownCof);
+                                    wheel.suspensionSpring = wheelSpring;
+                                }
                             }
                         }
 
