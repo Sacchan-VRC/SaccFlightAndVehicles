@@ -362,6 +362,36 @@ namespace SaccFlightAndVehicles
             if (AfterburnerOn) { SetAfterburnerOff(); }
             EngineOn = false;
         }
+        //use this to set the throttle from other scripts, setting PlayerThrottle directly gets overwritten while the pilot is holding the VR throttle
+        public void SetPlayerThrottle(float value)
+        {
+            PlayerThrottle = ThrottleInput = value;
+            if (ThrottleGripLastFrame)
+            {
+                //move the grab's starting point to the new throttle position so the throttle continues from here
+                TempThrottle = value;
+                ThrottleZeroPoint = HandDistanceZLastFrame = GetHandThrottleAxis();
+            }
+        }
+        private float GetHandThrottleAxis()
+        {
+            Vector3 handdistance;
+            if (SwitchHandsJoyThrottle)
+            {
+                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+            }
+            else
+            {
+                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+            }
+            handdistance = ControlsRoot.InverseTransformDirection(handdistance);
+
+            if (VerticalThrottle)
+            {
+                return handdistance.y;
+            }
+            return handdistance.z;
+        }
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
@@ -1114,26 +1144,7 @@ namespace SaccFlightAndVehicles
                         //VR Throttle
                         if (ThrottleGrip > GripSensitivity && !_DisableThrottleControl)
                         {
-                            Vector3 handdistance;
-                            if (SwitchHandsJoyThrottle)
-                            {
-                                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                            }
-                            else
-                            {
-                                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                            }
-                            handdistance = ControlsRoot.InverseTransformDirection(handdistance);
-
-                            float HandThrottleAxis;
-                            if (VerticalThrottle)
-                            {
-                                HandThrottleAxis = handdistance.y;
-                            }
-                            else
-                            {
-                                HandThrottleAxis = handdistance.z;
-                            }
+                            float HandThrottleAxis = GetHandThrottleAxis();
 
                             if (!ThrottleGripLastFrame)
                             {
